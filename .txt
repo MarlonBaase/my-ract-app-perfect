@@ -1,0 +1,50 @@
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import React, { useState } from 'react';
+
+
+  const [number, setNumber] = useState(1);
+
+  const handleChange = (event) => {
+    setNumber(Number(event.target.value)); // ✅ String → Zahl
+  };
+
+  const daten = [
+    { name: 'Gruppe A', wert: number },
+    { name: 'Gruppe B', wert: 300 },
+    { name: 'Gruppe C', wert: 300 },
+    { name: 'Gruppe D', wert: 200 },
+  ];
+
+const FARBEN = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <input 
+        type="number" 
+        value={number} 
+        onChange={handleChange} 
+        placeholder="Schreibe etwas..."
+      />
+      <h2>Mein Kreisdiagramm</h2>
+      <PieChart width={400} height={400}>
+        <Pie
+          data={daten}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+          outerRadius={150}
+          fill="#8884d8"
+          dataKey="wert"
+        >
+          {daten.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={FARBEN[index % FARBEN.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </div>
+  );
+

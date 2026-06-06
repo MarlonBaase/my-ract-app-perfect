@@ -1,0 +1,18 @@
+/* Standard: Light Mode */
+.app-container {
+  background-color: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+}
+
+/* Dark Mode */
+.app-container.dark,
+body.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+nav a {
+    text-decoration: none;
+    color:#000000
+}
