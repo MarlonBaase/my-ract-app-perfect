@@ -37,11 +37,13 @@ export default function Haushaltsbuch() {
     const { data: ausgaben } = await supabase
       .from("haushaltsbuch")
       .select("*")
+      .eq("user_id", user.id)  // ← fehlt noch
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
       .from("einnahmen")
       .select("*")
+      .eq("user_id", user.id)  // ← fehlt noch
       .order("erstellt_am", { ascending: false });
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
@@ -121,6 +123,17 @@ export default function Haushaltsbuch() {
     })
     setNeueKategorie("")
     ladeKategorien()
+  }
+
+
+  const eintragLoeschen = async (id, typ) => {
+    if (typ === "ausgabe") {
+      await supabase.from("haushaltsbuch").delete().eq("id", id)
+    }
+    if (typ === "einnahme") {
+      await supabase.from("einnahmen").delete().eq("id", id)
+    }
+    ladeAlles()
   }
 
   return (
@@ -206,10 +219,12 @@ export default function Haushaltsbuch() {
         <button onClick={kategorieHinzufuegen}>Kategorie hinzufügen</button>
       </div>
 
+
       <ul>
         {eintraege.map((e) => (
           <li key={e.id + e.typ}>
-            {e.beschreibung}: {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
+            {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
+            <button onClick={() => eintragLoeschen(e.id, e.typ)}>Löschen</button>
           </li>
         ))}
       </ul>
