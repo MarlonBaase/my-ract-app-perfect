@@ -10,9 +10,14 @@ export default function Haushaltsbuch() {
   const [eintraege, setEintraege] = useState([]);
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
+  const [kategorien, setKategorien] = useState([])
+  const [ausgabeKategorie, setAusgabeKategorie] = useState("")
+  const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
+  const [neueKategorie, setNeueKategorie] = useState("")
 
   useEffect(() => {
     ladeAlles();
+    ladeKategorien();
   }, []);
 
   const ladeAlles = async () => {
@@ -68,34 +73,55 @@ export default function Haushaltsbuch() {
   };
 
   const ausgabeHinzufuegen = async () => {
-    if (!beschreibung || !betrag) return;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (!beschreibung || !betrag || !ausgabeKategorie) return
+    const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("haushaltsbuch").insert({
       user_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
-    });
-    setBeschreibung("");
-    setBetrag("");
-    ladeAlles();
-  };
+      kategorie: ausgabeKategorie
+    })
+    setBeschreibung("")
+    setBetrag("")
+    setAusgabeKategorie("")
+    ladeAlles()
+  }
 
   const einnahmeHinzufuegen = async () => {
-    if (!einnahmenBeschreibung || !einnahmenBetrag) return;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
+    const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("einnahmen").insert({
       user_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
-    });
-    setEinnahmenBeschreibung("");
-    setEinnahmenBetrag("");
-    ladeAlles();
-  };
+      kategorie: einnahmeKategorie
+    })
+    setEinnahmenBeschreibung("")
+    setEinnahmenBetrag("")
+    setEinnahmeKategorie("")
+    ladeAlles()
+  }
+
+  const ladeKategorien = async () => {
+    const { data } = await supabase
+      .from("kategorien")
+      .select("*")
+      .order("name", { ascending: true })
+
+    if (data) setKategorien(data)
+  }
+
+  const kategorieHinzufuegen = async () => {
+    if (!neueKategorie) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from("kategorien").insert({
+      user_id: user.id,
+      name: neueKategorie,
+      ist_vordefiniert: false
+    })
+    setNeueKategorie("")
+    ladeKategorien()
+  }
 
   return (
     <div>
@@ -129,6 +155,17 @@ export default function Haushaltsbuch() {
           placeholder="Betrag"
           type="number"
         />
+        <select
+          value={ausgabeKategorie}
+          onChange={(e) => setAusgabeKategorie(e.target.value)}
+        >
+          <option value="">Kategorie wählen</option>
+          {kategorien.map((k) => (
+            <option key={k.id} value={k.name}>
+              {k.name}
+            </option>
+          ))}
+        </select>
         <button onClick={ausgabeHinzufuegen}>Ausgabe hinzufügen</button>
       </div>
 
@@ -145,7 +182,28 @@ export default function Haushaltsbuch() {
           placeholder="Betrag"
           type="number"
         />
+        <select
+          value={einnahmeKategorie}
+          onChange={(e) => setEinnahmeKategorie(e.target.value)}
+        >
+          <option value="">Kategorie wählen</option>
+          {kategorien.map((k) => (
+            <option key={k.id} value={k.name}>
+              {k.name}
+            </option>
+          ))}
+        </select>
         <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
+      </div>
+
+      <div>
+        <h4>Eigene Kategorie hinzufügen</h4>
+        <input
+          value={neueKategorie}
+          onChange={(e) => setNeueKategorie(e.target.value)}
+          placeholder="z.B. 🎮 Gaming"
+        />
+        <button onClick={kategorieHinzufuegen}>Kategorie hinzufügen</button>
       </div>
 
       <ul>
