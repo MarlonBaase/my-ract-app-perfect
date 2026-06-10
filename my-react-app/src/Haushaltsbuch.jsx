@@ -14,10 +14,22 @@ export default function Haushaltsbuch() {
   const [ausgabeKategorie, setAusgabeKategorie] = useState("")
   const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
   const [neueKategorie, setNeueKategorie] = useState("")
+  const [modalOffen, setModalOffen] = useState(false)  // sichtbar: true oder false, nicht ""
+  const [zuBearbeiten, setZuBearbeiten] = useState(null) // kein Eintrag am Anfang = null
+  const [editBeschreibung, setEditBeschreibung] = useState("")
+  const [editBetrag, setEditBetrag] = useState("")
+  const [editKategorie, setEditKategorie] = useState("")
+  const [wiederkehrende, setWiederkehrende] = useState([]);
+  const [beschreibungInter, setBeschreibungInter] = useState("");
+  const [betragInter, setBetragInter] = useState("");
+  const [kategorieInter, setkategorieInter] = useState("");
+  const [typInter, setTypInter] = useState("");
+  const [intervall, setIntervall] = useState("");
 
   useEffect(() => {
     ladeAlles();
     ladeKategorien();
+    ladeWiederkehrende();
   }, []);
 
   const ladeAlles = async () => {
@@ -136,6 +148,71 @@ export default function Haushaltsbuch() {
     ladeAlles()
   }
 
+  const bearbeitenOeffnen = (eintrag) => {
+    setZuBearbeiten(eintrag)
+    setEditBeschreibung(eintrag.beschreibung)
+    setEditBetrag(eintrag.betrag)
+    setEditKategorie(eintrag.kategorie)
+    setModalOffen(true)
+  }
+
+  const bearbeitenSchliessen = () => {
+    setModalOffen(false)
+    setZuBearbeiten(null)
+    setEditBeschreibung("")
+    setEditBetrag("")
+    setEditKategorie("")
+  }
+
+  const eintragSpeichern = async (id, typ) => {
+    if (typ === "ausgabe") {
+      await supabase.from("haushaltsbuch").update({
+        beschreibung: editBeschreibung,
+        betrag: parseFloat(editBetrag),
+        kategorie: editKategorie
+      }).eq("id", id)
+    }
+    if (typ === "einnahme") {
+      await supabase.from("einnahmen").update({
+        beschreibung: editBeschreibung,
+        betrag: parseFloat(editBetrag),
+        kategorie: editKategorie
+      }).eq("id", id)
+    }
+    bearbeitenSchliessen()
+    ladeAlles()
+  }
+
+  const ladeWiederkehrende = async () => {
+    const { data } = await supabase
+      .from("wiederkehrend")
+      .select("*")
+      .order("erstellt_am", { ascending: false })
+
+    if (data) setWiederkehrende(data)
+  }
+
+  const wiederkehrendHinzufuegen = async () => {
+    if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !Intervall) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from("wiederkehrend").insert({
+      user_id: user.id,
+      beschreibung: beschreibungInter,  // Spaltenname: Wert
+      betrag: parseFloat(betragInter),  // betragInter nicht betrag!
+      kategorie: kategorieInter,
+      typ: typInter,
+      intervall: intervall,
+      naechste_faelligkeit: new Date().toISOString().split("T")[0]  // vergessen!
+    })
+
+    setBeschreibungInter("")
+    setBetragInter("")
+    setkategorieInter("")
+    setTypInter("")
+    setIntervall("")
+    ladeWiederkehrende()
+  }
+
   return (
     <div>
       <h2>Haushaltsbuch</h2>
@@ -218,13 +295,105 @@ export default function Haushaltsbuch() {
         />
         <button onClick={kategorieHinzufuegen}>Kategorie hinzufügen</button>
       </div>
+      {modalOffen && (
+        <div style={{
+          // Overlay: deckt die ganze Seite ab
+          position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
+          top: 0, left: 0,      // startet oben links
+          width: "100%", height: "100%",  // bedeckt die ganze Seite
+          backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
+          display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
+        }}>
+          <div style={{
+            // Modal Box: das eigentliche Fenster
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            minWidth: "300px"
+          }}>
+            {/* dein bisheriger Modal Inhalt hier */}
 
+            <div>
+              <h4>Eintrag bearbeiten</h4>
+              <input
+                value={editBeschreibung}
+                onChange={(e) => setEditBeschreibung(e.target.value)}
+                placeholder="Beschreibung"
+              />
+              <input
+                value={editBetrag}
+                onChange={(e) => setEditBetrag(e.target.value)}
+                placeholder="Betrag"
+                type="number"
+              />
+              <select
+                value={editKategorie}
+                onChange={(e) => setEditKategorie(e.target.value)}
+              >
+                <option value="">Kategorie wählen</option>
+                {kategorien.map((k) => (
+                  <option key={k.id} value={k.name}>
+                    {k.name}
+                  </option>
+                ))}
+              </select>
+              <button onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}>Speichern</button>
+              <button onClick={bearbeitenSchliessen}>Abbrechen</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      
+            <div>
+              <h4>Wiederkehrenden Eintrag hinzufügen</h4>
+              <input
+                value={beschreibungInter}
+                onChange={(e) => setBeschreibungInter(e.target.value)}
+                placeholder="Beschreibung"
+              />
+              <input
+                value={betragInter}
+                onChange={(e) => setBetragInter(e.target.value)}
+                placeholder="Betrag"
+                type="number"
+              />
+              <select value={typInter} onChange={(e) => setTypInter(e.target.value)}>
+                <option value="">Typ wählen</option>
+                <option value="ausgabe">Ausgabe</option>
+                <option value="einnahme">Einnahme</option>
+              </select>
+              <select
+                value={kategorieInter}
+                onChange={(e) => setkategorieInter(e.target.value)}
+              >
+                <option value="">Kategorie wählen</option>
+                {kategorien.map((k) => (
+                  <option key={k.id} value={k.name}>
+                    {k.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={Intervall}
+                onChange={(e) => setIntervall(e.target.value)}
+              >
+                <option value="">Intervall wählen</option>
+                <option value="täglich">Täglich</option>
+                <option value="wöchentlich">Wöchentlich</option>
+                <option value="monatlich">Monatlich</option>
+                <option value="jährlich">Jährlich</option>
+              </select>
+             <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
+          </div>
 
       <ul>
         {eintraege.map((e) => (
           <li key={e.id + e.typ}>
             {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
-            <button onClick={() => eintragLoeschen(e.id, e.typ)}>Löschen</button>
+            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+            <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
           </li>
         ))}
       </ul>
