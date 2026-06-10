@@ -193,7 +193,7 @@ export default function Haushaltsbuch() {
   }
 
   const wiederkehrendHinzufuegen = async () => {
-    if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !Intervall) return
+    if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !intervall) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("wiederkehrend").insert({
       user_id: user.id,
@@ -376,7 +376,7 @@ export default function Haushaltsbuch() {
                 ))}
               </select>
               <select
-                value={Intervall}
+                value={intervall}
                 onChange={(e) => setIntervall(e.target.value)}
               >
                 <option value="">Intervall wählen</option>
