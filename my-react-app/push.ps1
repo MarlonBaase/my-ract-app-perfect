@@ -1,0 +1,1 @@
+$version = [decimal](Get-Content version.txt); $version += 0.01; $newVersion = $version.ToString("0.00"); Set-Content version.txt $newVersion; git add .; git commit -m "Version $newVersion - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"; git push
