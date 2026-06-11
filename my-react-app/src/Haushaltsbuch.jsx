@@ -27,10 +27,15 @@ export default function Haushaltsbuch() {
   const [intervall, setIntervall] = useState("");
 
   useEffect(() => {
-    ladeAlles();
-    ladeKategorien();
-    ladeWiederkehrende();
-  }, []);
+    const init = async () => {
+      await ladeAlles()
+      await ladeKategorien()
+      const daten = await ladeWiederkehrende()
+      await pruefeWiederkehrende(daten)  // ← direkt übergeben
+      await ladeAlles() // nochmal laden damit neue Buchungen sichtbar sind
+    }
+    init()
+  }, [])
 
   const ladeAlles = async () => {
     const {
@@ -190,6 +195,7 @@ export default function Haushaltsbuch() {
       .order("erstellt_am", { ascending: false })
 
     if (data) setWiederkehrende(data)
+    return data ?? []  // ← zurückgeben!
   }
 
   const wiederkehrendHinzufuegen = async () => {
@@ -211,6 +217,40 @@ export default function Haushaltsbuch() {
     setTypInter("")
     setIntervall("")
     ladeWiederkehrende()
+  }
+
+  const pruefeWiederkehrende = async (liste) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    const heute = new Date().toISOString().split("T")[0]
+
+    for (const eintrag of liste) {
+      if (eintrag.naechste_faelligkeit <= heute) {
+        if (eintrag.typ === "ausgabe") {
+          await supabase.from("haushaltsbuch").insert({
+            user_id: user.id,
+            beschreibung: eintrag.beschreibung,
+            betrag: parseFloat(eintrag.betrag),
+            kategorie: eintrag.kategorie
+          })
+        }
+        if (eintrag.typ === "einnahme") {
+          await supabase.from("einnahmen").insert({
+            user_id: user.id,
+            beschreibung: eintrag.beschreibung,
+            betrag: parseFloat(eintrag.betrag),
+            kategorie: eintrag.kategorie
+          })
+        }
+        const naechsteDatum = new Date(eintrag.naechste_faelligkeit)
+
+        if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7)
+        if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1)
+        if (eintrag.intervall === "jährlich") naechsteDatum.setFullYear(naechsteDatum.getFullYear() + 1)
+
+        const neuesFaelligkeitsDatum = naechsteDatum.toISOString().split("T")[0]
+        await supabase.from("wiederkehrend").update({ naechste_faelligkeit: neuesFaelligkeitsDatum }).eq("id", eintrag.id)
+      }
+    }
   }
 
   return (
@@ -345,48 +385,48 @@ export default function Haushaltsbuch() {
       )}
 
 
-      
-            <div>
-              <h4>Wiederkehrenden Eintrag hinzufügen</h4>
-              <input
-                value={beschreibungInter}
-                onChange={(e) => setBeschreibungInter(e.target.value)}
-                placeholder="Beschreibung"
-              />
-              <input
-                value={betragInter}
-                onChange={(e) => setBetragInter(e.target.value)}
-                placeholder="Betrag"
-                type="number"
-              />
-              <select value={typInter} onChange={(e) => setTypInter(e.target.value)}>
-                <option value="">Typ wählen</option>
-                <option value="ausgabe">Ausgabe</option>
-                <option value="einnahme">Einnahme</option>
-              </select>
-              <select
-                value={kategorieInter}
-                onChange={(e) => setkategorieInter(e.target.value)}
-              >
-                <option value="">Kategorie wählen</option>
-                {kategorien.map((k) => (
-                  <option key={k.id} value={k.name}>
-                    {k.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={intervall}
-                onChange={(e) => setIntervall(e.target.value)}
-              >
-                <option value="">Intervall wählen</option>
-                <option value="täglich">Täglich</option>
-                <option value="wöchentlich">Wöchentlich</option>
-                <option value="monatlich">Monatlich</option>
-                <option value="jährlich">Jährlich</option>
-              </select>
-             <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
-          </div>
+
+      <div>
+        <h4>Wiederkehrenden Eintrag hinzufügen</h4>
+        <input
+          value={beschreibungInter}
+          onChange={(e) => setBeschreibungInter(e.target.value)}
+          placeholder="Beschreibung"
+        />
+        <input
+          value={betragInter}
+          onChange={(e) => setBetragInter(e.target.value)}
+          placeholder="Betrag"
+          type="number"
+        />
+        <select value={typInter} onChange={(e) => setTypInter(e.target.value)}>
+          <option value="">Typ wählen</option>
+          <option value="ausgabe">Ausgabe</option>
+          <option value="einnahme">Einnahme</option>
+        </select>
+        <select
+          value={kategorieInter}
+          onChange={(e) => setkategorieInter(e.target.value)}
+        >
+          <option value="">Kategorie wählen</option>
+          {kategorien.map((k) => (
+            <option key={k.id} value={k.name}>
+              {k.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={intervall}
+          onChange={(e) => setIntervall(e.target.value)}
+        >
+          <option value="">Intervall wählen</option>
+          <option value="täglich">Täglich</option>
+          <option value="wöchentlich">Wöchentlich</option>
+          <option value="monatlich">Monatlich</option>
+          <option value="jährlich">Jährlich</option>
+        </select>
+        <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
+      </div>
 
       <ul>
         {eintraege.map((e) => (
