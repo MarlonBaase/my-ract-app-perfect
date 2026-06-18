@@ -106,11 +106,6 @@ export default function Haushaltsbuch() {
     ladeAlles()
   }
 
-  const logout = async () => {
-    await supabase.auth.signOut()
-    window.location.href = "/login"
-  }
-
   const einnahmeHinzufuegen = async () => {
     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
@@ -444,9 +439,6 @@ export default function Haushaltsbuch() {
           </li>
         ))}
       </ul>
-      <div>
-        <button onClick={logout}>Logout</button>
-      </div>
     </div>
   );
 }
