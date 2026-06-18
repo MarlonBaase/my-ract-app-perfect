@@ -249,6 +249,9 @@ export default function Haushaltsbuch() {
 
         const neuesFaelligkeitsDatum = naechsteDatum.toISOString().split("T")[0]
         await supabase.from("wiederkehrend").update({ naechste_faelligkeit: neuesFaelligkeitsDatum }).eq("id", eintrag.id)
+
+        const logout = async () => {
+          await supabase.auth.signOut()
       }
     }
   }
@@ -256,6 +259,10 @@ export default function Haushaltsbuch() {
   return (
     <div>
       <h2>Haushaltsbuch</h2>
+
+      <div>
+        <button onClick={logout}>Logout</button>
+      </div>
 
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
