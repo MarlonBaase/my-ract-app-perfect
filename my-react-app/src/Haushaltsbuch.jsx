@@ -106,6 +106,11 @@ export default function Haushaltsbuch() {
     ladeAlles()
   }
 
+  const logout = async () => {
+    await supabase.auth.signOut()
+    window.location.href = "/login"
+  }
+
   const einnahmeHinzufuegen = async () => {
     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
@@ -249,9 +254,6 @@ export default function Haushaltsbuch() {
 
         const neuesFaelligkeitsDatum = naechsteDatum.toISOString().split("T")[0]
         await supabase.from("wiederkehrend").update({ naechste_faelligkeit: neuesFaelligkeitsDatum }).eq("id", eintrag.id)
-
-        const logout = async () => {
-          await supabase.auth.signOut()
       }
     }
   }
