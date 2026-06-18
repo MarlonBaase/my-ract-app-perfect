@@ -6,7 +6,7 @@ export default function Profil() {
 
   const logout = async () => {
     await supabase.auth.signOut()
-    window.location.href = "/home"
+    window.location.href = "https://my-ract-app-perfect.vercel.app/"
   }
 
   return (
