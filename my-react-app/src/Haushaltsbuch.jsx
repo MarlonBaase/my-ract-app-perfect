@@ -262,9 +262,7 @@ export default function Haushaltsbuch() {
     <div>
       <h2>Haushaltsbuch</h2>
 
-      <div>
-        <button onClick={logout}>Logout</button>
-      </div>
+      
 
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
@@ -446,6 +444,9 @@ export default function Haushaltsbuch() {
           </li>
         ))}
       </ul>
+      <div>
+        <button onClick={logout}>Logout</button>
+      </div>
     </div>
   );
 }
