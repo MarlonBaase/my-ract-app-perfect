@@ -1,3 +1,7 @@
 export default function LF() {
-  return <h2>LF</h2>;
+  return(
+    <div>
+        <h2>LF</h2>;
+    </div>
+  ) 
 }
