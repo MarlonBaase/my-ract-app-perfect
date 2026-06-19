@@ -9,6 +9,7 @@ import Haushaltsbuch from './Haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
+import LF from './LF'
 import './index.css'
 
 function App() {
