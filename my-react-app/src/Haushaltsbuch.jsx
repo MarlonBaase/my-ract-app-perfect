@@ -188,6 +188,38 @@ export default function Haushaltsbuch() {
     ladeAlles()
   }
 
+
+
+
+const pruefeWiederkehrende = async (liste) => {
+  console.log("Liste:", liste)  // ← Was kommt an?
+  const { data: { user } } = await supabase.auth.getUser()
+  const heute = new Date().toISOString().split("T")[0]
+  console.log("Heute:", heute)  // ← Welches Datum?
+
+  for (const eintrag of liste) {
+    console.log("Eintrag:", eintrag.naechste_faelligkeit, "<=", heute, "?", eintrag.naechste_faelligkeit <= heute)
+    ...
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const ladeWiederkehrende = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     const { data } = await supabase
