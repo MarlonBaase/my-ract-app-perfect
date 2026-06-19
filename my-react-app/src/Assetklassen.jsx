@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Link, Navigate, Outlet } from 'react-router-dom'
 import { StrictMode, useEffect, useState } from 'react'
 import { supabase } from './supabase'
-import Lf from './lf.jsx'
+import Lf from './Lf.jsx'
 
 export default function Assetklassen() {
   return (
