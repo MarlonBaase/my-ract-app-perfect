@@ -189,9 +189,11 @@ export default function Haushaltsbuch() {
   }
 
   const ladeWiederkehrende = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
     const { data } = await supabase
       .from("wiederkehrend")
       .select("*")
+      .eq("user_id", user.id)
       .order("erstellt_am", { ascending: false })
 
     if (data) setWiederkehrende(data)
