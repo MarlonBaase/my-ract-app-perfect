@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate, Outlet } from 'react-rout
 import { StrictMode, useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import Lf from './Lf.jsx'
+import Wd from './Wd.jsx'
 
 export default function Assetklassen() {
   return (
@@ -11,7 +12,7 @@ export default function Assetklassen() {
       
         <nav>
           <Link to="lf">Liquidität & Forderungen</Link> |{" "}
-          <Link to="lf">Wertpapiere & Derivate</Link> |{" "}
+          <Link to="wd">Wertpapiere & Derivate</Link> |{" "}
           <Link to="lf">Immobilien</Link> |{" "}
           <Link to="lf">Krypto & Web3</Link> |{" "}
           <Link to="lf">Sachwerte & Edelmetalle</Link> |{" "}
