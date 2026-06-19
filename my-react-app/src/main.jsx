@@ -35,8 +35,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/assetklassen" element={<Assetklassen />} />
+        <Route path="/assetklassen" element={<Assetklassen />}>
           <Route path='lf' element={<LF/>}/>
+        </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/simulation" element={<Simulation />} />
