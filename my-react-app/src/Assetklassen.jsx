@@ -11,6 +11,12 @@ export default function Assetklassen() {
       
         <nav>
           <Link to="lf">Liquidität & Forderungen</Link> |{" "}
+          <Link to="lf">Wertpapiere & Derivate</Link> |{" "}
+          <Link to="lf">Immobilien</Link> |{" "}
+          <Link to="lf">Krypto & Web3</Link> |{" "}
+          <Link to="lf">Sachwerte & Edelmetalle</Link> |{" "}
+          <Link to="lf">Geschäftliches & Immaterielles</Link> |{" "}
+          <Link to="lf">Versicherungen, Vorsorge & Verbindlichkeiten</Link>
         </nav>
        <Outlet/> 
     </div>
