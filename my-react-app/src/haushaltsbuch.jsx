@@ -206,7 +206,11 @@ export default function haushaltsbuch() {
   }
 
   const wiederkehrendHinzufuegen = async () => {
-    if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !intervall) return
+    if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !intervall){
+    console.log("Validierung fehlgeschlagen:", { beschreibungInter, betragInter, kategorieInter, typInter, intervall })
+    return
+    }
+    console.log("Speichern...")
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("wiederkehrend").insert({
       user_id: user.id,
