@@ -8,6 +8,7 @@ export default function Assetklassen() {
         <nav>
           <Link to="/assetklassen/lf">Liquidität & Forderungen</Link> |{" "}
         </nav>
+        <Outlet/>
     </div>
 
   )
