@@ -199,7 +199,7 @@ const pruefeWiederkehrende = async (liste) => {
 
   for (const eintrag of liste) {
     console.log("Eintrag:", eintrag.naechste_faelligkeit, "<=", heute, "?", eintrag.naechste_faelligkeit <= heute)
-    ...
+    
   }
 }
 
