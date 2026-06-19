@@ -9,7 +9,6 @@ import Haushaltsbuch from './Haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
-import LF from './LF'
 import './index.css'
 
 function App() {
@@ -36,7 +35,6 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/assetklassen" element={<Assetklassen />} />
-          <Route path='/LF' element={<LF/>}/>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/simulation" element={<Simulation />} />
