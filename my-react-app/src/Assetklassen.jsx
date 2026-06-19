@@ -6,10 +6,16 @@ export default function Assetklassen() {
   return (
     <div>
       <h1>Products Page</h1>
+      <BrowserRouter>
         <nav>
           <Link to="/assetklassen/lf">Liquidität & Forderungen</Link> |{" "}
         </nav>
-        <Outlet/>
+        <Routes>
+          <Route path='lf' element={<lf />} />
+        </Routes>
+      </BrowserRouter>
+
+      <Outlet />
     </div>
 
   )
