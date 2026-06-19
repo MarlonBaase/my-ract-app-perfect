@@ -8,7 +8,7 @@ export default function Assetklassen() {
       <h1>Products Page</h1>
     <BrowserRouter>
       <nav>
-        <Link to="/assetklassen/LF">Liquidität & Forderungen</Link> |{" "}
+        <Link to="/LF">Liquidität & Forderungen</Link> |{" "}
         <Link to="/Assetklassen/car">Wertpapiere & Derivate</Link> |{" "}
         <Link to="/Assetklassen/car">Immobilien</Link> |{" "}
         <Link to="/Assetklassen/car">Krypto & Web3</Link> |{" "}
