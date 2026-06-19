@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 
-export default function Haushaltsbuch() {
+export default function haushaltsbuch() {
   const [startkapital, setStartkapital] = useState(0);
   const [kapital, setKapital] = useState(0);
   const [neuesStartkapital, setNeuesStartkapital] = useState("");
