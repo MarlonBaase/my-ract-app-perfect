@@ -6,7 +6,7 @@ export default function Assetklassen() {
     <div>
       <h1>Products Page</h1>
       <nav style={{ marginBottom: '20px' }}>
-        <Link to="/Assetklassen/LF">Liquidität & Forderungen</Link> |{" "}
+        <Link to="/assetklassen/LF">Liquidität & Forderungen</Link> |{" "}
         <Link to="/Assetklassen/car">Wertpapiere & Derivate</Link> |{" "}
         <Link to="/Assetklassen/car">Immobilien</Link> |{" "}
         <Link to="/Assetklassen/car">Krypto & Web3</Link> |{" "}
