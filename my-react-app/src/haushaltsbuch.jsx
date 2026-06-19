@@ -31,6 +31,7 @@ export default function haushaltsbuch() {
       await ladeAlles()
       await ladeKategorien()
       const daten = await ladeWiederkehrende()
+      console.log("Daten nach ladeWiederkehrende:", daten)
       await pruefeWiederkehrende(daten)  // ← direkt übergeben
       await ladeAlles() // nochmal laden damit neue Buchungen sichtbar sind
     }
