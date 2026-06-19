@@ -27,16 +27,20 @@ export default function haushaltsbuch() {
   const [intervall, setIntervall] = useState("");
 
   useEffect(() => {
-    const init = async () => {
+  const init = async () => {
+    try {
       await ladeAlles()
       await ladeKategorien()
       const daten = await ladeWiederkehrende()
-      console.log("Daten nach ladeWiederkehrende:", daten)
-      await pruefeWiederkehrende(daten)  // ← direkt übergeben
-      await ladeAlles() // nochmal laden damit neue Buchungen sichtbar sind
+      console.log("Daten:", daten)
+      await pruefeWiederkehrende(daten)
+      await ladeAlles()
+    } catch (err) {
+      console.error("Fehler in init:", err)
     }
-    init()
-  }, [])
+  }
+  init()
+}, [])
 
   const ladeAlles = async () => {
     const {
