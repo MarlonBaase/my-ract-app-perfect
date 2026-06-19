@@ -14,8 +14,6 @@ export default function Assetklassen() {
           <Route path='lf' element={<lf />} />
         </Routes>
       </BrowserRouter>
-
-      <Outlet />
     </div>
 
   )

@@ -10,7 +10,6 @@ import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
 import './index.css'
-import lf from './lf'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -35,9 +34,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/assetklassen" element={<Assetklassen />}>
-          <Route path='lf' element={<lf/>}/>
-        </Route>
+        <Route path="/assetklassen" element={<Assetklassen />}/>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/simulation" element={<Simulation />} />
