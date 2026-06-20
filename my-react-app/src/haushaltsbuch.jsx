@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 export default function haushaltsbuch() {
   const [startkapital, setStartkapital] = useState(0);
@@ -28,6 +29,7 @@ export default function haushaltsbuch() {
   const [zeitraum, setZeitraum] = useState("monat")
   const [summeEinnahmen, setSummeEinnahmen] = useState(0)
   const [summeAusgaben, setSummeAusgaben] = useState(0)
+  const [diagrammDaten, setDiagrammDaten] = useState([])
 
   useEffect(() => {
     const init = async () => {
@@ -47,6 +49,7 @@ export default function haushaltsbuch() {
 
   useEffect(() => {
     berechneZeitraum()
+    berechneDiagrammDaten()
   }, [zeitraum, eintraege])
 
   const ladeAlles = async () => {
@@ -352,6 +355,77 @@ export default function haushaltsbuch() {
     setSummeEinnahmen(gefilterteEinnahmen.reduce((sum, e) => sum + e.betrag, 0))
   }
 
+  const berechneDiagrammDaten = () => {
+    const jetzt = new Date()
+    let punkte = []
+
+    if (zeitraum === "heute") {
+      // 24 Stunden
+      for (let i = 0; i < 24; i++) {
+        const einnahmen = eintraege
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getHours() === i &&
+            new Date(e.erstellt_am).getDate() === jetzt.getDate())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        const ausgaben = eintraege
+          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getHours() === i &&
+            new Date(e.erstellt_am).getDate() === jetzt.getDate())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        punkte.push({ label: `${i}:00`, einnahmen, ausgaben })
+      }
+    }
+
+    if (zeitraum === "woche") {
+      // letzte 7 Tage
+      for (let i = 6; i >= 0; i--) {
+        const tag = new Date()
+        tag.setDate(jetzt.getDate() - i)
+        const einnahmen = eintraege
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === tag.getDate() &&
+            new Date(e.erstellt_am).getMonth() === tag.getMonth())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        const ausgaben = eintraege
+          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getDate() === tag.getDate() &&
+            new Date(e.erstellt_am).getMonth() === tag.getMonth())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        punkte.push({ label: `${tag.getDate()}.`, einnahmen, ausgaben })
+      }
+    }
+
+    if (zeitraum === "monat") {
+      // alle Tage des aktuellen Monats
+      const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate()
+      for (let i = 1; i <= tageImMonat; i++) {
+        const einnahmen = eintraege
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === i &&
+            new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        const ausgaben = eintraege
+          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getDate() === i &&
+            new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        punkte.push({ label: `${i}.`, einnahmen, ausgaben })
+      }
+    }
+
+    if (zeitraum === "jahr") {
+      // 12 Monate
+      const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
+      for (let i = 0; i < 12; i++) {
+        const einnahmen = eintraege
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getMonth() === i &&
+            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        const ausgaben = eintraege
+          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getMonth() === i &&
+            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+          .reduce((sum, e) => sum + e.betrag, 0)
+        punkte.push({ label: monate[i], einnahmen, ausgaben })
+      }
+    }
+
+    setDiagrammDaten(punkte)
+  }
+
   return (
     <div>
       <h2>Haushaltsbuch</h2>
@@ -540,6 +614,16 @@ export default function haushaltsbuch() {
         <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
         <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
       </div>
+
+      <LineChart width={600} height={300} data={diagrammDaten}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="label" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="einnahmen" stroke="green" />
+        <Line type="monotone" dataKey="ausgaben" stroke="red" />
+      </LineChart>
 
       <ul>
         {eintraege.map((e) => (
