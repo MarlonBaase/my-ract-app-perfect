@@ -27,20 +27,20 @@ export default function haushaltsbuch() {
   const [intervall, setIntervall] = useState("");
 
   useEffect(() => {
-  const init = async () => {
-    try {
-      await ladeAlles()
-      await ladeKategorien()
-      const daten = await ladeWiederkehrende()
-      console.log("Daten:", daten)
-      await pruefeWiederkehrende(daten)
-      await ladeAlles()
-    } catch (err) {
-      console.error("Fehler in init:", err)
+    const init = async () => {
+      try {
+        await ladeAlles()
+        await ladeKategorien()
+        const daten = await ladeWiederkehrende()
+        console.log("Daten:", daten)
+        await pruefeWiederkehrende(daten)
+        await ladeAlles()
+      } catch (err) {
+        console.error("Fehler in init:", err)
+      }
     }
-  }
-  init()
-}, [])
+    init()
+  }, [])
 
   const ladeAlles = async () => {
     const {
@@ -207,7 +207,11 @@ export default function haushaltsbuch() {
 
   const wiederkehrendHinzufuegen = async () => {
     if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !intervall)
-    return
+      return
+    const now = new Date()
+    const lokalDatum = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("wiederkehrend").insert({
       user_id: user.id,
@@ -216,7 +220,7 @@ export default function haushaltsbuch() {
       kategorie: kategorieInter,
       typ: typInter,
       intervall: intervall,
-      naechste_faelligkeit: new Date().toISOString().split("T")[0]  // vergessen!
+      naechste_faelligkeit: lokalDatum
     })
 
     setBeschreibungInter("")
@@ -229,7 +233,9 @@ export default function haushaltsbuch() {
 
   const pruefeWiederkehrende = async (liste) => {
     const { data: { user } } = await supabase.auth.getUser()
-    const heute = new Date().toISOString().split("T")[0]
+
+    const now = new Date()
+    const heute = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
     for (const eintrag of liste) {
       if (eintrag.naechste_faelligkeit <= heute) {
@@ -249,39 +255,20 @@ export default function haushaltsbuch() {
             kategorie: eintrag.kategorie
           })
         }
+
         const parts = eintrag.naechste_faelligkeit.split("-")
-const naechsteDatum = new Date(
-  console.log("Raw Datum aus DB:", eintrag.naechste_faelligkeit),
-  parseInt(parts[0]),   // Jahr
-  parseInt(parts[1]) - 1, // Monat (0-basiert)
-  parseInt(parts[2])    // Tag
-)
+        const naechsteDatum = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
 
-console.log("Ausgangsdatum:", naechsteDatum.toDateString())
-
-if (eintrag.intervall === "täglich") naechsteDatum.setDate(naechsteDatum.getDate() + 1)
-if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7)
-if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1)
-if (eintrag.intervall === "jährlich") naechsteDatum.setFullYear(naechsteDatum.getFullYear() + 1)
-
-console.log("Neues Datum nach Berechnung:", naechsteDatum.toDateString())
-
+        if (eintrag.intervall === "täglich") naechsteDatum.setDate(naechsteDatum.getDate() + 1)
         if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7)
         if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1)
         if (eintrag.intervall === "jährlich") naechsteDatum.setFullYear(naechsteDatum.getFullYear() + 1)
 
-        const neuesFaelligkeitsDatum = naechsteDatum.toISOString().split("T")[0]
-        await supabase.from("wiederkehrend").update({ naechste_faelligkeit: neuesFaelligkeitsDatum }).eq("id", eintrag.id)
+        const neuesFaelligkeitsDatum = `${naechsteDatum.getFullYear()}-${String(naechsteDatum.getMonth() + 1).padStart(2, '0')}-${String(naechsteDatum.getDate()).padStart(2, '0')}`
 
-
-        const { error } = await supabase
-  .from("wiederkehrend")
-  .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
-  .eq("id", eintrag.id)
-
-console.log("Update Fehler:", error)
-console.log("Neues Datum:", neuesFaelligkeitsDatum)
-console.log("Eintrag ID:", eintrag.id)
+        await supabase.from("wiederkehrend")
+          .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
+          .eq("id", eintrag.id)
       }
     }
   }
@@ -290,7 +277,7 @@ console.log("Eintrag ID:", eintrag.id)
     <div>
       <h2>Haushaltsbuch</h2>
 
-      
+
 
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
