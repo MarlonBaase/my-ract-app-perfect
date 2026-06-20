@@ -25,6 +25,9 @@ export default function haushaltsbuch() {
   const [kategorieInter, setkategorieInter] = useState("");
   const [typInter, setTypInter] = useState("");
   const [intervall, setIntervall] = useState("");
+  const [zeitraum, setZeitraum] = useState("monat")
+  const [summeEinnahmen, setSummeEinnahmen] = useState(0)
+  const [summeAusgaben, setSummeAusgaben] = useState(0)
 
   useEffect(() => {
     const init = async () => {
@@ -41,6 +44,10 @@ export default function haushaltsbuch() {
     }
     init()
   }, [])
+
+  useEffect(() => {
+    berechneZeitraum()
+  }, [zeitraum, eintraege])
 
   const ladeAlles = async () => {
     const {
@@ -274,11 +281,76 @@ export default function haushaltsbuch() {
   }
 
   const kategorieLoeschen = async (id, ist_vordefiniert) => {
-          if (ist_vordefiniert === false) {
-            await supabase.from("kategorien").delete().eq("id", id)
-          }
-          ladeKategorien()
-        }
+    if (ist_vordefiniert === false) {
+      await supabase.from("kategorien").delete().eq("id", id)
+    }
+    ladeKategorien()
+  }
+
+  const berechneZeitraum = () => {
+    const jetzt = new Date()
+
+    const gefilterteAusgaben = eintraege.filter(e => {
+      if (e.typ !== "ausgabe") return false
+      const datum = new Date(e.erstellt_am)
+
+      if (zeitraum === "heute") {
+        return (
+          datum.getFullYear() === jetzt.getFullYear() &&
+          datum.getMonth() === jetzt.getMonth() &&
+          datum.getDate() === jetzt.getDate()
+        )
+      }
+      if (zeitraum === "woche") {
+        const diffInMs = jetzt - datum  // Differenz in Millisekunden
+        const diffInTagen = diffInMs / (1000 * 60 * 60 * 24)  // umrechnen in Tage
+        return diffInTagen <= 7
+      }
+      if (zeitraum === "monat") {
+        return (
+          datum.getMonth() === jetzt.getMonth() &&
+          datum.getFullYear() === jetzt.getFullYear()
+        )
+      }
+      if (zeitraum === "jahr") {
+        return (
+          datum.getFullYear() === jetzt.getFullYear()
+        )
+      }
+    })
+
+    const gefilterteEinnahmen = eintraege.filter(e => {
+      if (e.typ !== "einnahme") return false
+      const datum = new Date(e.erstellt_am)
+
+      if (zeitraum === "heute") {
+        return (
+          datum.getFullYear() === jetzt.getFullYear() &&
+          datum.getMonth() === jetzt.getMonth() &&
+          datum.getDate() === jetzt.getDate()
+        )
+      }
+      if (zeitraum === "woche") {
+        const diffInMs = jetzt - datum  // Differenz in Millisekunden
+        const diffInTagen = diffInMs / (1000 * 60 * 60 * 24)  // umrechnen in Tage
+        return diffInTagen <= 7
+      }
+      if (zeitraum === "monat") {
+        return (
+          datum.getMonth() === jetzt.getMonth() &&
+          datum.getFullYear() === jetzt.getFullYear()
+        )
+      }
+      if (zeitraum === "jahr") {
+        return (
+          datum.getFullYear() === jetzt.getFullYear()
+        )
+      }
+    })
+
+    setSummeAusgaben(gefilterteAusgaben.reduce((sum, e) => sum + e.betrag, 0))
+    setSummeEinnahmen(gefilterteEinnahmen.reduce((sum, e) => sum + e.betrag, 0))
+  }
 
   return (
     <div>
@@ -457,6 +529,18 @@ export default function haushaltsbuch() {
         <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
       </div>
 
+      <div>
+        {/* Buttons */}
+        <button onClick={() => setZeitraum("heute")}>Heute</button>
+        <button onClick={() => setZeitraum("woche")}>Woche</button>
+        <button onClick={() => setZeitraum("monat")}>Monat</button>
+        <button onClick={() => setZeitraum("jahr")}>Jahr</button>
+
+        {/* Anzeige */}
+        <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+        <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+      </div>
+
       <ul>
         {eintraege.map((e) => (
           <li key={e.id + e.typ}>
@@ -469,7 +553,7 @@ export default function haushaltsbuch() {
 
 
       <ul>
-        {kategorien.map((e) =>(
+        {kategorien.map((e) => (
           <li key={e.id}>
             {e.name}
             {!e.ist_vordefiniert && (
