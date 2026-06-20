@@ -360,15 +360,14 @@ export default function haushaltsbuch() {
     let punkte = []
 
     if (zeitraum === "heute") {
-      // 24 Stunden
       for (let i = 0; i < 24; i++) {
         const einnahmen = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getHours() === i &&
-            new Date(e.erstellt_am).getDate() === jetzt.getDate())
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am.replace(" ", "T")).getHours() === i &&
+            new Date(e.erstellt_am.replace(" ", "T")).getDate() === jetzt.getDate())
           .reduce((sum, e) => sum + e.betrag, 0)
         const ausgaben = eintraege
-          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getHours() === i &&
-            new Date(e.erstellt_am).getDate() === jetzt.getDate())
+          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am.replace(" ", "T")).getHours() === i &&
+            new Date(e.erstellt_am.replace(" ", "T")).getDate() === jetzt.getDate())
           .reduce((sum, e) => sum + e.betrag, 0)
         punkte.push({ label: `${i}:00`, einnahmen, ausgaben })
       }
