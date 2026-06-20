@@ -12,6 +12,16 @@ body.dark {
   color: #ffffff;
 }
 
+nav.dark a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+nav.light a {
+  color: #000000;
+  text-decoration: none;
+}
+
 body.dark {
   background-color: #1a1a1a;
   color: #ffffff;
