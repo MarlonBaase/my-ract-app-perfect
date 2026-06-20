@@ -269,6 +269,13 @@ export default function haushaltsbuch() {
         await supabase.from("wiederkehrend")
           .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
           .eq("id", eintrag.id)
+
+        const kategorieLoeschen = async (id, ist_vordefiniert) => {
+          if (ist_vordefiniert === false) {
+            await supabase.from("kategorien").delete().eq("id", id)
+          }
+          ladeKategorien()
+        }
       }
     }
   }
@@ -456,6 +463,18 @@ export default function haushaltsbuch() {
             {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
             <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
             <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
+          </li>
+        ))}
+      </ul>
+
+
+      <ul>
+        {kategorien.map((e) =>(
+          <li key={e.id}>
+            {e.name}
+            {!e.ist_vordefiniert && (
+              <button onClick={() => kategorieLoeschen(e.id, e.ist_vordefiniert)}>🗑️</button>
+            )}
           </li>
         ))}
       </ul>
