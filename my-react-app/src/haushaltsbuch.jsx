@@ -269,16 +269,16 @@ export default function haushaltsbuch() {
         await supabase.from("wiederkehrend")
           .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
           .eq("id", eintrag.id)
+      }
+    }
+  }
 
-        const kategorieLoeschen = async (id, ist_vordefiniert) => {
+  const kategorieLoeschen = async (id, ist_vordefiniert) => {
           if (ist_vordefiniert === false) {
             await supabase.from("kategorien").delete().eq("id", id)
           }
           ladeKategorien()
         }
-      }
-    }
-  }
 
   return (
     <div>
