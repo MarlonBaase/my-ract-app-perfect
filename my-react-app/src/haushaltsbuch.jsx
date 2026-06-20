@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts"
+import { PieChart, Pie, Cell} from "recharts"
 
 export default function haushaltsbuch() {
   const [startkapital, setStartkapital] = useState(0);
