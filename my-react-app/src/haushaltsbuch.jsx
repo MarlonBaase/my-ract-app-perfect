@@ -32,6 +32,9 @@ export default function haushaltsbuch() {
   const [diagrammDaten, setDiagrammDaten] = useState([])
   const [kreisDatenAusgaben, setKreisDatenAusgaben] = useState([])
   const [kreisDatenEinnahmen, setKreisDatenEinnahmen] = useState([])
+  const [tabellenZeitraum, setTabellenZeitraum] = useState("monat") // heute/woche/monat/jahr
+  const [tabellenMonat, setTabellenMonat] = useState(new Date().getMonth()) // 0-11
+  const [tabellenJahr, setTabellenJahr] = useState(new Date().getFullYear()) // z.B. 2026
 
   useEffect(() => {
     const init = async () => {
@@ -711,6 +714,78 @@ export default function haushaltsbuch() {
           </li>
         ))}
       </ul>
+      <div>
+        <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
+        <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
+        <button onClick={() => setTabellenZeitraum("monat")}>Monat</button>
+        <button onClick={() => setTabellenZeitraum("jahr")}>Jahr</button>
+
+        {/* Monat/Jahr Auswahl */}
+        <select onChange={(e) => setTabellenMonat(parseInt(e.target.value))}>
+          <option value="0">Januar</option>
+          <option value="1">Februar</option>
+          <option value="2">März</option>
+          <option value="3">April</option>
+          <option value="4">Mai</option>
+          <option value="5">Juni</option>
+          <option value="6">Juli</option>
+          <option value="7">August</option>
+          <option value="8">September</option>
+          <option value="9">Oktober</option>
+          <option value="10">November</option>
+          <option value="11">Dezember</option>
+        </select>
+
+        <select onChange={(e) => {
+          setTabellenMonat(parseInt(e.target.value))
+          setTabellenZeitraum("spezifisch")  // ← automatisch wechseln
+        }}>
+          ...
+        </select>
+
+        <select onChange={(e) => {
+          setTabellenJahr(parseInt(e.target.value))
+          setTabellenZeitraum("spezifisch")
+        }}>
+          {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map(jahr => (
+            <option key={jahr} value={jahr}>{jahr}</option>
+          ))}
+        </select>
+      </div>
+      {eintraege
+        .filter(e => {
+          const datum = new Date(e.erstellt_am)
+          const jetzt = new Date()
+
+          if (tabellenZeitraum === "heute") {
+            return datum.getFullYear() === jetzt.getFullYear() &&
+              datum.getMonth() === jetzt.getMonth() &&
+              datum.getDate() === jetzt.getDate()
+          }
+          if (tabellenZeitraum === "woche") {
+            const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
+            return diffInTagen <= 7
+          }
+          if (tabellenZeitraum === "monat") {
+            return (
+              datum.getMonth() === jetzt.getMonth() &&
+              datum.getFullYear() === jetzt.getFullYear()
+            )
+          }
+          if (tabellenZeitraum === "jahr") {
+            return datum.getFullYear() === jetzt.getFullYear()
+          }
+          if (tabellenZeitraum === "spezifisch") {
+            return datum.getFullYear() === tabellenJahr &&
+              datum.getMonth() === tabellenMonat
+          }
+        })
+        .map((e) => (
+          <li key={e.id + e.typ}>
+            ...
+          </li>
+        ))
+      }
     </div>
   );
 }
