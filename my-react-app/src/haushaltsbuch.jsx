@@ -251,6 +251,7 @@ export default function haushaltsbuch() {
         }
         const parts = eintrag.naechste_faelligkeit.split("-")
 const naechsteDatum = new Date(
+  console.log("Raw Datum aus DB:", eintrag.naechste_faelligkeit),
   parseInt(parts[0]),   // Jahr
   parseInt(parts[1]) - 1, // Monat (0-basiert)
   parseInt(parts[2])    // Tag
