@@ -249,8 +249,21 @@ export default function haushaltsbuch() {
             kategorie: eintrag.kategorie
           })
         }
-        const [year, month, day] = eintrag.naechste_faelligkeit.split("-").map(Number)
-const naechsteDatum = new Date(year, month - 1, day)
+        const parts = eintrag.naechste_faelligkeit.split("-")
+const naechsteDatum = new Date(
+  parseInt(parts[0]),   // Jahr
+  parseInt(parts[1]) - 1, // Monat (0-basiert)
+  parseInt(parts[2])    // Tag
+)
+
+console.log("Ausgangsdatum:", naechsteDatum.toDateString())
+
+if (eintrag.intervall === "täglich") naechsteDatum.setDate(naechsteDatum.getDate() + 1)
+if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7)
+if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1)
+if (eintrag.intervall === "jährlich") naechsteDatum.setFullYear(naechsteDatum.getFullYear() + 1)
+
+console.log("Neues Datum nach Berechnung:", naechsteDatum.toDateString())
 
         if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7)
         if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1)
