@@ -26,3 +26,13 @@ body.light {
   background-color: #ffffff;
   color: #000000;
 }
+
+nav.dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+nav.light {
+  background-color: #ffffff;
+  color: #000000;
+}

@@ -28,7 +28,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <nav>
+      <nav className={darkMode ? "dark" : "light"}>
         <Link to="/dashboard">Dashboard</Link> |{" "}
         <Link to="/haushaltsbuch">Haushaltsbuch</Link> |{" "}
         <Link to="/assetklassen">Assetklassen</Link> |{" "}
