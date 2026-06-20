@@ -16,3 +16,13 @@ nav a {
     text-decoration: none;
     color:#000000
 }
+
+body.dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #000000;
+}

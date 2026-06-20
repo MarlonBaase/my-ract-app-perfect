@@ -13,11 +13,16 @@ import './index.css'
 
 function App() {
   const [session, setSession] = useState(null)
+  const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
     supabase.auth.onAuthStateChange((_event, session) => setSession(session))
   }, [])
+
+  useEffect(() => {
+  document.body.className = darkMode ? "dark" : "light"
+}, [darkMode])
 
   if (!session) return <BrowserRouter><Home /></BrowserRouter>
 
@@ -32,13 +37,13 @@ function App() {
         <Link to="/support">Support</Link>
       </nav>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/assetklassen" element={<Assetklassen />}/>
-        <Route path="/haushaltsbuch" element={<Haushaltsbuch />} />
-        <Route path="/profil" element={<Profil />} />
-        <Route path="/simulation" element={<Simulation />} />
-        <Route path="/support" element={<Support />} />
+        <Route path="/" element={<Navigate to="/dashboard"/>} />
+        <Route path="/dashboard" element={<Dashboard darkMode={darkMode}/>} />
+        <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode}/>}/>
+        <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode}/>} />
+        <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
+        <Route path="/simulation" element={<Simulation darkMode={darkMode}/>} />
+        <Route path="/support" element={<Support darkMode={darkMode}/>} />
       </Routes>
     </BrowserRouter>
   )
