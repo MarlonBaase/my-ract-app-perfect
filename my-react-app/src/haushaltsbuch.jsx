@@ -257,6 +257,16 @@ export default function haushaltsbuch() {
 
         const neuesFaelligkeitsDatum = naechsteDatum.toISOString().split("T")[0]
         await supabase.from("wiederkehrend").update({ naechste_faelligkeit: neuesFaelligkeitsDatum }).eq("id", eintrag.id)
+
+
+        const { error } = await supabase
+  .from("wiederkehrend")
+  .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
+  .eq("id", eintrag.id)
+
+console.log("Update Fehler:", error)
+console.log("Neues Datum:", neuesFaelligkeitsDatum)
+console.log("Eintrag ID:", eintrag.id)
       }
     }
   }
