@@ -782,7 +782,9 @@ export default function haushaltsbuch() {
         })
         .map((e) => (
           <li key={e.id + e.typ}>
-            ...
+            {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
+            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+            <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
           </li>
         ))
       }
