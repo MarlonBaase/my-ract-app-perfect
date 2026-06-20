@@ -425,6 +425,9 @@ export default function haushaltsbuch() {
     setDiagrammDaten(punkte)
   }
 
+  console.log(new Date("2026-06-20 14:56:02").getHours())
+console.log(new Date("2026-06-20T14:56:02").getHours())
+
   return (
     <div>
       <h2>Haushaltsbuch</h2>
