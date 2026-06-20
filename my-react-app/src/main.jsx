@@ -9,6 +9,7 @@ import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
+import Navbar from './Navbar'
 import './index.css'
 
 function App() {
@@ -28,14 +29,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <nav className={darkMode ? "dark" : "light"}>
-        <Link to="/dashboard">Dashboard</Link> |{" "}
-        <Link to="/haushaltsbuch">Haushaltsbuch</Link> |{" "}
-        <Link to="/assetklassen">Assetklassen</Link> |{" "}
-        <Link to="/simulation">Simulation</Link> |{" "}
-        <Link to="/profil">Profil</Link> |{" "}
-        <Link to="/support">Support</Link>
-      </nav>
+      <Navbar darkMode={darkMode} />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard"/>} />
         <Route path="/dashboard" element={<Dashboard darkMode={darkMode}/>} />
