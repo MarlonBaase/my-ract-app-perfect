@@ -37,9 +37,9 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
         <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
-          <Route path="liquiditaet" element={<Lf darkMode={darkMode} />} />
-          <Route path="liquiditaet/girokonto" element={<Girokonto darkMode={darkMode} />} />
-          <Route path="wd" element={<Wd darkMode={darkMode} />} />
+          <Route path="liquiditaet" element={<Lf darkMode={darkMode} />}>
+            <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
+          </Route>
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
         <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
