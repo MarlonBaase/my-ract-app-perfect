@@ -6,7 +6,6 @@ export default function Lf() {
       <h2>Liquidität & Forderungen</h2>
       <nav>
         <Link to="girokonto">Girokonto</Link>
-        {/* später weitere Links */}
       </nav>
       <Outlet />
     </div>
