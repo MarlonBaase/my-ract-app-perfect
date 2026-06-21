@@ -6,6 +6,7 @@ export default function Lf() {
       <h2>Liquidität & Forderungen</h2>
       <nav>
         <Link to="girokonto">Girokonto</Link>
+        <Link to="tagesgeld">Tagesgeldkonto</Link>
       </nav>
       <Outlet />
     </div>

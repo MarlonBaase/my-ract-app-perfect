@@ -8,12 +8,14 @@ import Assetklassen from './Assetklassen'
 import Lf from './Lf'
 import Wd from './Wd'
 import Girokonto from './assetklassen/Girokonto'
+import Tagesgeld from './assetklassen/Tagesgeld'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
 import './index.css'
+import Tagesgeld from './assetklassen/Tagesgeld'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -39,6 +41,7 @@ function App() {
         <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
           <Route path="lf" element={<Lf darkMode={darkMode} />}>
             <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
+            <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
           </Route>
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
