@@ -5,7 +5,7 @@ import { supabase } from './supabase'
 import Home from './Home'
 import Dashboard from './Dashboard'
 import Assetklassen from './Assetklassen'
-  import Girokonto from './assetklassen/Girokonto'
+  
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
@@ -35,7 +35,7 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard"/>} />
         <Route path="/dashboard" element={<Dashboard darkMode={darkMode}/>} />
         <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode}/>}/>
-          <Route path="/assetklassen/liquiditaet/girokonto" element={<Girokonto darkMode={darkMode} />} />
+          
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode}/>} />
         <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
         <Route path="/simulation" element={<Simulation darkMode={darkMode}/>} />
