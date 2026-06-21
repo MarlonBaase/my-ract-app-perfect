@@ -647,7 +647,7 @@ export default function haushaltsbuch() {
         <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
       </div>
 
-      <div>
+      <div className="zeitraum">
         {/* Buttons */}
         <button onClick={() => setZeitraum("heute")}>Heute</button>
         <button onClick={() => setZeitraum("woche")}>Woche</button>
