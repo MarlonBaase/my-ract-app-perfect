@@ -4,7 +4,6 @@ import { StrictMode, useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import Lf from './Lf.jsx'
 import Wd from './Wd.jsx'
-import Girokonto from './Girokonto.jsx'
 
 export default function Assetklassen() {
   return (
@@ -12,7 +11,7 @@ export default function Assetklassen() {
       <h1>Products Page</h1>
       
         <nav>
-          <Link to="girokonto">Liquidität & Forderungen</Link> |{" "}
+          <Link to="lf">Liquidität & Forderungen</Link> |{" "}
           <Link to="wd">Wertpapiere & Derivate</Link> |{" "}
           <Link to="lf">Immobilien</Link> |{" "}
           <Link to="lf">Krypto & Web3</Link> |{" "}

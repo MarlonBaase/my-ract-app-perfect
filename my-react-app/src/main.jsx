@@ -5,7 +5,9 @@ import { supabase } from './supabase'
 import Home from './Home'
 import Dashboard from './Dashboard'
 import Assetklassen from './Assetklassen'
-  
+import Lf from './Lf'
+import Wd from './Wd'
+import Girokonto from './assetklassen/Girokonto'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
@@ -23,8 +25,8 @@ function App() {
   }, [])
 
   useEffect(() => {
-  document.body.className = darkMode ? "dark" : "light"
-}, [darkMode])
+    document.body.className = darkMode ? "dark" : "light"
+  }, [darkMode])
 
   if (!session) return <BrowserRouter><Home /></BrowserRouter>
 
@@ -32,14 +34,17 @@ function App() {
     <BrowserRouter>
       <Navbar darkMode={darkMode} />
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard"/>} />
-        <Route path="/dashboard" element={<Dashboard darkMode={darkMode}/>} />
-        <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode}/>}/>
-          
-        <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode}/>} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
+        <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
+          <Route path="liquiditaet" element={<Lf darkMode={darkMode} />} />
+          <Route path="liquiditaet/girokonto" element={<Girokonto darkMode={darkMode} />} />
+          <Route path="wd" element={<Wd darkMode={darkMode} />} />
+        </Route>
+        <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
         <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
-        <Route path="/simulation" element={<Simulation darkMode={darkMode}/>} />
-        <Route path="/support" element={<Support darkMode={darkMode}/>} />
+        <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
+        <Route path="/support" element={<Support darkMode={darkMode} />} />
       </Routes>
     </BrowserRouter>
   )

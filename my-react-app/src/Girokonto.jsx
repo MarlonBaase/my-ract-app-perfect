@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 
-export default function girokonto() {
+export default function Girokonto() {
     const [listeGeldmarkt, setListeGeldmarkt] = useState([])
     const [name, setName] = useState("")
     const [bank, setBank] = useState("")
