@@ -15,7 +15,6 @@ import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
 import './index.css'
-import Tagesgeld from './assetklassen/Tagesgeld'
 
 function App() {
   const [session, setSession] = useState(null)
