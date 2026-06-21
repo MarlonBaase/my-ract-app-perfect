@@ -653,7 +653,8 @@ export default function haushaltsbuch() {
         <button onClick={() => setZeitraum("woche")}>Woche</button>
         <button onClick={() => setZeitraum("monat")}>Monat</button>
         <button onClick={() => setZeitraum("jahr")}>Jahr</button>
-
+      </div>
+      <div>
         {/* Anzeige */}
         <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
         <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
