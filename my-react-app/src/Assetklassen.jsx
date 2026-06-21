@@ -12,7 +12,7 @@ export default function Assetklassen() {
       <h1>Products Page</h1>
       
         <nav>
-          <Link to="Girokonto">Liquidität & Forderungen</Link> |{" "}
+          <Link to="girokonto">Liquidität & Forderungen</Link> |{" "}
           <Link to="wd">Wertpapiere & Derivate</Link> |{" "}
           <Link to="lf">Immobilien</Link> |{" "}
           <Link to="lf">Krypto & Web3</Link> |{" "}
