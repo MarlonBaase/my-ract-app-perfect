@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 export default function Girokonto() {
-    const [listeGeldmarkt, setListeGeldmarkt] = useState([])
+    const [listeGirokonto, setListeGirokonto] = useState([])
     const [name, setName] = useState("")
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
@@ -15,6 +15,20 @@ export default function Girokonto() {
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
 
+    
+
+    const ladeGirokonto = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data } = await supabase
+            .from("girokonto")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("typ", "girokonto")  // ← nur Girokonten
+            .order("name", { ascending: true })
+
+        if (data) setListeGirokonto(data)
+    }
+
     useEffect(() => {
         const init = async () => {
             await ladeGirokonto()
@@ -22,22 +36,10 @@ export default function Girokonto() {
         init()
     }, [])
 
-    const ladeGirokonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data } = await supabase
-            .from("geldmarkt")
-            .select("*")
-            .eq("user_id", user.id)
-            .eq("typ", "girokonto")  // ← nur Girokonten
-            .order("name", { ascending: true })
-
-        if (data) setListeGeldmarkt(data)
-    }
-
     const girokontoHinzufuegen = async () => {
         if (!name || !bank || !iban || !wert || !summe || !waehrung || !eroeffnet_am) return
         const { data: { user } } = await supabase.auth.getUser()
-        await supabase.from("geldmarkt").insert({
+        await supabase.from("girokonto").insert({
             user_id: user.id,
             typ: "girokonto",
             name: name,
@@ -56,12 +58,9 @@ export default function Girokonto() {
         setWaehrung("")
         setEroeffnet_am("")
         ladeGirokonto()
-
-        const { data, error } = await supabase.from("geldmarkt").insert({...})
-console.log("Fehler:", error)
     }
 
-    
+
 
     const bearbeitenOeffnen = (eintrag) => {
         setZuBearbeiten(eintrag)
@@ -76,13 +75,13 @@ console.log("Fehler:", error)
     }
 
     const eintragLoeschen = async (id) => {
-        await supabase.from("geldmarkt").delete().eq("id", id)
+        await supabase.from("girokonto").delete().eq("id", id)
         ladeGirokonto()
     }
 
     const girokontoSpeichern = async () => {
 
-        await supabase.from("geldmarkt").update({
+        await supabase.from("girokonto").update({
             typ: "girokonto",
             name: name,
             bank: bank,
@@ -104,7 +103,7 @@ console.log("Fehler:", error)
             {/* Liste */}
 
             <ul>
-                {listeGeldmarkt.map((e) => (
+                {listeGirokonto.map((e) => (
                     <li key={e.id}>
                         {e.name} | {e.bank} |  {e.iban} | {e.wert} | {e.einlage_summe} | {e.waehrung} | {e.eroeffnet_am}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
