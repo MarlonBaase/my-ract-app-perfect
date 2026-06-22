@@ -56,7 +56,12 @@ export default function Girokonto() {
         setWaehrung("")
         setEroeffnet_am("")
         ladeGirokonto()
+
+        const { data, error } = await supabase.from("geldmarkt").insert({...})
+console.log("Fehler:", error)
     }
+
+    
 
     const bearbeitenOeffnen = (eintrag) => {
         setZuBearbeiten(eintrag)
