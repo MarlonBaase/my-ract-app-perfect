@@ -36,7 +36,7 @@ export default function Girokonto() {
         init()
     }, [])
 
-    /*const girokontoHinzufuegen = async () => {
+    const girokontoHinzufuegen = async () => {
         if (!name || !bank || !iban || !wert || !einlage_summe || !waehrung || !eroeffnet_am) return
         const { data: { user } } = await supabase.auth.getUser()
         await supabase.from("girokonto").insert({
@@ -58,46 +58,9 @@ export default function Girokonto() {
         setWaehrung("")
         setEroeffnet_am("")
         ladeGirokonto()
-    }*/
-
-        const girokontoHinzufuegen = async () => {
-    if (!name || !bank || !iban || !wert || !einlage_summe || !waehrung || !eroeffnet_am) {
-        console.log("Abbruch: Nicht alle Pflichtfelder im Formular ausgefüllt.");
-        return;
-    }
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    // Wir fangen hier den Fehler (error) explizit ab!
-    const { error } = await supabase.from("girokonto").insert({
-        user_id: user.id,
-        typ: "girokonto",
-        name: name,
-        bank: bank,
-        iban: iban,
-        wert: parseFloat(wert.replace(',', '.')) || 0,          // Erlaubt Komma-Eingabe im Formular
-        einlage_summe: parseFloat(einlage_summe.replace(',', '.')) || 0, // Erlaubt Komma-Eingabe im Formular
-        waehrung: waehrung,
-        eroeffnet_am: eroeffnet_am
-    });
-
-    if (error) {
-        // Das wird uns genau verraten, was der Datenbank nicht passt!
-        console.error("Supabase Fehler-Details:", error.message, error.details, error.hint);
-        alert(`Fehler von der Datenbank: ${error.message}`);
-        return;
     }
 
-    // Felder leeren bei Erfolg
-    setName("");
-    setBank("");
-    setIban("");
-    setWert("");
-    setSumme("");
-    setWaehrung("");
-    setEroeffnet_am("");
-    ladeGirokonto();
-};
+        
 
 
 
