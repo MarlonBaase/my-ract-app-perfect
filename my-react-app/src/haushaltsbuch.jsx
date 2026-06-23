@@ -64,7 +64,7 @@ export default function haushaltsbuch() {
     } = await supabase.auth.getUser();
 
     const { data: kapitalData } = await supabase
-      .from("kapital")
+      .from("kofiguration_kapital")
       .select("betrag")
       .eq("user_id", user.id)
       .single();
@@ -73,13 +73,13 @@ export default function haushaltsbuch() {
     setStartkapital(start);
 
     const { data: ausgaben } = await supabase
-      .from("ausgaben")
+      .from("haushaltsbuch_ausgaben")
       .select("*")
       .eq("user_id", user.id)  // ← fehlt noch
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
-      .from("einnahmen")
+      .from("haushaltsbuch_einnahmen")
       .select("*")
       .eq("user_id", user.id)  // ← fehlt noch
       .order("erstellt_am", { ascending: false });
@@ -101,7 +101,7 @@ export default function haushaltsbuch() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    await supabase.from("kapital").upsert(
+    await supabase.from("kofiguration_kapital").upsert(
       {
         user_id: user.id,
         betrag: parseFloat(neuesStartkapital),
@@ -115,7 +115,7 @@ export default function haushaltsbuch() {
   const ausgabeHinzufuegen = async () => {
     if (!beschreibung || !betrag || !ausgabeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("ausgaben").insert({
+    await supabase.from("haushaltsbuch_ausgaben").insert({
       user_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
@@ -130,7 +130,7 @@ export default function haushaltsbuch() {
   const einnahmeHinzufuegen = async () => {
     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("einnahmen").insert({
+    await supabase.from("haushaltsbuch_einnahmen").insert({
       user_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
@@ -144,7 +144,7 @@ export default function haushaltsbuch() {
 
   const ladeKategorien = async () => {
     const { data } = await supabase
-      .from("kategorien")
+      .from("haushaltsbuch_kategorien")
       .select("*")
       .order("name", { ascending: true })
 
@@ -154,7 +154,7 @@ export default function haushaltsbuch() {
   const kategorieHinzufuegen = async () => {
     if (!neueKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("kategorien").insert({
+    await supabase.from("haushaltsbuch_kategorien").insert({
       user_id: user.id,
       name: neueKategorie,
       ist_vordefiniert: false
@@ -166,10 +166,10 @@ export default function haushaltsbuch() {
 
   const eintragLoeschen = async (id, typ) => {
     if (typ === "ausgabe") {
-      await supabase.from("ausgaben").delete().eq("id", id)
+      await supabase.from("haushaltsbuch_ausgaben").delete().eq("id", id)
     }
     if (typ === "einnahme") {
-      await supabase.from("einnahmen").delete().eq("id", id)
+      await supabase.from("haushaltsbuch_einnahmen").delete().eq("id", id)
     }
     ladeAlles()
   }
@@ -192,14 +192,14 @@ export default function haushaltsbuch() {
 
   const eintragSpeichern = async (id, typ) => {
     if (typ === "ausgabe") {
-      await supabase.from("ausgaben").update({
+      await supabase.from("haushaltsbuch_ausgaben").update({
         beschreibung: editBeschreibung,
         betrag: parseFloat(editBetrag),
         kategorie: editKategorie
       }).eq("id", id)
     }
     if (typ === "einnahme") {
-      await supabase.from("einnahmen").update({
+      await supabase.from("haushaltsbuch_einnahmen").update({
         beschreibung: editBeschreibung,
         betrag: parseFloat(editBetrag),
         kategorie: editKategorie
@@ -212,7 +212,7 @@ export default function haushaltsbuch() {
   const ladeWiederkehrende = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     const { data } = await supabase
-      .from("wiederkehrend")
+      .from("haushaltsbuch_wiederkehrend")
       .select("*")
       .eq("user_id", user.id)
       .order("erstellt_am", { ascending: false })
@@ -229,7 +229,7 @@ export default function haushaltsbuch() {
 
 
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("wiederkehrend").insert({
+    await supabase.from("haushaltsbuch_wiederkehrend").insert({
       user_id: user.id,
       beschreibung: beschreibungInter,  // Spaltenname: Wert
       betrag: parseFloat(betragInter),  // betragInter nicht betrag!
@@ -256,7 +256,7 @@ export default function haushaltsbuch() {
     for (const eintrag of liste) {
       if (eintrag.naechste_faelligkeit <= heute) {
         if (eintrag.typ === "ausgabe") {
-          await supabase.from("ausgaben").insert({
+          await supabase.from("haushaltsbuch_ausgaben").insert({
             user_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
@@ -264,7 +264,7 @@ export default function haushaltsbuch() {
           })
         }
         if (eintrag.typ === "einnahme") {
-          await supabase.from("einnahmen").insert({
+          await supabase.from("haushaltsbuch_einnahmen").insert({
             user_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
@@ -282,7 +282,7 @@ export default function haushaltsbuch() {
 
         const neuesFaelligkeitsDatum = `${naechsteDatum.getFullYear()}-${String(naechsteDatum.getMonth() + 1).padStart(2, '0')}-${String(naechsteDatum.getDate()).padStart(2, '0')}`
 
-        await supabase.from("wiederkehrend")
+        await supabase.from("haushaltsbuch_wiederkehrend")
           .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
           .eq("id", eintrag.id)
       }
@@ -291,7 +291,7 @@ export default function haushaltsbuch() {
 
   const kategorieLoeschen = async (id, ist_vordefiniert) => {
     if (ist_vordefiniert === false) {
-      await supabase.from("kategorien").delete().eq("id", id)
+      await supabase.from("haushaltsbuch_kategorien").delete().eq("id", id)
     }
     ladeKategorien()
   }
