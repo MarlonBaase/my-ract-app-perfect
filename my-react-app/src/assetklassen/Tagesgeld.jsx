@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 export default function Tagesgeld() {
-    const [listeGeldmarkt, setListeGeldmarkt] = useState([])
+    const [listeTagesgeld, setListeTagesgeld] = useState([])
     const [name, setName] = useState("")
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
@@ -17,6 +17,20 @@ export default function Tagesgeld() {
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
 
+    
+
+    const ladeTagesgeld = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data } = await supabase
+            .from("tagesgeld")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("typ", "tagesgeld")
+            .order("name", { ascending: true })
+
+        if (data) setListeTagesgeld(data)
+    }
+
     useEffect(() => {
         const init = async () => {
             await ladeTagesgeld()
@@ -24,22 +38,10 @@ export default function Tagesgeld() {
         init()
     }, [])
 
-    const ladeTagesgeld = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data } = await supabase
-            .from("geldmarkt")
-            .select("*")
-            .eq("user_id", user.id)
-            .eq("typ", "tagesgeld")
-            .order("name", { ascending: true })
-
-        if (data) setListeGeldmarkt(data)
-    }
-
     const tagesgeldHinzufuegen = async () => {
         if (!name || !bank || !iban || !wert || !summe || !waehrung || !eroeffnet_am || !zinssatz || !endet_am) return
         const { data: { user } } = await supabase.auth.getUser()
-        await supabase.from("geldmarkt").insert({
+        await supabase.from("tagesgeld").insert({
             user_id: user.id,
             typ: "tagesgeld",
             name: name,
@@ -79,13 +81,13 @@ export default function Tagesgeld() {
     }
 
     const eintragLoeschen = async (id) => {
-        await supabase.from("geldmarkt").delete().eq("id", id)
+        await supabase.from("tagesgeld").delete().eq("id", id)
         ladeTagesgeld()
     }
 
     const tagesgeldSpeichern = async () => {
 
-        await supabase.from("geldmarkt").update({
+        await supabase.from("tagesgeld").update({
             typ: "tagesgeld",
             name: name,
             bank: bank,
@@ -109,7 +111,7 @@ export default function Tagesgeld() {
             {/* Liste */}
 
             <ul>
-                {listeGeldmarkt.map((e) => (
+                {listeTagesgeld.map((e) => (
                     <li key={e.id}>
                         {e.name} | {e.bank} |  {e.iban} | {e.wert} | {e.einlage_summe} | {e.waehrung} | {e.eroeffnet_am} | {e.zinssatz} | {e.endet_am}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
