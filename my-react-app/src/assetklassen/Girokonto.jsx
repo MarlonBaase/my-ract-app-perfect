@@ -15,7 +15,7 @@ export default function Girokonto() {
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
 
-    
+
 
     const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -45,8 +45,8 @@ export default function Girokonto() {
             name: name,
             bank: bank,
             iban: iban,
-            wert: wert,
-            einlage_summe: einlage_summe,
+            wert: parseFloat(wert) || 0,          
+            einlage_summe: parseFloat(einlage_summe) || 0,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
         })
@@ -86,8 +86,8 @@ export default function Girokonto() {
             name: name,
             bank: bank,
             iban: iban,
-            wert: wert,
-            einlage_summe: einlage_summe,
+            wert: parseFloat(wert) || 0,          
+            einlage_summe: parseFloat(einlage_summe) || 0,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
         }).eq("id", zuBearbeiten.id)
