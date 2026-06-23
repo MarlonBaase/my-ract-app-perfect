@@ -68,7 +68,7 @@ export default function Girokonto() {
         setBank(eintrag.bank)
         setIban(eintrag.iban)
         setWert(eintrag.wert)
-        setSumme(eintrag.summe)
+        setSumme(eintrag.einlage_summe)
         setWaehrung(eintrag.waehrung)
         setEroeffnet_am(eintrag.eroeffnet_am)
         setModalOffen(true)
