@@ -7,7 +7,7 @@ export default function Girokonto() {
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
     const [wert, setWert] = useState("")
-    const [summe, setSumme] = useState("")
+    const [einlage_summe, setSumme] = useState("")
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnet_am, setEroeffnet_am] = useState("")
     const [besonderheiten, setBesonderheiten] = useState("")
@@ -37,7 +37,7 @@ export default function Girokonto() {
     }, [])
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !wert || !summe || !waehrung || !eroeffnet_am) return
+        if (!name || !bank || !iban || !wert || !einlage_summe || !waehrung || !eroeffnet_am) return
         const { data: { user } } = await supabase.auth.getUser()
         await supabase.from("girokonto").insert({
             user_id: user.id,
@@ -46,7 +46,7 @@ export default function Girokonto() {
             bank: bank,
             iban: iban,
             wert: wert,
-            einlage_summe: summe,
+            einlage_summe: einlage_summe,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
         })
@@ -87,7 +87,7 @@ export default function Girokonto() {
             bank: bank,
             iban: iban,
             wert: wert,
-            einlage_summe: summe,
+            einlage_summe: einlage_summe,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
         }).eq("id", zuBearbeiten.id)
@@ -119,7 +119,7 @@ export default function Girokonto() {
                 <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
                 <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
                 <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                <input value={summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
+                <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
                 <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                 <input value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
 
@@ -148,7 +148,7 @@ export default function Girokonto() {
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
                         <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                        <input value={summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
+                        <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
                         <button onClick={girokontoSpeichern}>Speichern</button>
