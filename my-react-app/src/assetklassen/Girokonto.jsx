@@ -160,7 +160,7 @@ export default function Girokonto() {
                 <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
                 <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
                 <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                <input value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
+                <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
 
 
                 <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
@@ -189,7 +189,7 @@ export default function Girokonto() {
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
                         <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                        <input value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
+                        <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
                     </div>
