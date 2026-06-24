@@ -41,8 +41,8 @@ function App() {
           <Route path="lf" element={<Lf darkMode={darkMode} />}>
             <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
             <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
-          <Route path='wd' element={<Wd darkMode={darkMode}/>} />
           </Route>
+          <Route path='wd' element={<Wd darkMode={darkMode}/>} />
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
         <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
