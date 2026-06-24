@@ -11,13 +11,17 @@ export default function Assetklassen() {
       <h1>Products Page</h1>
       
         <nav>
-          <Link to="lf">Liquidität & Forderungen</Link> |{" "}
-          <Link to="wd">Wertpapiere & Derivate</Link> |{" "}
+          <Link to="lf">Geldmarkt & Liquidität</Link> |{" "}
+          <Link to="wd">Wertpapiere</Link> |{" "}
+          <Link to="wd">Derivate, Hebel- & Strukturierte Produkte</Link> |{" "}
           <Link to="lf">Immobilien</Link> |{" "}
-          <Link to="lf">Krypto & Web3</Link> |{" "}
-          <Link to="lf">Sachwerte & Edelmetalle</Link> |{" "}
+          <Link to="lf">Sachwerte & Rohstoffe</Link> |{" "}
+          <Link to="lf">Digitale Assets & Web3</Link> |{" "}
           <Link to="lf">Geschäftliches & Immaterielles</Link> |{" "}
-          <Link to="lf">Versicherungen, Vorsorge & Verbindlichkeiten</Link>
+          <Link to="lf">Versicherungen & Vorsorge</Link> |{" "}
+          <Link to="lf">Forderungen & Guthaben-Punkte</Link> |{" "}
+          <Link to="lf">Kredite & Finanzierungen</Link> |{" "}
+          <Link to="lf">Persönlich angelegte</Link>
         </nav>
        <Outlet/> 
     </div>
