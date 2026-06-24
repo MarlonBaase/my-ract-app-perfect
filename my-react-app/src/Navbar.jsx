@@ -176,7 +176,7 @@ export default function Navbar({ darkMode }) {
             </div>
           )}
           {/* unter-Dropdown */}
-          {item.unterunterseiten.length > 0 && offenIndex === index && (
+          {item.unterunterseiten?.length > 0 && offenIndex === index && (
             <div style={{
               position: 'absolute',
               top: '56px',
