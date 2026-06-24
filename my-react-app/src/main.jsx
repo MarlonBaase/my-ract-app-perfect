@@ -9,6 +9,7 @@ import Lf from './Lf'
 import Wd from './Wd'
 import Girokonto from './assetklassen/Girokonto'
 import Tagesgeld from './assetklassen/Tagesgeld'
+import Festgeld  from './assetklassen/Festgeld'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
@@ -41,6 +42,7 @@ function App() {
           <Route path="lf" element={<Lf darkMode={darkMode} />}>
             <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
             <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
+            <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
           </Route>
           <Route path='wd' element={<Wd darkMode={darkMode}/>} />
         </Route>
