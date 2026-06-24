@@ -25,12 +25,16 @@ const navStruktur = [
     path: '/assetklassen',
     unterseiten: [
       { label: 'Liquidität & Forderungen', path: '/assetklassen/lf' },
-      { label: 'Wertpapiere & Derivate', path: '/assetklassen/wd' },
-      { label: 'Immobilien', path: '/assetklassen/immobilien' },
-      { label: 'Krypto & Web3', path: '/assetklassen/krypto' },
-      { label: 'Sachwerte & Edelmetalle', path: '/assetklassen/sachwerte' },
-      { label: 'Geschäftliches & Immaterielles', path: '/assetklassen/geschaeftliches' },
+      { label: 'Wertpapiere', path: '/assetklassen/wd' },
+      { label: 'Derivate, Hebel- & Strukturierte Produkte', path: '/assetklassen/dhs' },
+      { label: 'Immobilien', path: '/assetklassen/im' },
+      { label: 'Sachwerte & Rohstoffe', path: '/assetklassen/sr' },
+      { label: 'Digitale Assets & Web3', path: '/assetklassen/dw' },
+      { label: 'Geschäftliches & Immaterielles', path: '/assetklassen/gi' },
       { label: 'Versicherungen, Vorsorge & Verbindlichkeiten', path: '/assetklassen/versicherungen' },
+      { label: 'Forderungen & Guthaben', path: '/assetklassen/fg' },
+      { label: 'Kredite & Finanzierungen', path: '/assetklassen/kf' },
+      { label: 'Persönlich angelegt', path: '/assetklassen/pa' },
     ]
   },
   {
