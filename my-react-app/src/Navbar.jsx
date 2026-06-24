@@ -24,7 +24,10 @@ const navStruktur = [
     label: 'Assetklassen',
     path: '/assetklassen',
     unterseiten: [
-      { label: 'Liquidität & Forderungen', path: '/assetklassen/lf' },
+      { label: 'Liquidität & Forderungen', path: '/assetklassen/lf' ,
+      unterunterseiten: [
+        { label: 'test', path: '/assetklassen/lf/girokonto'},
+      ],},
       { label: 'Wertpapiere & Derivate', path: '/assetklassen/wertpapiere' },
       { label: 'Immobilien', path: '/assetklassen/immobilien' },
       { label: 'Krypto & Web3', path: '/assetklassen/krypto' },
