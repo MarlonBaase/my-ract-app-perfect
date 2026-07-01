@@ -3,9 +3,7 @@ import { supabase } from "./supabase";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts"
 
 export default function haushaltsbuch() {
-  const [startkapital, setStartkapital] = useState(0);
   const [kapital, setKapital] = useState(0);
-  const [neuesStartkapital, setNeuesStartkapital] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
   const [betrag, setBetrag] = useState("");
   const [eintraege, setEintraege] = useState([]);
@@ -63,30 +61,22 @@ export default function haushaltsbuch() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data: kapitalData } = await supabase
-      .from("kofiguration_kapital")
-      .select("betrag")
-      .eq("user_id", user.id)
-      .single();
-
-    const start = kapitalData?.betrag ?? 0;
-    setStartkapital(start);
 
     const { data: ausgaben } = await supabase
-      .from("haushaltsbuch_ausgaben")
+      .from("transaktionsprotokoll")
       .select("*")
-      .eq("user_id", user.id)  // ← fehlt noch
+      .eq("user_id", user.id) 
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
-      .from("haushaltsbuch_einnahmen")
+      .from("transaktionsprotokoll")
       .select("*")
       .eq("user_id", user.id)  // ← fehlt noch
       .order("erstellt_am", { ascending: false });
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
     const gesamtEinnahmen = einnahmen?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    setKapital(start - gesamtAusgaben + gesamtEinnahmen);
+    setKapital(gesamtAusgaben + gesamtEinnahmen);
 
     const alle = [
       ...(ausgaben ?? []).map((e) => ({ ...e, typ: "ausgabe" })),
@@ -94,22 +84,6 @@ export default function haushaltsbuch() {
     ].sort((a, b) => new Date(b.erstellt_am) - new Date(a.erstellt_am));
 
     setEintraege(alle);
-  };
-
-  const startkapitalSpeichern = async () => {
-    if (!neuesStartkapital) return;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    await supabase.from("kofiguration_kapital").upsert(
-      {
-        user_id: user.id,
-        betrag: parseFloat(neuesStartkapital),
-      },
-      { onConflict: "user_id" }
-    );
-    setNeuesStartkapital("");
-    ladeAlles();
   };
 
   const ausgabeHinzufuegen = async () => {
@@ -478,17 +452,6 @@ export default function haushaltsbuch() {
 
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
-      </div>
-
-      <div>
-        <h4>Startkapital setzen</h4>
-        <input
-          placeholder={`Aktuell: ${startkapital.toFixed(2)} €`}
-          type="number"
-          value={neuesStartkapital}
-          onChange={(e) => setNeuesStartkapital(e.target.value)}
-        />
-        <button onClick={startkapitalSpeichern}>Speichern</button>
       </div>
 
       <div>
