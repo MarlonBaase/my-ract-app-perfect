@@ -73,15 +73,17 @@ export default function haushaltsbuch() {
     setStartkapital(start);
 
     const { data: ausgaben } = await supabase
-      .from("haushaltsbuch")
+      .from("transaktionsprotokoll")
       .select("*")
-      .eq("user_id", user.id)  // ← fehlt noch
+      .eq("user_id", user.id) 
+      .eq("typ", "ausgabe") 
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
-      .from("einnahmen")
+      .from("transaktionsprotokoll")
       .select("*")
       .eq("user_id", user.id)  // ← fehlt noch
+      .eq("typ", "einnahme")
       .order("erstellt_am", { ascending: false });
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
@@ -115,11 +117,12 @@ export default function haushaltsbuch() {
   const ausgabeHinzufuegen = async () => {
     if (!beschreibung || !betrag || !ausgabeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("haushaltsbuch").insert({
+    await supabase.from("transaktionsprotokoll").insert({
       user_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
-      kategorie: ausgabeKategorie
+      kategorie: ausgabeKategorie,
+      typ: "ausgabe"
     })
     setBeschreibung("")
     setBetrag("")
@@ -130,11 +133,12 @@ export default function haushaltsbuch() {
   const einnahmeHinzufuegen = async () => {
     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("einnahmen").insert({
+    await supabase.from("transaktionsprotokoll").insert({
       user_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
-      kategorie: einnahmeKategorie
+      kategorie: einnahmeKategorie,
+      typ: "einnahme"
     })
     setEinnahmenBeschreibung("")
     setEinnahmenBetrag("")
@@ -166,10 +170,10 @@ export default function haushaltsbuch() {
 
   const eintragLoeschen = async (id, typ) => {
     if (typ === "ausgabe") {
-      await supabase.from("haushaltsbuch").delete().eq("id", id)
+      await supabase.from("transaktionsprotokoll").delete().eq("id", id)
     }
     if (typ === "einnahme") {
-      await supabase.from("einnahmen").delete().eq("id", id)
+      await supabase.from("transaktionsprotokoll").delete().eq("id", id)
     }
     ladeAlles()
   }
@@ -192,17 +196,19 @@ export default function haushaltsbuch() {
 
   const eintragSpeichern = async (id, typ) => {
     if (typ === "ausgabe") {
-      await supabase.from("haushaltsbuch").update({
+      await supabase.from("transaktionsprotokoll").update({
         beschreibung: editBeschreibung,
         betrag: parseFloat(editBetrag),
-        kategorie: editKategorie
+        kategorie: editKategorie,
+        typ: "ausgabe"
       }).eq("id", id)
     }
     if (typ === "einnahme") {
-      await supabase.from("einnahmen").update({
+      await supabase.from("transaktionsprotokoll").update({
         beschreibung: editBeschreibung,
         betrag: parseFloat(editBetrag),
-        kategorie: editKategorie
+        kategorie: editKategorie,
+        typ: "einnahme"
       }).eq("id", id)
     }
     bearbeitenSchliessen()
@@ -256,19 +262,21 @@ export default function haushaltsbuch() {
     for (const eintrag of liste) {
       if (eintrag.naechste_faelligkeit <= heute) {
         if (eintrag.typ === "ausgabe") {
-          await supabase.from("haushaltsbuch").insert({
+          await supabase.from("transaktionsprotokoll").insert({
             user_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
-            kategorie: eintrag.kategorie
+            kategorie: eintrag.kategorie,
+            typ: "ausgabe"
           })
         }
         if (eintrag.typ === "einnahme") {
-          await supabase.from("einnahmen").insert({
+          await supabase.from("transaktionsprotokoll").insert({
             user_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
-            kategorie: eintrag.kategorie
+            kategorie: eintrag.kategorie,
+            typ: "einnahme"
           })
         }
 
