@@ -10,8 +10,6 @@ export default function haushaltsbuch() {
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
   const [kategorien, setKategorien] = useState([])
-  const [ausgabeKategorie, setAusgabeKategorie] = useState("")
-  const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
   const [neueKategorie, setNeueKategorie] = useState("")
   const [modalOffen, setModalOffen] = useState(false)  // sichtbar: true oder false, nicht ""
   const [zuBearbeiten, setZuBearbeiten] = useState(null) // kein Eintrag am Anfang = null
@@ -87,38 +85,38 @@ export default function haushaltsbuch() {
   };
 
   const ausgabeHinzufuegen = async () => {
-    if (!beschreibung || !betrag || !ausgabeKategorie) return
+    if (!beschreibung || !betrag || !transaktionsKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("haushaltsbuch_ausgaben").insert({
       user_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
-      kategorie: ausgabeKategorie
+      kategorie: transaktionsKategorie
     })
     setBeschreibung("")
     setBetrag("")
-    setAusgabeKategorie("")
+    setTransaktionsKategorie("")
     ladeAlles()
   }
 
   const einnahmeHinzufuegen = async () => {
-    if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
+    if (!einnahmenBeschreibung || !einnahmenBetrag || !transaktionsKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("haushaltsbuch_einnahmen").insert({
       user_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
-      kategorie: einnahmeKategorie
+      kategorie: transaktionsKategorie
     })
     setEinnahmenBeschreibung("")
     setEinnahmenBetrag("")
-    setEinnahmeKategorie("")
+    setTransaktionsKategorie("")
     ladeAlles()
   }
 
   const ladeKategorien = async () => {
     const { data } = await supabase
-      .from("haushaltsbuch_kategorien")
+      .from("transaktionskategorien")
       .select("*")
       .order("name", { ascending: true })
 
@@ -128,7 +126,7 @@ export default function haushaltsbuch() {
   const kategorieHinzufuegen = async () => {
     if (!neueKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("haushaltsbuch_kategorien").insert({
+    await supabase.from("transaktionskategorien").insert({
       user_id: user.id,
       name: neueKategorie,
       ist_vordefiniert: false
@@ -265,7 +263,7 @@ export default function haushaltsbuch() {
 
   const kategorieLoeschen = async (id, ist_vordefiniert) => {
     if (ist_vordefiniert === false) {
-      await supabase.from("haushaltsbuch_kategorien").delete().eq("id", id)
+      await supabase.from("transaktionskategorien").delete().eq("id", id)
     }
     ladeKategorien()
   }
