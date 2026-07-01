@@ -161,7 +161,8 @@ export default function haushaltsbuch() {
     await supabase.from("transaktionskategorie").insert({
       benutzer_id: user.id,
       name: neueKategorie,
-      ist_vordefiniert: false
+      ist_vordefiniert: false,
+      erstellt_am: new Date()
     })
     setNeueKategorie("")
     ladeKategorien()
