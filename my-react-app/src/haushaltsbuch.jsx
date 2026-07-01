@@ -148,7 +148,7 @@ export default function haushaltsbuch() {
 
   const ladeKategorien = async () => {
     const { data } = await supabase
-      .from("kategorien")
+      .from("transaktionskategorie")
       .select("*")
       .order("name", { ascending: true })
 
@@ -158,7 +158,7 @@ export default function haushaltsbuch() {
   const kategorieHinzufuegen = async () => {
     if (!neueKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("kategorien").insert({
+    await supabase.from("transaktionskategorie").insert({
       user_id: user.id,
       name: neueKategorie,
       ist_vordefiniert: false
@@ -299,7 +299,7 @@ export default function haushaltsbuch() {
 
   const kategorieLoeschen = async (id, ist_vordefiniert) => {
     if (ist_vordefiniert === false) {
-      await supabase.from("kategorien").delete().eq("id", id)
+      await supabase.from("transaktionskategorie").delete().eq("id", id)
     }
     ladeKategorien()
   }
