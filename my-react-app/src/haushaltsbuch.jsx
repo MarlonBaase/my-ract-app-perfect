@@ -10,6 +10,8 @@ export default function haushaltsbuch() {
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
   const [kategorien, setKategorien] = useState([])
+  const [ausgabeKategorie, setAusgabeKategorie] = useState("")
+  const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
   const [neueKategorie, setNeueKategorie] = useState("")
   const [modalOffen, setModalOffen] = useState(false)  // sichtbar: true oder false, nicht ""
   const [zuBearbeiten, setZuBearbeiten] = useState(null) // kein Eintrag am Anfang = null
@@ -31,6 +33,7 @@ export default function haushaltsbuch() {
   const [tabellenZeitraum, setTabellenZeitraum] = useState("monat") // heute/woche/monat/jahr
   const [tabellenMonat, setTabellenMonat] = useState(new Date().getMonth()) // 0-11
   const [tabellenJahr, setTabellenJahr] = useState(new Date().getFullYear()) // z.B. 2026
+  const [neuerKategorieTyp, setNeuerKategorieTyp] = useState("")
 
   useEffect(() => {
     const init = async () => {
@@ -63,7 +66,7 @@ export default function haushaltsbuch() {
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
       .select("*")
-      .eq("user_id", user.id) 
+      .eq("user_id", user.id)
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
@@ -85,38 +88,38 @@ export default function haushaltsbuch() {
   };
 
   const ausgabeHinzufuegen = async () => {
-    if (!beschreibung || !betrag || !transaktionsKategorie) return
+    if (!beschreibung || !betrag || !ausgabeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("haushaltsbuch_ausgaben").insert({
       user_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
-      kategorie: transaktionsKategorie
+      kategorie: ausgabeKategorie
     })
     setBeschreibung("")
     setBetrag("")
-    setTransaktionsKategorie("")
+    setAusgabeKategorie("")
     ladeAlles()
   }
 
   const einnahmeHinzufuegen = async () => {
-    if (!einnahmenBeschreibung || !einnahmenBetrag || !transaktionsKategorie) return
+    if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("haushaltsbuch_einnahmen").insert({
       user_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
-      kategorie: transaktionsKategorie
+      kategorie: einnahmeKategorie
     })
     setEinnahmenBeschreibung("")
     setEinnahmenBetrag("")
-    setTransaktionsKategorie("")
+    setEinnahmeKategorie("")
     ladeAlles()
   }
 
   const ladeKategorien = async () => {
     const { data } = await supabase
-      .from("transaktionskategorien")
+      .from("transaktionskategorie")
       .select("*")
       .order("name", { ascending: true })
 
@@ -126,12 +129,14 @@ export default function haushaltsbuch() {
   const kategorieHinzufuegen = async () => {
     if (!neueKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("transaktionskategorien").insert({
+    await supabase.from("transaktionskategorie").insert({
       user_id: user.id,
       name: neueKategorie,
+      typ: neuerKategorieTyp,
       ist_vordefiniert: false
     })
     setNeueKategorie("")
+    setNeuerKategorieTyp("")
     ladeKategorien()
   }
 
@@ -263,7 +268,7 @@ export default function haushaltsbuch() {
 
   const kategorieLoeschen = async (id, ist_vordefiniert) => {
     if (ist_vordefiniert === false) {
-      await supabase.from("transaktionskategorien").delete().eq("id", id)
+      await supabase.from("transaktionskategorie").delete().eq("id", id)
     }
     ladeKategorien()
   }
@@ -470,11 +475,20 @@ export default function haushaltsbuch() {
           onChange={(e) => setAusgabeKategorie(e.target.value)}
         >
           <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
+          {kategorien
+            .filter(k => k.typ === "ausgabe")
+            .map((k) => (
+              <option key={k.id} value={k.name}>
+                {k.name}
+              </option>
+            ))}
+          {kategorien
+            .filter(k => k.typ === "einnahme")
+            .map((k) => (
+              <option key={k.id} value={k.name}>
+                {k.name}
+              </option>
+            ))}
         </select>
         <button onClick={ausgabeHinzufuegen}>Ausgabe hinzufügen</button>
       </div>
@@ -497,11 +511,20 @@ export default function haushaltsbuch() {
           onChange={(e) => setEinnahmeKategorie(e.target.value)}
         >
           <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
+          {kategorien
+            .filter(k => k.typ === "ausgabe")
+            .map((k) => (
+              <option key={k.id} value={k.name}>
+                {k.name}
+              </option>
+            ))}
+          {kategorien
+            .filter(k => k.typ === "einnahme")
+            .map((k) => (
+              <option key={k.id} value={k.name}>
+                {k.name}
+              </option>
+            ))}
         </select>
         <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
       </div>
@@ -551,11 +574,13 @@ export default function haushaltsbuch() {
                 onChange={(e) => setEditKategorie(e.target.value)}
               >
                 <option value="">Kategorie wählen</option>
-                {kategorien.map((k) => (
-                  <option key={k.id} value={k.name}>
-                    {k.name}
-                  </option>
-                ))}
+                {kategorien
+                  .filter(k => k.typ === zuBearbeiten?.typ)
+                  .map((k) => (
+                    <option key={k.id} value={k.name}>
+                      {k.name}
+                    </option>
+                  ))}
               </select>
               <button onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}>Speichern</button>
               <button onClick={bearbeitenSchliessen}>Abbrechen</button>
@@ -589,11 +614,13 @@ export default function haushaltsbuch() {
           onChange={(e) => setkategorieInter(e.target.value)}
         >
           <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
+          {kategorien
+            .filter(k => k.typ === typInter)
+            .map((k) => (
+              <option key={k.id} value={k.name}>
+                {k.name}
+              </option>
+            ))}
         </select>
         <select
           value={intervall}
