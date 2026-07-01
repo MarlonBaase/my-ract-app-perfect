@@ -482,13 +482,6 @@ export default function haushaltsbuch() {
                 {k.name}
               </option>
             ))}
-          {kategorien
-            .filter(k => k.typ === "einnahme")
-            .map((k) => (
-              <option key={k.id} value={k.name}>
-                {k.name}
-              </option>
-            ))}
         </select>
         <button onClick={ausgabeHinzufuegen}>Ausgabe hinzufügen</button>
       </div>
@@ -511,13 +504,6 @@ export default function haushaltsbuch() {
           onChange={(e) => setEinnahmeKategorie(e.target.value)}
         >
           <option value="">Kategorie wählen</option>
-          {kategorien
-            .filter(k => k.typ === "ausgabe")
-            .map((k) => (
-              <option key={k.id} value={k.name}>
-                {k.name}
-              </option>
-            ))}
           {kategorien
             .filter(k => k.typ === "einnahme")
             .map((k) => (
