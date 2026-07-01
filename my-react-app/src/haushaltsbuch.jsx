@@ -66,7 +66,7 @@ export default function haushaltsbuch() {
     const { data: kapitalData } = await supabase
       .from("kapital")
       .select("betrag")
-      .eq("user_id", user.id)
+      .eq("benutzer_id", user.id)
       .single();
 
     const start = kapitalData?.betrag ?? 0;
@@ -75,14 +75,14 @@ export default function haushaltsbuch() {
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
       .select("*")
-      .eq("user_id", user.id) 
+      .eq("benutzer_id", user.id) 
       .eq("typ", "ausgabe") 
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
       .from("transaktionsprotokoll")
       .select("*")
-      .eq("user_id", user.id)  // ← fehlt noch
+      .eq("benutzer_id", user.id)  // ← fehlt noch
       .eq("typ", "einnahme")
       .order("erstellt_am", { ascending: false });
 
@@ -105,10 +105,10 @@ export default function haushaltsbuch() {
     } = await supabase.auth.getUser();
     await supabase.from("kapital").upsert(
       {
-        user_id: user.id,
+        benutzer_id: user.id,
         betrag: parseFloat(neuesStartkapital),
       },
-      { onConflict: "user_id" }
+      { onConflict: "benutzer_id" }
     );
     setNeuesStartkapital("");
     ladeAlles();
@@ -118,7 +118,7 @@ export default function haushaltsbuch() {
     if (!beschreibung || !betrag || !ausgabeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("transaktionsprotokoll").insert({
-      user_id: user.id,
+      benutzer_id: user.id,
       beschreibung,
       betrag: parseFloat(betrag),
       kategorie: ausgabeKategorie,
@@ -134,7 +134,7 @@ export default function haushaltsbuch() {
     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("transaktionsprotokoll").insert({
-      user_id: user.id,
+      benutzer_id: user.id,
       beschreibung: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
       kategorie: einnahmeKategorie,
@@ -159,7 +159,7 @@ export default function haushaltsbuch() {
     if (!neueKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("transaktionskategorie").insert({
-      user_id: user.id,
+      benutzer_id: user.id,
       name: neueKategorie,
       ist_vordefiniert: false
     })
@@ -220,7 +220,7 @@ export default function haushaltsbuch() {
     const { data } = await supabase
       .from("wiederkehrend")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("benutzer_id", user.id)
       .order("erstellt_am", { ascending: false })
 
     if (data) setWiederkehrende(data)
@@ -236,7 +236,7 @@ export default function haushaltsbuch() {
 
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("wiederkehrend").insert({
-      user_id: user.id,
+      benutzer_id: user.id,
       beschreibung: beschreibungInter,  // Spaltenname: Wert
       betrag: parseFloat(betragInter),  // betragInter nicht betrag!
       kategorie: kategorieInter,
@@ -263,7 +263,7 @@ export default function haushaltsbuch() {
       if (eintrag.naechste_faelligkeit <= heute) {
         if (eintrag.typ === "ausgabe") {
           await supabase.from("transaktionsprotokoll").insert({
-            user_id: user.id,
+            benutzer_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
@@ -272,7 +272,7 @@ export default function haushaltsbuch() {
         }
         if (eintrag.typ === "einnahme") {
           await supabase.from("transaktionsprotokoll").insert({
-            user_id: user.id,
+            benutzer_id: user.id,
             beschreibung: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
