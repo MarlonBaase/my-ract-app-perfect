@@ -11,6 +11,8 @@ export default function haushaltsbuch() {
   const [eintraege, setEintraege] = useState([]);
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
+  const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
+  const [ausgabeBetrag, setAusgabeBetrag] = useState("");
   const [kategorien, setKategorien] = useState([])
   const [ausgabeKategorie, setAusgabeKategorie] = useState("")
   const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
@@ -115,17 +117,17 @@ export default function haushaltsbuch() {
   };
 
   const ausgabeHinzufuegen = async () => {
-    if (!beschreibung || !betrag || !ausgabeKategorie) return
+    if (!ausgabeBeschreibung || !ausgabeBetrag || !ausgabeKategorie) return
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
-      beschreibung,
-      betrag: parseFloat(betrag),
+      notizen: ausgabeBeschreibung,
+      betrag: parseFloat(ausgabeBetrag),
       kategorie: ausgabeKategorie,
       typ: "ausgabe"
     })
-    setBeschreibung("")
-    setBetrag("")
+    setAusgabeBeschreibung("")
+    setAusgabeBetrag("")
     setAusgabeKategorie("")
     ladeAlles()
   }
@@ -135,7 +137,7 @@ export default function haushaltsbuch() {
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
-      beschreibung: einnahmenBeschreibung,
+      notizen: einnahmenBeschreibung,
       betrag: parseFloat(einnahmenBetrag),
       kategorie: einnahmeKategorie,
       typ: "einnahme"
