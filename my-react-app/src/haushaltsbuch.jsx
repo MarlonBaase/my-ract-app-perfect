@@ -200,7 +200,7 @@ export default function haushaltsbuch() {
   const eintragSpeichern = async (id, typ) => {
     if (typ === "ausgabe") {
       await supabase.from("transaktionsprotokoll").update({
-        beschreibung: editBeschreibung,
+        notizen: editBeschreibung,
         betrag: parseFloat(editBetrag),
         kategorie: editKategorie,
         typ: "ausgabe"
@@ -208,7 +208,7 @@ export default function haushaltsbuch() {
     }
     if (typ === "einnahme") {
       await supabase.from("transaktionsprotokoll").update({
-        beschreibung: editBeschreibung,
+        notizen: editBeschreibung,
         betrag: parseFloat(editBetrag),
         kategorie: editKategorie,
         typ: "einnahme"
@@ -267,7 +267,7 @@ export default function haushaltsbuch() {
         if (eintrag.typ === "ausgabe") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            beschreibung: eintrag.beschreibung,
+            notizen: eintrag.notizen,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
             typ: "ausgabe"
@@ -276,7 +276,7 @@ export default function haushaltsbuch() {
         if (eintrag.typ === "einnahme") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            beschreibung: eintrag.beschreibung,
+            notizen: eintrag.notizen,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
             typ: "einnahme"
