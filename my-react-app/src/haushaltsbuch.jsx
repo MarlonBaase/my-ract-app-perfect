@@ -64,7 +64,7 @@ export default function haushaltsbuch() {
     } = await supabase.auth.getUser();
 
     const { data: kapitalData } = await supabase
-      .from("kapital")
+      .from("konfiguration_kapital")
       .select("betrag")
       .eq("benutzer_id", user.id)
       .single();
@@ -103,7 +103,7 @@ export default function haushaltsbuch() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    await supabase.from("kapital").upsert(
+    await supabase.from("konfiguration_kapital").upsert(
       {
         benutzer_id: user.id,
         betrag: parseFloat(neuesStartkapital),
