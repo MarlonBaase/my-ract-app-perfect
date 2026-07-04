@@ -269,7 +269,7 @@ export default function haushaltsbuch() {
         if (eintrag.typ === "ausgabe") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            notizen: eintrag.notizen,
+            notizen: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
             typ: "ausgabe"
@@ -278,7 +278,7 @@ export default function haushaltsbuch() {
         if (eintrag.typ === "einnahme") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            notizen: eintrag.notizen,
+            notizen: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
             kategorie: eintrag.kategorie,
             typ: "einnahme"
