@@ -221,9 +221,10 @@ export default function haushaltsbuch() {
   const ladeWiederkehrende = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     const { data } = await supabase
-      .from("wiederkehrend")
+      .from("transaktionsprotokoll")
       .select("*")
       .eq("benutzer_id", user.id)
+      .eq("wiederkehrend", true)
       .order("erstellt_am", { ascending: false })
 
     if (data) setWiederkehrende(data)
@@ -238,12 +239,13 @@ export default function haushaltsbuch() {
 
 
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("wiederkehrend").insert({
+    await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
-      beschreibung: beschreibungInter,  // Spaltenname: Wert
+      notizen: beschreibungInter,  // Spaltenname: Wert
       betrag: parseFloat(betragInter),  // betragInter nicht betrag!
       kategorie: kategorieInter,
       typ: typInter,
+      wiederkehrend: true,
       intervall: intervall,
       naechste_faelligkeit: lokalDatum
     })
@@ -293,9 +295,10 @@ export default function haushaltsbuch() {
 
         const neuesFaelligkeitsDatum = `${naechsteDatum.getFullYear()}-${String(naechsteDatum.getMonth() + 1).padStart(2, '0')}-${String(naechsteDatum.getDate()).padStart(2, '0')}`
 
-        await supabase.from("wiederkehrend")
+        await supabase.from("transaktionsprotokoll")
           .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
           .eq("id", eintrag.id)
+          .eq("wiederkehrend", true)
       }
     }
   }
