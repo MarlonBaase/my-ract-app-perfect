@@ -505,13 +505,13 @@ export default function haushaltsbuch() {
       <div>
         <h4>Ausgabe hinzufügen</h4>
         <input
-          value={beschreibung}
-          onChange={(e) => setBeschreibung(e.target.value)}
+          value={ausgabeBeschreibung}
+          onChange={(e) => setAusgabeBeschreibung(e.target.value)}
           placeholder="Beschreibung"
         />
         <input
-          value={betrag}
-          onChange={(e) => setBetrag(e.target.value)}
+          value={ausgabeBetrag}
+          onChange={(e) => setAusgabeBetrag(e.target.value)}
           placeholder="Betrag"
           type="number"
         />
