@@ -114,7 +114,8 @@ export default function Girokonto() {
                 ))}
             </ul>
 
-
+            
+            <button onClick={() => setModalOffen(true)}>Girokonto hinzufügen</button>
             {modalOffen && (
                 <div style={{
                     // Overlay: deckt die ganze Seite ab
