@@ -133,7 +133,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
-                        <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
+                        <button onClick={girokontoHinzufuegen} onClick={() => setModalOffenHinzu(false)}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
                 </div>
