@@ -7,7 +7,7 @@ export default function Girokonto() {
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
     const [wert, setWert] = useState("")
-    const [einlage_summe, setSumme] = useState("")
+    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnet_am, setEroeffnet_am] = useState("")
     const [besonderheiten, setBesonderheiten] = useState("")
@@ -37,13 +37,13 @@ export default function Girokonto() {
     }, [])
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !wert || !einlage_summe || !waehrung || !eroeffnet_am) return
+        if (!name || !bank || !iban || !wert || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnet_am) return
         const { data: { user } } = await supabase.auth.getUser()
         await supabase.from("girokonto").insert({
             benutzer_id: user.id,
             name_der_bank: bank,
             iban: iban,
-            einlage_summe: parseFloat(einlage_summe) || 0,
+            einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
         })
@@ -51,7 +51,7 @@ export default function Girokonto() {
         setBank("")
         setIban("")
         setWert("")
-        setSumme("")
+        setEinzahlung_bei_eroeffnung("")
         setWaehrung("")
         setEroeffnet_am("")
         ladeGirokonto()
@@ -66,7 +66,7 @@ export default function Girokonto() {
         setName(eintrag.name_der_bank)
         setBank(eintrag.name_der_bank)
         setIban(eintrag.iban)
-        setWert(eintrag.einlage_summe)
+        setWert(eintrag.einzahlung_bei_eroeffnung)
         setWaehrung(eintrag.waehrung)
         setEroeffnet_am(eintrag.eroeffnet_am)
         setModalOffen(true)
@@ -82,9 +82,9 @@ export default function Girokonto() {
         await supabase.from("girokonto").update({
             name_der_bank: bank,
             iban: iban,
-            einlage_summe: parseFloat(einlage_summe) || 0,
+            einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             waehrung: waehrung,
-            eroeffnet_am: eroeffnet_am
+            eroeffnungsdatum: eroeffnet_am
         }).eq("id", zuBearbeiten.id)
         setModalOffen(false)
         ladeGirokonto()
@@ -100,7 +100,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.name_der_bank} | {e.iban} | {e.einlage_summe} | {e.waehrung} | {e.eroeffnet_am}
+                        {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} | {e.waehrung} | {e.eroeffnet_am}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                     </li>
@@ -130,7 +130,7 @@ export default function Girokonto() {
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
                         <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                        <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
+                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
@@ -159,7 +159,7 @@ export default function Girokonto() {
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
                         <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                        <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
+                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
                         <button onClick={girokontoSpeichern}>Speichern</button>
