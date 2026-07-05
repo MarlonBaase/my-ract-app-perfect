@@ -13,7 +13,7 @@ export default function Assetklassen({ darkMode }) {
         onClick={() => setSidebarOffen(!sidebarOffen)}
         style={{
           position: "fixed",
-          top: "70px",
+          bottom: "70px",
           left: sidebarOffen ? "248px" : "0px",
           zIndex: 999,
           backgroundColor: "#4F6EF7",
