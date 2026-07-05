@@ -45,7 +45,7 @@ export default function Girokonto() {
             name: name,
             bank: bank,
             iban: iban,
-            wert: parseFloat(wert) || 0,          
+            wert: parseFloat(wert) || 0,
             einlage_summe: parseFloat(einlage_summe) || 0,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
@@ -60,7 +60,7 @@ export default function Girokonto() {
         ladeGirokonto()
     }
 
-        
+
 
 
 
@@ -88,7 +88,7 @@ export default function Girokonto() {
             name: name,
             bank: bank,
             iban: iban,
-            wert: parseFloat(wert) || 0,          
+            wert: parseFloat(wert) || 0,
             einlage_summe: parseFloat(einlage_summe) || 0,
             waehrung: waehrung,
             eroeffnet_am: eroeffnet_am
@@ -115,20 +115,38 @@ export default function Girokonto() {
             </ul>
 
 
-            <div>
-                <h4>Neues Girokonto hinzufügen</h4>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
-                <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
-                <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
-                <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
-                <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
+            {modalOffen && (
+                <div style={{
+                    // Overlay: deckt die ganze Seite ab
+                    position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
+                    top: 0, left: 0,      // startet oben links
+                    width: "100%", height: "100%",  // bedeckt die ganze Seite
+                    backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
+                    display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
+                }}>
+                    <div style={{
+                        // Modal Box: das eigentliche Fenster
+                        backgroundColor: "white",
+                        padding: "20px",
+                        borderRadius: "8px",
+                        minWidth: "300px"
+                    }}></div>
+                    <div>
+                        <h4>Neues Girokonto hinzufügen</h4>
+                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+                        <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
+                        <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
+                        <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
+                        <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
+                        <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
+                        <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
 
 
-                <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
+                        <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
 
-            </div>
+                    </div>
+                </div>
+            )}
             {modalOffen && (
                 <div style={{
                     // Overlay: deckt die ganze Seite ab
