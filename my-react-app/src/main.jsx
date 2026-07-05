@@ -9,12 +9,13 @@ import Lf from './Lf'
 import Wd from './Wd'
 import Girokonto from './assetklassen/Girokonto'
 import Tagesgeld from './assetklassen/Tagesgeld'
-import Festgeld  from './assetklassen/Festgeld'
+import Festgeld from './assetklassen/Festgeld'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
+import AssetSidebar from './AssetSidebar'
 import './index.css'
 
 function App() {
@@ -39,12 +40,17 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
         <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
-          <Route path="lf" element={<Lf darkMode={darkMode} />}>
-            <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
-            <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
-            <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
-          </Route>
-          <Route path='wd' element={<Wd darkMode={darkMode}/>} />
+          <div style={{ display: "flex" }}>
+            <AssetSidebar darkMode={darkMode} />
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              <Route path="lf" element={<Lf darkMode={darkMode} />}>
+                <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
+                <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
+                <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
+              </Route>
+              <Route path='wd' element={<Wd darkMode={darkMode} />} />
+            </div>
+          </div>
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
         <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />} />
