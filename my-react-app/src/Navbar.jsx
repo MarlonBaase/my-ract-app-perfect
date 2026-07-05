@@ -22,6 +22,7 @@ const navStruktur = [
   },
   {
     label: 'Assetklassen',
+    path: '/assetklassen',
   },
   {
     label: 'Steuern & Risiko',
