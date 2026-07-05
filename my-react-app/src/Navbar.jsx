@@ -22,20 +22,6 @@ const navStruktur = [
   },
   {
     label: 'Assetklassen',
-    path: '/assetklassen',
-    unterseiten: [
-      { label: 'Liquidität & Forderungen', path: '/assetklassen/lf' },
-      { label: 'Wertpapiere', path: '/assetklassen/wd' },
-      { label: 'Derivate, Hebel- & Strukturierte Produkte', path: '/assetklassen/dhs' },
-      { label: 'Immobilien', path: '/assetklassen/im' },
-      { label: 'Sachwerte & Rohstoffe', path: '/assetklassen/sr' },
-      { label: 'Digitale Assets & Web3', path: '/assetklassen/dw' },
-      { label: 'Geschäftliches & Immaterielles', path: '/assetklassen/gi' },
-      { label: 'Versicherungen, Vorsorge & Verbindlichkeiten', path: '/assetklassen/versicherungen' },
-      { label: 'Forderungen & Guthaben', path: '/assetklassen/fg' },
-      { label: 'Kredite & Finanzierungen', path: '/assetklassen/kf' },
-      { label: 'Persönlich angelegt', path: '/assetklassen/pa' },
-    ]
   },
   {
     label: 'Steuern & Risiko',
