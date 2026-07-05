@@ -55,7 +55,6 @@ export default function Girokonto() {
         setWaehrung("")
         setEroeffnungsdatum("")
         ladeGirokonto()
-        setModalOffenHinzu(false)
     }
 
 
@@ -134,7 +133,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
-                        <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
+                        <button onClick={() => {girokontoHinzufuegen(); setModalOffenHinzu(false)}}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
                 </div>
@@ -163,7 +162,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
-                        <button onClick={girokontoSpeichern}>Speichern</button>
+                        <button onClick={() => {girokontoSpeichern(); setModalOffen(false)}}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
                     </div>
                 </div>
