@@ -9,7 +9,7 @@ export default function Girokonto() {
     const [wert, setWert] = useState("")
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [waehrung, setWaehrung] = useState("")
-    const [eroeffnet_am, setEroeffnet_am] = useState("")
+    const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
     const [besonderheiten, setBesonderheiten] = useState("")
     const [modalOffen, setModalOffen] = useState(false)
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
@@ -37,7 +37,7 @@ export default function Girokonto() {
     }, [])
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !wert || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnet_am) return
+        if (!name || !bank || !iban || !wert || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
         const { data: { user } } = await supabase.auth.getUser()
         await supabase.from("girokonto").insert({
             benutzer_id: user.id,
@@ -45,7 +45,7 @@ export default function Girokonto() {
             iban: iban,
             einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             waehrung: waehrung,
-            eroeffnet_am: eroeffnet_am
+            eroeffnungsdatum: eroeffnungsdatum
         })
         setName("")
         setBank("")
@@ -53,7 +53,7 @@ export default function Girokonto() {
         setWert("")
         setEinzahlung_bei_eroeffnung("")
         setWaehrung("")
-        setEroeffnet_am("")
+        setEroeffnungsdatum("")
         ladeGirokonto()
     }
 
@@ -68,7 +68,7 @@ export default function Girokonto() {
         setIban(eintrag.iban)
         setWert(eintrag.einzahlung_bei_eroeffnung)
         setWaehrung(eintrag.waehrung)
-        setEroeffnet_am(eintrag.eroeffnet_am)
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum)
         setModalOffen(true)
     }
 
@@ -84,7 +84,7 @@ export default function Girokonto() {
             iban: iban,
             einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             waehrung: waehrung,
-            eroeffnungsdatum: eroeffnet_am
+            eroeffnungsdatum: eroeffnungsdatum
         }).eq("id", zuBearbeiten.id)
         setModalOffen(false)
         ladeGirokonto()
@@ -100,7 +100,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} | {e.waehrung} | {e.eroeffnet_am}
+                        {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} | {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                     </li>
@@ -132,7 +132,7 @@ export default function Girokonto() {
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                        <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
+                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
@@ -161,7 +161,7 @@ export default function Girokonto() {
                         <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                        <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
+                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
                     </div>
