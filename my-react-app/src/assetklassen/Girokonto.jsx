@@ -11,7 +11,8 @@ export default function Girokonto() {
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnet_am, setEroeffnet_am] = useState("")
     const [besonderheiten, setBesonderheiten] = useState("")
-    const [modalOffen, setModalOffen] = useState(false)  // sichtbar: true oder false, nicht ""
+    const [modalOffen, setModalOffen] = useState(false) 
+    const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
 
@@ -115,8 +116,8 @@ export default function Girokonto() {
             </ul>
 
             
-            <button onClick={() => setModalOffen(true)}>Girokonto hinzufügen</button>
-            {modalOffen && (
+            <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
+            {modalOffenHinzu && (
                 <div style={{
                     // Overlay: deckt die ganze Seite ab
                     position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
