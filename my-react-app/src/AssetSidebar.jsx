@@ -122,6 +122,7 @@ export default function AssetSidebar({ darkMode: dark }) {
       top: "56px",
       padding: "1rem 0",
       fontSize: "0.82rem",
+      marginright: "56px", 
     }}>
       {struktur.map((block) => (
         <div key={block.block} style={{ marginBottom: "1.5rem" }}>
