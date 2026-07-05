@@ -33,7 +33,7 @@ export default function Assetklassen({ darkMode }) {
       {sidebarOffen && <AssetSidebar darkMode={darkMode} />}
 
       {/* Inhalt */}
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div style={{ flex: 1, overflowY: "auto" , paddingLeft: "50px" , paddingTop: "50px"}}>
         <Outlet />
       </div>
     </div>
