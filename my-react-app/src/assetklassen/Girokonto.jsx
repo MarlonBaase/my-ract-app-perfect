@@ -11,7 +11,7 @@ export default function Girokonto() {
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnet_am, setEroeffnet_am] = useState("")
     const [besonderheiten, setBesonderheiten] = useState("")
-    const [modalOffen, setModalOffen] = useState(false) 
+    const [modalOffen, setModalOffen] = useState(false)
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
@@ -115,7 +115,7 @@ export default function Girokonto() {
                 ))}
             </ul>
 
-            
+
             <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
             {modalOffenHinzu && (
                 <div style={{
@@ -132,8 +132,7 @@ export default function Girokonto() {
                         padding: "20px",
                         borderRadius: "8px",
                         minWidth: "300px"
-                    }}></div>
-                    <div>
+                    }}>
                         <h4>Neues Girokonto hinzufügen</h4>
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
@@ -142,10 +141,8 @@ export default function Girokonto() {
                         <input value={einlage_summe} onChange={(e) => setSumme(e.target.value)} placeholder="Einlage Summe" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
                         <input type="date" value={eroeffnet_am} onChange={(e) => setEroeffnet_am(e.target.value)} placeholder="Eroefnnet am" />
-
-
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
-
+                        <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
                 </div>
             )}
