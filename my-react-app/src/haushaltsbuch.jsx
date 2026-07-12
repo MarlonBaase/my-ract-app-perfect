@@ -9,7 +9,7 @@ export default function haushaltsbuch() {
   const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
   const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
   const [transaktionsTyp, setTransaktionsTyp] = useState("");
-
+  const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
   
   
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
@@ -184,10 +184,6 @@ export default function haushaltsbuch() {
 
   const transaktionSchließen = () => {
     setModalOffen(false)
-    setTransaktionsBeschreibung("")
-    setTransaktionsBetrag("")
-    setTransaktionsKategorie("")
-    setTransaktionsTyp("")
     ladeAlles()
   }
 
@@ -590,7 +586,13 @@ export default function haushaltsbuch() {
                 <option value="ausgabe">Ausgabe</option>
                 <option value="einnahme">Einnahme</option>
               </select>
-              <select
+              <input
+                type="checkbox"
+                checked={wiederkehrendaktiv}
+                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+              />
+              <label>Wiederkehrend</label>
+              {wiederkehrendaktiv && (<select
                 value={intervall}
                 onChange={(e) => setIntervall(e.target.value)}
               >
@@ -599,8 +601,7 @@ export default function haushaltsbuch() {
                 <option value="wöchentlich">Wöchentlich</option>
                 <option value="monatlich">Monatlich</option>
                 <option value="jährlich">Jährlich</option>
-              </select>
-              <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
+              </select>)}
             </div>
             <button onClick={transaktionHinzufuegen}>Transaktion hinzufügen</button>
             <button onClick={transaktionSchließen}>Abbrechen</button>
