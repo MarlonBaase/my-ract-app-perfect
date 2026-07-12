@@ -483,59 +483,7 @@ export default function haushaltsbuch() {
         <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
       </div>
 
-      <div>
-        <h4>Ausgabe hinzufügen</h4>
-        <input
-          value={ausgabeBeschreibung}
-          onChange={(e) => setAusgabeBeschreibung(e.target.value)}
-          placeholder="Beschreibung"
-        />
-        <input
-          value={ausgabeBetrag}
-          onChange={(e) => setAusgabeBetrag(e.target.value)}
-          placeholder="Betrag"
-          type="number"
-        />
-        <select
-          value={ausgabeKategorie}
-          onChange={(e) => setAusgabeKategorie(e.target.value)}
-        >
-          <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
-        </select>
-        <button onClick={ausgabeHinzufuegen}>Ausgabe hinzufügen</button>
-      </div>
-
-      <div>
-        <h4>Einnahme hinzufügen</h4>
-        <input
-          value={einnahmenBeschreibung}
-          onChange={(e) => setEinnahmenBeschreibung(e.target.value)}
-          placeholder="Beschreibung"
-        />
-        <input
-          value={einnahmenBetrag}
-          onChange={(e) => setEinnahmenBetrag(e.target.value)}
-          placeholder="Betrag"
-          type="number"
-        />
-        <select
-          value={einnahmeKategorie}
-          onChange={(e) => setEinnahmeKategorie(e.target.value)}
-        >
-          <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
-        </select>
-        <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
-      </div>
+      
 
       <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
 
@@ -662,49 +610,6 @@ export default function haushaltsbuch() {
         )
       }
 
-
-
-      <div>
-        <h4>Wiederkehrenden Eintrag hinzufügen</h4>
-        <input
-          value={beschreibungInter}
-          onChange={(e) => setBeschreibungInter(e.target.value)}
-          placeholder="Beschreibung"
-        />
-        <input
-          value={betragInter}
-          onChange={(e) => setBetragInter(e.target.value)}
-          placeholder="Betrag"
-          type="number"
-        />
-        <select value={typInter} onChange={(e) => setTypInter(e.target.value)}>
-          <option value="">Typ wählen</option>
-          <option value="ausgabe">Ausgabe</option>
-          <option value="einnahme">Einnahme</option>
-        </select>
-        <select
-          value={kategorieInter}
-          onChange={(e) => setkategorieInter(e.target.value)}
-        >
-          <option value="">Kategorie wählen</option>
-          {kategorien.map((k) => (
-            <option key={k.id} value={k.name}>
-              {k.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={intervall}
-          onChange={(e) => setIntervall(e.target.value)}
-        >
-          <option value="">Intervall wählen</option>
-          <option value="täglich">Täglich</option>
-          <option value="wöchentlich">Wöchentlich</option>
-          <option value="monatlich">Monatlich</option>
-          <option value="jährlich">Jährlich</option>
-        </select>
-        <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
-      </div>
 
       <div>
         {/* Buttons */}
