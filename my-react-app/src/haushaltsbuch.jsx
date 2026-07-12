@@ -5,7 +5,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart
 export default function haushaltsbuch() {
   const [startkapital, setStartkapital] = useState(0);
   const [kapital, setKapital] = useState(0);
-  const [neuesStartkapital, setNeuesStartkapital] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
   const [betrag, setBetrag] = useState("");
   const [eintraege, setEintraege] = useState([]);
@@ -90,7 +89,7 @@ export default function haushaltsbuch() {
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
     const gesamtEinnahmen = einnahmen?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    setKapital(start - gesamtAusgaben + gesamtEinnahmen);
+    setKapital(gesamtAusgaben + gesamtEinnahmen);
 
     const alle = [
       ...(ausgaben ?? []).map((e) => ({ ...e, typ: "ausgabe" })),
@@ -100,21 +99,6 @@ export default function haushaltsbuch() {
     setEintraege(alle);
   };
 
-  const startkapitalSpeichern = async () => {
-    if (!neuesStartkapital) return;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    await supabase.from("konfiguration_kapital").upsert(
-      {
-        benutzer_id: user.id,
-        betrag: parseFloat(neuesStartkapital),
-      },
-      { onConflict: "benutzer_id" }
-    );
-    setNeuesStartkapital("");
-    ladeAlles();
-  };
 
   const ausgabeHinzufuegen = async () => {
     if (!ausgabeBeschreibung || !ausgabeBetrag || !ausgabeKategorie) return
@@ -498,19 +482,6 @@ export default function haushaltsbuch() {
       </div>
       <div>
         <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
-      </div>
-      
-        
-
-      <div>
-        <h4>Startkapital setzen</h4>
-        <input
-          placeholder={`Aktuell: ${startkapital.toFixed(2)} €`}
-          type="number"
-          value={neuesStartkapital}
-          onChange={(e) => setNeuesStartkapital(e.target.value)}
-        />
-        <button onClick={startkapitalSpeichern}>Speichern</button>
       </div>
 
       <div>
