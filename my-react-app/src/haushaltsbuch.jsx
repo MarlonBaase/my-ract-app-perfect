@@ -550,7 +550,8 @@ export default function haushaltsbuch() {
             top: 0, left: 0,      // startet oben links
             width: "100%", height: "100%",  // bedeckt die ganze Seite
             backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-            display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
+            display: "flex", alignItems: "center", justifyContent: "center",  // zentriert die Box
+            zIndex: 1000  // sorgt dafür, dass das Modal über allem anderen liegt
           }}>
             <div style={{
               // Modal Box: das eigentliche Fenster
@@ -616,7 +617,8 @@ export default function haushaltsbuch() {
             top: 0, left: 0,      // startet oben links
             width: "100%", height: "100%",  // bedeckt die ganze Seite
             backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-            display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
+            display: "flex", alignItems: "center", justifyContent: "center",  // zentriert die Box
+            zIndex: 1000  // sorgt dafür, dass das Modal über allem anderen liegt
           }}>
             <div style={{
               // Modal Box: das eigentliche Fenster
