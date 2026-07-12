@@ -22,7 +22,6 @@ const struktur = [
         label: "Einstellungen",
         path: "/profil/konfiguration",
         unterseiten: [
-            { label: "Eigene Kategorien", path: "/profil/konfiguration/kategorien" },
         ]
       },
     ]
