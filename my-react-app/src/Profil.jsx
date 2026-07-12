@@ -18,6 +18,10 @@ export default function Profil({ darkMode, setDarkMode }) {
        <div>
         <button onClick={logout}>Logout</button>
       </div>
+      <div style={{ flex: 1, overflowY: "auto" , paddingLeft: "50px" , paddingTop: "50px"}}>
+        <Outlet />
+      </div>
     </div>
+    
   );
 }
