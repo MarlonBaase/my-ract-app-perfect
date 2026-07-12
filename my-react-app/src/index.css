@@ -74,6 +74,8 @@ body.dark {
   display: flex;
   flex-direction: row;
   padding-right: 50px;
+  align-items: center;
+  text-align: center;
 }
 
 .zahl , .diagramm{
