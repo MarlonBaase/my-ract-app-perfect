@@ -528,16 +528,6 @@ export default function haushaltsbuch() {
         </select>
         <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
       </div>
-
-      <div>
-        <h4>Eigene Kategorie hinzufügen</h4>
-        <input
-          value={neueKategorie}
-          onChange={(e) => setNeueKategorie(e.target.value)}
-          placeholder="z.B. 🎮 Gaming"
-        />
-        <button onClick={kategorieHinzufuegen}>Kategorie hinzufügen</button>
-      </div>
       {modalOffen && (
         <div style={{
           // Overlay: deckt die ganze Seite ab
@@ -676,16 +666,7 @@ export default function haushaltsbuch() {
         </PieChart>
       </div>
 
-      <ul>
-        {kategorien.map((e) => (
-          <li key={e.id}>
-            {e.name}
-            {!e.ist_vordefiniert && (
-              <button onClick={() => kategorieLoeschen(e.id, e.ist_vordefiniert)}>🗑️</button>
-            )}
-          </li>
-        ))}
-      </ul>
+      
       <div>
         <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
         <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
