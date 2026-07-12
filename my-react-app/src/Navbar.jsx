@@ -52,7 +52,6 @@ const navStruktur = [
     unterseiten: [
       { label: 'Einstellungen', path: '/profil/einstellungen' },
       { label: 'Konfiguration', path: '/profil/konfiguration' },
-      { label: 'Abmelden', path: '/profil/abmelden' },
     ]
   },
 ]
@@ -110,6 +109,7 @@ export default function Navbar({ darkMode }) {
               <span style={{ marginLeft: '4px', fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
             )}
           </Link>
+           
 
           {/* Dropdown */}
           {item.unterseiten.length > 0 && offenIndex === index && (

@@ -15,7 +15,9 @@ export default function Profil({ darkMode, setDarkMode }) {
       <button onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? "Light Mode" : "Dark Mode"}
       </button>
-      <button onClick={logout}>Abmelden</button>
+       <div>
+        <button onClick={logout}>Logout</button>
+      </div>
     </div>
   );
 }

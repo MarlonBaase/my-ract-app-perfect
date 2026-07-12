@@ -493,6 +493,14 @@ export default function haushaltsbuch() {
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
       </div>
+      <div>
+        <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+      </div>
+      <div>
+        <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+      </div>
+      
+        
 
       <div>
         <h4>Startkapital setzen</h4>
@@ -669,8 +677,7 @@ export default function haushaltsbuch() {
         <button onClick={() => setZeitraum("jahr")}>Jahr</button>
 
         {/* Anzeige */}
-        <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
-        <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+        
       </div>
 
       <LineChart width={600} height={300} data={diagrammDaten}>
