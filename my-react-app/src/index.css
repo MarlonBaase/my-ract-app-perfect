@@ -72,5 +72,5 @@ body.dark {
 
 .uebersicht{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
