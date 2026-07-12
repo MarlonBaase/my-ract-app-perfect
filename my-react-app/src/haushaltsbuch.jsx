@@ -89,7 +89,7 @@ export default function haushaltsbuch() {
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
     const gesamtEinnahmen = einnahmen?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    setKapital(gesamtAusgaben + gesamtEinnahmen);
+    setKapital(gesamtAusgaben - gesamtEinnahmen);
 
     const alle = [
       ...(ausgaben ?? []).map((e) => ({ ...e, typ: "ausgabe" })),
