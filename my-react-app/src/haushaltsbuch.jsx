@@ -475,6 +475,15 @@ export default function haushaltsbuch() {
 
       <div>
         <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+        <LineChart width={600} height={300} data={diagrammDaten}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="label" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="einnahmen" stroke="green" />
+        <Line type="monotone" dataKey="ausgaben" stroke="red" />
+      </LineChart>
       </div>
       <div>
         <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
@@ -502,36 +511,6 @@ export default function haushaltsbuch() {
           <Legend />
         </PieChart>
       </div>
-      {
-        eintraege
-          .filter(e => {
-            const datum = new Date(e.erstellt_am)
-            const jetzt = new Date()
-
-            if (tabellenZeitraum === "heute") {
-              return datum.getFullYear() === jetzt.getFullYear() &&
-                datum.getMonth() === jetzt.getMonth() &&
-                datum.getDate() === jetzt.getDate()
-            }
-            if (tabellenZeitraum === "woche") {
-              const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
-              return diffInTagen <= 7
-            }
-            if (tabellenZeitraum === "monat") {
-              return (
-                datum.getMonth() === jetzt.getMonth() &&
-                datum.getFullYear() === jetzt.getFullYear()
-              )
-            }
-            if (tabellenZeitraum === "jahr") {
-              return datum.getFullYear() === jetzt.getFullYear()
-            }
-            if (tabellenZeitraum === "spezifisch") {
-              return datum.getFullYear() === tabellenJahr &&
-                datum.getMonth() === tabellenMonat
-            }
-          })    
-      }
 
       
 
@@ -672,15 +651,7 @@ export default function haushaltsbuch() {
 
       </div>
 
-      <LineChart width={600} height={300} data={diagrammDaten}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="label" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="einnahmen" stroke="green" />
-        <Line type="monotone" dataKey="ausgaben" stroke="red" />
-      </LineChart>
+      
 
 
 
@@ -724,6 +695,33 @@ export default function haushaltsbuch() {
       </div>
       {
         eintraege
+          .filter(e => {
+            const datum = new Date(e.erstellt_am)
+            const jetzt = new Date()
+
+            if (tabellenZeitraum === "heute") {
+              return datum.getFullYear() === jetzt.getFullYear() &&
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getDate() === jetzt.getDate()
+            }
+            if (tabellenZeitraum === "woche") {
+              const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
+              return diffInTagen <= 7
+            }
+            if (tabellenZeitraum === "monat") {
+              return (
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getFullYear() === jetzt.getFullYear()
+              )
+            }
+            if (tabellenZeitraum === "jahr") {
+              return datum.getFullYear() === jetzt.getFullYear()
+            }
+            if (tabellenZeitraum === "spezifisch") {
+              return datum.getFullYear() === tabellenJahr &&
+                datum.getMonth() === tabellenMonat
+            }
+          })
           .map((e) => (
             <li key={e.id + e.typ}>
               {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
