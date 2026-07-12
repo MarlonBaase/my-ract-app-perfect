@@ -51,7 +51,7 @@ const navStruktur = [
     path: '/profil',
     unterseiten: [
       { label: 'Einstellungen', path: '/profil/einstellungen' },
-      { label: 'Konfiguration', path: '/profil/konfiguration' },
+      { label: 'Konfiguration', path: '/profil/profil/konfiguration' },
     ]
   },
 ]
