@@ -52,6 +52,7 @@ const navStruktur = [
     unterseiten: [
       { label: 'Einstellungen', path: '/profil/einstellungen' },
       { label: 'Konfiguration', path: '/profil/konfiguration' },
+      { label: 'Abmelden', path: '/profil/abmelden' },
     ]
   },
 ]
