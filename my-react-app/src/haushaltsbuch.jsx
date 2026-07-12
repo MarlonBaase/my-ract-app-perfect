@@ -182,6 +182,15 @@ export default function haushaltsbuch() {
     setEditKategorie("")
   }
 
+  const transaktionSchließen = () => {
+    setModalOffen(false)
+    setTransaktionsBeschreibung("")
+    setTransaktionsBetrag("")
+    setTransaktionsKategorie("")
+    setTransaktionsTyp("")
+    ladeAlles()
+  }
+
   const eintragSpeichern = async (id, typ) => {
     if (typ === "ausgabe") {
       await supabase.from("transaktionsprotokoll").update({
@@ -593,6 +602,7 @@ export default function haushaltsbuch() {
               <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
             </div>
             <button onClick={transaktionHinzufuegen}>Transaktion hinzufügen</button>
+            <button onClick={transaktionSchließen}>Abbrechen</button>
           </div>
         </div>
       )
