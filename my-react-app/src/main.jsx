@@ -49,8 +49,8 @@ function App() {
           <Route path='wd' element={<Wd darkMode={darkMode} />} />
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
-        <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />}>
-          <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} />} />
+        <Route path="/profil" element={<Profil darkMode={darkMode} />}>
+          <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode}  />} />
         </Route>
         <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
         <Route path="/support" element={<Support darkMode={darkMode} />} />
