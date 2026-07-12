@@ -478,9 +478,29 @@ export default function haushaltsbuch() {
       </div>
       <div>
         <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+        <h4>Einnahmen pro Kategorie</h4>
+        <PieChart width={300} height={300}>
+          <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+            {kreisDatenEinnahmen.map((entry, index) => (
+              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
       </div>
       <div>
         <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+         <h4>Ausgaben pro Kategorie</h4>
+        <PieChart width={300} height={300}>
+          <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+            {kreisDatenAusgaben.map((entry, index) => (
+              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
       </div>
 
       
@@ -632,29 +652,6 @@ export default function haushaltsbuch() {
         <Line type="monotone" dataKey="ausgaben" stroke="red" />
       </LineChart>
 
-      <div>
-        <h4>Ausgaben pro Kategorie</h4>
-        <PieChart width={300} height={300}>
-          <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-            {kreisDatenAusgaben.map((entry, index) => (
-              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-
-        <h4>Einnahmen pro Kategorie</h4>
-        <PieChart width={300} height={300}>
-          <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-            {kreisDatenEinnahmen.map((entry, index) => (
-              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </div>
 
 
       <div>
