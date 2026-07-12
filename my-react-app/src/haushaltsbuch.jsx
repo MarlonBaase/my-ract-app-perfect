@@ -64,15 +64,6 @@ export default function haushaltsbuch() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data: kapitalData } = await supabase
-      .from("konfiguration_kapital")
-      .select("betrag")
-      .eq("benutzer_id", user.id)
-      .single();
-
-    const start = kapitalData?.betrag ?? 0;
-    setStartkapital(start);
-
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
       .select("*")
@@ -89,7 +80,7 @@ export default function haushaltsbuch() {
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
     const gesamtEinnahmen = einnahmen?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    setKapital(gesamtAusgaben - gesamtEinnahmen);
+    setKapital(gesamtEinnahmen - gesamtAusgaben);
 
     const alle = [
       ...(ausgaben ?? []).map((e) => ({ ...e, typ: "ausgabe" })),
