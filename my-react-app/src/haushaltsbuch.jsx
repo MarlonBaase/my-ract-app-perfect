@@ -473,7 +473,7 @@ export default function haushaltsbuch() {
 
 
       <div className="uebersicht">
-        <div>
+        <div className="kapital">
           <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
           <LineChart width={600} height={300} data={diagrammDaten}>
             <CartesianGrid strokeDasharray="3 3" />
