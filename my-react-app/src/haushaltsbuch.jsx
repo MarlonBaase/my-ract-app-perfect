@@ -183,7 +183,7 @@ export default function haushaltsbuch() {
   }
 
   const transaktionSchließen = () => {
-    setModalOffen(false)
+    setModalTransaktion(false)
     ladeAlles()
   }
 
