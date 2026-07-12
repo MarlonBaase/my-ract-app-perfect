@@ -69,3 +69,8 @@ body.dark {
   transition: 0.3s;
   border-radius: 5px;
 }
+
+.uebersicht{
+  display: flex;
+  flex-direction: row;
+}

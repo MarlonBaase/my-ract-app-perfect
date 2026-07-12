@@ -10,8 +10,8 @@ export default function haushaltsbuch() {
   const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
   const [transaktionsTyp, setTransaktionsTyp] = useState("");
   const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
-  
-  
+
+
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
   const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
@@ -472,68 +472,70 @@ export default function haushaltsbuch() {
       <h2>Haushaltsbuch</h2>
 
 
+      <div className="uebersicht">
+        <div>
+          <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+          <LineChart width={600} height={300} data={diagrammDaten}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="label" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="einnahmen" stroke="green" />
+            <Line type="monotone" dataKey="ausgaben" stroke="red" />
+          </LineChart>
+        </div>
+        <div>
+          <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+          <h4>Einnahmen pro Kategorie</h4>
+          <PieChart width={300} height={300}>
+            <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+              {kreisDatenEinnahmen.map((entry, index) => (
+                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </div>
+        <div>
+          <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+          <h4>Ausgaben pro Kategorie</h4>
+          <PieChart width={300} height={300}>
+            <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+              {kreisDatenAusgaben.map((entry, index) => (
+                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </div>
+      </div>
 
-      <div>
-        <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
-        <LineChart width={600} height={300} data={diagrammDaten}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="label" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="einnahmen" stroke="green" />
-        <Line type="monotone" dataKey="ausgaben" stroke="red" />
-      </LineChart>
-      </div>
-      <div>
-        <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
-        <h4>Einnahmen pro Kategorie</h4>
-        <PieChart width={300} height={300}>
-          <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-            {kreisDatenEinnahmen.map((entry, index) => (
-              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </div>
-      <div>
-        <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
-         <h4>Ausgaben pro Kategorie</h4>
-        <PieChart width={300} height={300}>
-          <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-            {kreisDatenAusgaben.map((entry, index) => (
-              <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </div>
 
-      
+
 
       <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
 
       {modalTransaktion && (
+        <div style={{
+          // Overlay: deckt die ganze Seite ab
+          position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
+          top: 0, left: 0,      // startet oben links
+          width: "100%", height: "100%",  // bedeckt die ganze Seite
+          backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
+          display: "flex", alignItems: "center", justifyContent: "center",  // zentriert die Box
+          zIndex: 1000  // sorgt dafür, dass das Modal über allem anderen liegt
+        }}>
           <div style={{
-            // Overlay: deckt die ganze Seite ab
-            position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
-            top: 0, left: 0,      // startet oben links
-            width: "100%", height: "100%",  // bedeckt die ganze Seite
-            backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-            display: "flex", alignItems: "center", justifyContent: "center",  // zentriert die Box
-            zIndex: 1000  // sorgt dafür, dass das Modal über allem anderen liegt
+            // Modal Box: das eigentliche Fenster
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            minWidth: "300px"
           }}>
-            <div style={{
-              // Modal Box: das eigentliche Fenster
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              minWidth: "300px"
-            }}>
-              {/* dein bisheriger Modal Inhalt hier */}
+            {/* dein bisheriger Modal Inhalt hier */}
             <div>
               <h4>Transaktion hinzufügen</h4>
               <input
@@ -651,7 +653,7 @@ export default function haushaltsbuch() {
 
       </div>
 
-      
+
 
 
 
