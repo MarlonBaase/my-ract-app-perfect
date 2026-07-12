@@ -1,27 +1,41 @@
-import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
-import { useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { Outlet } from 'react-router-dom'
+import ProfilSidebar from './ProfilSidebar'
+import { useState } from 'react'
 
-export default function Profil({ darkMode, setDarkMode }) {
-
-  const logout = async () => {
-    await supabase.auth.signOut()
-    window.location.href = "https://my-ract-app-perfect.vercel.app/"
-  }
+export default function Profil({ darkMode }) {
+  const [sidebarOffen, setSidebarOffen] = useState(true)
 
   return (
-    <div>
-      <h1>Profil</h1>
-      <button onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? "Light Mode" : "Dark Mode"}
+    <div style={{ display: "flex" }}>
+      
+      {/* Toggle Button */}
+      <button
+        onClick={() => setSidebarOffen(!sidebarOffen)}
+        style={{
+          position: "fixed",
+          bottom: "70px",
+          left: sidebarOffen ? "248px" : "0px",
+          zIndex: 999,
+          backgroundColor: "#4F6EF7",
+          color: "white",
+          border: "none",
+          borderRadius: "0 8px 8px 0",
+          padding: "0.5rem 0.4rem",
+          cursor: "pointer",
+          fontSize: "0.75rem",
+          transition: "left 0.2s",
+        }}
+      >
+        {sidebarOffen ? "◀" : "▶"}
       </button>
-       <div>
-        <button onClick={logout}>Logout</button>
-      </div>
+
+      {/* Sidebar */}
+      {sidebarOffen && <ProfilSidebar darkMode={darkMode} />}
+
+      {/* Inhalt */}
       <div style={{ flex: 1, overflowY: "auto" , paddingLeft: "50px" , paddingTop: "50px"}}>
         <Outlet />
       </div>
     </div>
-    
-  );
+  )
 }

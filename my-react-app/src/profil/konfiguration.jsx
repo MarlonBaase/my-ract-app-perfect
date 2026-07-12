@@ -49,6 +49,11 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
           ladeKategorien()
         }
 
+        const logout = async () => {
+    await supabase.auth.signOut()
+    window.location.href = "https://my-ract-app-perfect.vercel.app/"
+  }
+
   return (
     <div>
     <button onClick={() => setDarkMode(!darkMode)}>
@@ -76,6 +81,19 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
         ))}
       </ul>
 
+
+
+
+
+    <div>
+      <h1>Profil</h1>
+      
+       <div>
+        <button onClick={logout}>Logout</button>
+      </div>
+      <div style={{ flex: 1, overflowY: "auto" , paddingLeft: "50px" , paddingTop: "50px"}}>
+      </div>
+    </div>
       </div>
 
   );
