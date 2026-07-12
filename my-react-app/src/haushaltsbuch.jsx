@@ -8,6 +8,13 @@ export default function haushaltsbuch() {
   const [beschreibung, setBeschreibung] = useState("");
   const [betrag, setBetrag] = useState("");
   const [eintraege, setEintraege] = useState([]);
+  const [transaktionsBeschreibung, setTransaktionsBeschreibung] = useState("");
+  const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
+  const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
+  const [transaktionsTyp, setTransaktionsTyp] = useState("");
+
+  
+  
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
   const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
@@ -16,7 +23,8 @@ export default function haushaltsbuch() {
   const [ausgabeKategorie, setAusgabeKategorie] = useState("")
   const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
   const [neueKategorie, setNeueKategorie] = useState("")
-  const [modalOffen, setModalOffen] = useState(false)  // sichtbar: true oder false, nicht ""
+  const [modalOffen, setModalOffen] = useState(false)// sichtbar: true oder false, nicht ""
+  const [modalTransaktion, setModalTransaktion] = useState(false)
   const [zuBearbeiten, setZuBearbeiten] = useState(null) // kein Eintrag am Anfang = null
   const [editBeschreibung, setEditBeschreibung] = useState("")
   const [editBetrag, setEditBetrag] = useState("")
@@ -67,8 +75,8 @@ export default function haushaltsbuch() {
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
       .select("*")
-      .eq("benutzer_id", user.id) 
-      .eq("typ", "ausgabe") 
+      .eq("benutzer_id", user.id)
+      .eq("typ", "ausgabe")
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
@@ -120,6 +128,23 @@ export default function haushaltsbuch() {
     setEinnahmenBeschreibung("")
     setEinnahmenBetrag("")
     setEinnahmeKategorie("")
+    ladeAlles()
+  }
+
+  const transaktionHinzufuegen = async () => {
+    if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from("transaktionsprotokoll").insert({
+      benutzer_id: user.id,
+      notizen: transaktionsBeschreibung,
+      betrag: parseFloat(transaktionsBetrag),
+      kategorie: transaktionsKategorie,
+      typ: transaktionsTyp
+    })
+    setTransaktionsBeschreibung("")
+    setTransaktionsBetrag("")
+    setTransaktionsKategorie("")
+    setTransaktionsTyp("")
     ladeAlles()
   }
 
@@ -528,7 +553,11 @@ export default function haushaltsbuch() {
         </select>
         <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
       </div>
-      {modalOffen && (
+
+      <button onClick={setModalTransaktion(true)}>Transaktion hinzufügen</button>
+
+      {modalTransaktion && (
+
         <div style={{
           // Overlay: deckt die ganze Seite ab
           position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
@@ -544,24 +573,22 @@ export default function haushaltsbuch() {
             borderRadius: "8px",
             minWidth: "300px"
           }}>
-            {/* dein bisheriger Modal Inhalt hier */}
-
             <div>
-              <h4>Eintrag bearbeiten</h4>
+              <h4>Transaktion hinzufügen</h4>
               <input
-                value={editBeschreibung}
-                onChange={(e) => setEditBeschreibung(e.target.value)}
+                value={transaktionsBeschreibung}
+                onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
                 placeholder="Beschreibung"
               />
               <input
-                value={editBetrag}
-                onChange={(e) => setEditBetrag(e.target.value)}
+                value={transaktionsBetrag}
+                onChange={(e) => setTransaktionsBetrag(e.target.value)}
                 placeholder="Betrag"
                 type="number"
               />
               <select
-                value={editKategorie}
-                onChange={(e) => setEditKategorie(e.target.value)}
+                value={transaktionsKategorie}
+                onChange={(e) => setTransaktionsKategorie(e.target.value)}
               >
                 <option value="">Kategorie wählen</option>
                 {kategorien.map((k) => (
@@ -570,12 +597,79 @@ export default function haushaltsbuch() {
                   </option>
                 ))}
               </select>
-              <button onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}>Speichern</button>
-              <button onClick={bearbeitenSchliessen}>Abbrechen</button>
+              <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
+                <option value="">Typ wählen</option>
+                <option value="ausgabe">Ausgabe</option>
+                <option value="einnahme">Einnahme</option>
+              </select>
+              <select
+                value={intervall}
+                onChange={(e) => setIntervall(e.target.value)}
+              >
+                <option value="">Intervall wählen</option>
+                <option value="täglich">Täglich</option>
+                <option value="wöchentlich">Wöchentlich</option>
+                <option value="monatlich">Monatlich</option>
+                <option value="jährlich">Jährlich</option>
+              </select>
+              <button onClick={wiederkehrendHinzufuegen}>Hinzufügen</button>
             </div>
+            <button onClick={transaktionHinzufuegen}>Transaktion hinzufügen</button>
           </div>
         </div>
-      )}
+      )
+      }
+
+      {
+        modalOffen && (
+          <div style={{
+            // Overlay: deckt die ganze Seite ab
+            position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
+            top: 0, left: 0,      // startet oben links
+            width: "100%", height: "100%",  // bedeckt die ganze Seite
+            backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
+            display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
+          }}>
+            <div style={{
+              // Modal Box: das eigentliche Fenster
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              minWidth: "300px"
+            }}>
+              {/* dein bisheriger Modal Inhalt hier */}
+
+              <div>
+                <h4>Eintrag bearbeiten</h4>
+                <input
+                  value={editBeschreibung}
+                  onChange={(e) => setEditBeschreibung(e.target.value)}
+                  placeholder="Beschreibung"
+                />
+                <input
+                  value={editBetrag}
+                  onChange={(e) => setEditBetrag(e.target.value)}
+                  placeholder="Betrag"
+                  type="number"
+                />
+                <select
+                  value={editKategorie}
+                  onChange={(e) => setEditKategorie(e.target.value)}
+                >
+                  <option value="">Kategorie wählen</option>
+                  {kategorien.map((k) => (
+                    <option key={k.id} value={k.name}>
+                      {k.name}
+                    </option>
+                  ))}
+                </select>
+                <button onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}>Speichern</button>
+                <button onClick={bearbeitenSchliessen}>Abbrechen</button>
+              </div>
+            </div>
+          </div>
+        )
+      }
 
 
 
@@ -629,7 +723,7 @@ export default function haushaltsbuch() {
         <button onClick={() => setZeitraum("jahr")}>Jahr</button>
 
         {/* Anzeige */}
-        
+
       </div>
 
       <LineChart width={600} height={300} data={diagrammDaten}>
@@ -666,7 +760,7 @@ export default function haushaltsbuch() {
         </PieChart>
       </div>
 
-      
+
       <div>
         <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
         <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
@@ -705,42 +799,43 @@ export default function haushaltsbuch() {
           ))}
         </select>
       </div>
-      {eintraege
-        .filter(e => {
-          const datum = new Date(e.erstellt_am)
-          const jetzt = new Date()
+      {
+        eintraege
+          .filter(e => {
+            const datum = new Date(e.erstellt_am)
+            const jetzt = new Date()
 
-          if (tabellenZeitraum === "heute") {
-            return datum.getFullYear() === jetzt.getFullYear() &&
-              datum.getMonth() === jetzt.getMonth() &&
-              datum.getDate() === jetzt.getDate()
-          }
-          if (tabellenZeitraum === "woche") {
-            const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
-            return diffInTagen <= 7
-          }
-          if (tabellenZeitraum === "monat") {
-            return (
-              datum.getMonth() === jetzt.getMonth() &&
-              datum.getFullYear() === jetzt.getFullYear()
-            )
-          }
-          if (tabellenZeitraum === "jahr") {
-            return datum.getFullYear() === jetzt.getFullYear()
-          }
-          if (tabellenZeitraum === "spezifisch") {
-            return datum.getFullYear() === tabellenJahr &&
-              datum.getMonth() === tabellenMonat
-          }
-        })
-        .map((e) => (
-          <li key={e.id + e.typ}>
-            {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
-            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-            <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
-          </li>
-        ))
+            if (tabellenZeitraum === "heute") {
+              return datum.getFullYear() === jetzt.getFullYear() &&
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getDate() === jetzt.getDate()
+            }
+            if (tabellenZeitraum === "woche") {
+              const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
+              return diffInTagen <= 7
+            }
+            if (tabellenZeitraum === "monat") {
+              return (
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getFullYear() === jetzt.getFullYear()
+              )
+            }
+            if (tabellenZeitraum === "jahr") {
+              return datum.getFullYear() === jetzt.getFullYear()
+            }
+            if (tabellenZeitraum === "spezifisch") {
+              return datum.getFullYear() === tabellenJahr &&
+                datum.getMonth() === tabellenMonat
+            }
+          })
+          .map((e) => (
+            <li key={e.id + e.typ}>
+              {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
+              <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+              <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
+            </li>
+          ))
       }
-    </div>
+    </div >
   );
 }
