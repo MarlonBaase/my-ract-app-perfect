@@ -544,22 +544,22 @@ export default function haushaltsbuch() {
       <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
 
       {modalTransaktion && (
-
-        <div style={{
-          // Overlay: deckt die ganze Seite ab
-          position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
-          top: 0, left: 0,      // startet oben links
-          width: "100%", height: "100%",  // bedeckt die ganze Seite
-          backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-          display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
-        }}>
           <div style={{
-            // Modal Box: das eigentliche Fenster
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            minWidth: "300px"
+            // Overlay: deckt die ganze Seite ab
+            position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
+            top: 0, left: 0,      // startet oben links
+            width: "100%", height: "100%",  // bedeckt die ganze Seite
+            backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
+            display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
           }}>
+            <div style={{
+              // Modal Box: das eigentliche Fenster
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              minWidth: "300px"
+            }}>
+              {/* dein bisheriger Modal Inhalt hier */}
             <div>
               <h4>Transaktion hinzufügen</h4>
               <input
