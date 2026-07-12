@@ -12,7 +12,7 @@ import Tagesgeld from './assetklassen/Tagesgeld'
 import Festgeld  from './assetklassen/Festgeld'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
-import Konfiguration from './konfiguration'
+import Konfiguration from './profil/konfiguration'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
@@ -49,8 +49,10 @@ function App() {
           <Route path='wd' element={<Wd darkMode={darkMode}/>} />
         </Route>
         <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
-        <Route path="/profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />}>
-          <Route path="konfiguration" element={<Konfiguration darkMode={darkMode}/>} />
+        <Route path="/profil" element={<Profil darkMode={darkMode}/>}>
+          <Route path="profil" element={<Profil darkMode={darkMode} setDarkMode={setDarkMode} />}>
+            <Route path="konfiguration" element={<Konfiguration darkMode={darkMode}/>} />
+          </Route>
         </Route>
         <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
         <Route path="/support" element={<Support darkMode={darkMode} />} />
