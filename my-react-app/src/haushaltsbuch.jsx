@@ -3,10 +3,7 @@ import { supabase } from "./supabase";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts"
 
 export default function haushaltsbuch() {
-  const [startkapital, setStartkapital] = useState(0);
   const [kapital, setKapital] = useState(0);
-  const [beschreibung, setBeschreibung] = useState("");
-  const [betrag, setBetrag] = useState("");
   const [eintraege, setEintraege] = useState([]);
   const [transaktionsBeschreibung, setTransaktionsBeschreibung] = useState("");
   const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
@@ -157,18 +154,6 @@ export default function haushaltsbuch() {
     if (data) setKategorien(data)
   }
 
-  const kategorieHinzufuegen = async () => {
-    if (!neueKategorie) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("transaktionskategorie").insert({
-      benutzer_id: user.id,
-      name: neueKategorie,
-      ist_vordefiniert: false,
-      erstellt_am: new Date()
-    })
-    setNeueKategorie("")
-    ladeKategorien()
-  }
 
 
   const eintragLoeschen = async (id, typ) => {
@@ -301,13 +286,6 @@ export default function haushaltsbuch() {
           .eq("wiederkehrend", true)
       }
     }
-  }
-
-  const kategorieLoeschen = async (id, ist_vordefiniert) => {
-    if (ist_vordefiniert === false) {
-      await supabase.from("transaktionskategorie").delete().eq("id", id)
-    }
-    ladeKategorien()
   }
 
   const berechneZeitraum = () => {
@@ -554,7 +532,7 @@ export default function haushaltsbuch() {
         <button onClick={einnahmeHinzufuegen}>Einnahme hinzufügen</button>
       </div>
 
-      <button onClick={setModalTransaktion(true)}>Transaktion hinzufügen</button>
+      <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
 
       {modalTransaktion && (
 
