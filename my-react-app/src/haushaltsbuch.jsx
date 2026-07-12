@@ -502,6 +502,36 @@ export default function haushaltsbuch() {
           <Legend />
         </PieChart>
       </div>
+      {
+        eintraege
+          .filter(e => {
+            const datum = new Date(e.erstellt_am)
+            const jetzt = new Date()
+
+            if (tabellenZeitraum === "heute") {
+              return datum.getFullYear() === jetzt.getFullYear() &&
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getDate() === jetzt.getDate()
+            }
+            if (tabellenZeitraum === "woche") {
+              const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
+              return diffInTagen <= 7
+            }
+            if (tabellenZeitraum === "monat") {
+              return (
+                datum.getMonth() === jetzt.getMonth() &&
+                datum.getFullYear() === jetzt.getFullYear()
+              )
+            }
+            if (tabellenZeitraum === "jahr") {
+              return datum.getFullYear() === jetzt.getFullYear()
+            }
+            if (tabellenZeitraum === "spezifisch") {
+              return datum.getFullYear() === tabellenJahr &&
+                datum.getMonth() === tabellenMonat
+            }
+          })    
+      }
 
       
 
@@ -694,33 +724,6 @@ export default function haushaltsbuch() {
       </div>
       {
         eintraege
-          .filter(e => {
-            const datum = new Date(e.erstellt_am)
-            const jetzt = new Date()
-
-            if (tabellenZeitraum === "heute") {
-              return datum.getFullYear() === jetzt.getFullYear() &&
-                datum.getMonth() === jetzt.getMonth() &&
-                datum.getDate() === jetzt.getDate()
-            }
-            if (tabellenZeitraum === "woche") {
-              const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24)
-              return diffInTagen <= 7
-            }
-            if (tabellenZeitraum === "monat") {
-              return (
-                datum.getMonth() === jetzt.getMonth() &&
-                datum.getFullYear() === jetzt.getFullYear()
-              )
-            }
-            if (tabellenZeitraum === "jahr") {
-              return datum.getFullYear() === jetzt.getFullYear()
-            }
-            if (tabellenZeitraum === "spezifisch") {
-              return datum.getFullYear() === tabellenJahr &&
-                datum.getMonth() === tabellenMonat
-            }
-          })
           .map((e) => (
             <li key={e.id + e.typ}>
               {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
