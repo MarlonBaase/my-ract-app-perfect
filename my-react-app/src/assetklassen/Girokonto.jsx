@@ -10,34 +10,33 @@ export default function Girokonto() {
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
-    const [besonderheiten, setBesonderheiten] = useState("")
     const [modalOffen, setModalOffen] = useState(false)
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
 
-
-
-
     const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from("girokonto")
             .select("*")
             .eq("benutzer_id", user.id)
-            .order("name", { ascending: true })
+            .order("asset_name", { ascending: true }) // Sortierung angepasst auf asset_name, falls name_der_bank nicht indiziert ist
 
+        if (error) {
+            console.error("Fehler beim Laden:", error.message)
+            return
+        }
         if (data) setListeGirokonto(data)
     }
 
     useEffect(() => {
-        const init = async () => {
-            await ladeGirokonto()
-        }
-        init()
+        ladeGirokonto()
     }, [])
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !wert || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
+        // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
+        if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
+        
         try {
             const { data: { user } } = await supabase.auth.getUser()
             
@@ -97,18 +96,14 @@ export default function Girokonto() {
         }
     }
 
-
-
-
-
     const bearbeitenOeffnen = (eintrag) => {
         setZuBearbeiten(eintrag)
-        setName(eintrag.name_der_bank)
-        setBank(eintrag.name_der_bank)
-        setIban(eintrag.iban)
-        setWert(eintrag.einzahlung_bei_eroeffnung)
-        setWaehrung(eintrag.waehrung)
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum)
+        setName(eintrag.asset_name || "")
+        setBank(eintrag.name_der_bank || "")
+        setIban(eintrag.iban || "")
+        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
+        setWaehrung(eintrag.waehrung || "")
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setModalOffen(true)
     }
 
@@ -118,91 +113,70 @@ export default function Girokonto() {
     }
 
     const girokontoSpeichern = async () => {
+        if (!zuBearbeiten) return
 
-        await supabase.from("girokonto").update({
-            name_der_bank: bank,
-            iban: iban,
-            einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-            waehrung: waehrung,
-            eroeffnungsdatum: eroeffnungsdatum
-        }).eq("id", zuBearbeiten.id)
+        await supabase
+            .from("girokonto")
+            .update({
+                name_der_bank: bank,
+                asset_name: name,
+                iban: iban,
+                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                waehrung: waehrung,
+                eroeffnungsdatum: eroeffnungsdatum
+            })
+            .eq("id", zuBearbeiten.id)
+
         setModalOffen(false)
+        setZuBearbeiten(null)
         ladeGirokonto()
     }
-
 
     return (
         <div>
             <h2>Girokonto</h2>
 
-            {/* Liste */}
-
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} | {e.waehrung} | {e.eroeffnungsdatum}
+                        {e.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                     </li>
                 ))}
             </ul>
 
-
             <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
+            
             {modalOffenHinzu && (
-                <div style={{
-                    // Overlay: deckt die ganze Seite ab
-                    position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
-                    top: 0, left: 0,      // startet oben links
-                    width: "100%", height: "100%",  // bedeckt die ganze Seite
-                    backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-                    display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
-                }}>
-                    <div style={{
-                        // Modal Box: das eigentliche Fenster
-                        backgroundColor: "white",
-                        padding: "20px",
-                        borderRadius: "8px",
-                        minWidth: "300px"
-                    }}>
+                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
                         <h4>Neues Girokonto hinzufügen</h4>
-                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
-                        <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
-                        <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
-                        <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
-                        <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
-                        <button onClick={() => {girokontoHinzufuegen(); setModalOffenHinzu(false)}}>Girokonto hinzufügen</button>
+                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name (z.B. Hauptkonto)" />
+                        <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank Name (z.B. Sparkasse)" />
+                        <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
+                        <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung (z.B. EUR)" />
+                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                        
+                        <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
                 </div>
             )}
+
             {modalOffen && (
-                <div style={{
-                    // Overlay: deckt die ganze Seite ab
-                    position: "fixed",    // bleibt immer an der gleichen Stelle, egal wie man scrollt
-                    top: 0, left: 0,      // startet oben links
-                    width: "100%", height: "100%",  // bedeckt die ganze Seite
-                    backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
-                    display: "flex", alignItems: "center", justifyContent: "center"  // zentriert die Box
-                }}>
-                    <div style={{
-                        // Modal Box: das eigentliche Fenster
-                        backgroundColor: "white",
-                        padding: "20px",
-                        borderRadius: "8px",
-                        minWidth: "300px"
-                    }}>
+                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
                         <h4>Girokonto bearbeiten</h4>
-                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
-                        <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="Iban" />
-                        <input value={wert} onChange={(e) => setWert(e.target.value)} placeholder="Wert" />
-                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" />
-                        <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Waehrung" />
-                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} placeholder="Eroeffnungsdatum" />
-                        <button onClick={() => {girokontoSpeichern(); setModalOffen(false)}}>Speichern</button>
+                        <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+                        <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
+                        <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
+                        <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                        
+                        <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
                     </div>
                 </div>
