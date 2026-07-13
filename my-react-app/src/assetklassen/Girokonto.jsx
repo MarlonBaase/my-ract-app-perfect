@@ -38,31 +38,63 @@ export default function Girokonto() {
 
     const girokontoHinzufuegen = async () => {
         if (!name || !bank || !iban || !wert || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data } = await supabase.from("asset").insert({
-            benutzer_id: user.id,
-            asset_name: name,
-            asset_typ: "girokonto",
-        }).select()
-        const asset_id = data[0].id
-        await supabase.from("girokonto").insert({
-            benutzer_id: user.id,
-            asset_id: asset_id,
-            name_der_bank: bank,
-            asset_name: name,
-            iban: iban,
-            einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-            waehrung: waehrung,
-            eroeffnungsdatum: eroeffnungsdatum
-        })
-        setName("")
-        setBank("")
-        setIban("")
-        setWert("")
-        setEinzahlung_bei_eroeffnung("")
-        setWaehrung("")
-        setEroeffnungsdatum("")
-        ladeGirokonto()
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            
+            // 1. Asset eintragen
+            const { data: assetData, error: assetError } = await supabase
+                .from("asset")
+                .insert({
+                    benutzer_id: user.id,
+                    asset_name: name,
+                    asset_typ: "girokonto",
+                })
+                .select() // .select() erzwingt die Rückgabe des erstellten Datensatzes
+
+            if (assetError || !assetData || assetData.length === 0) {
+                console.error("Fehler beim Erstellen des Assets:", assetError)
+                alert("Fehler beim Erstellen des übergeordneten Assets. Spaltennamen in der Tabelle 'asset' prüfen!")
+                return
+            }
+
+            const asset_id = assetData[0].id
+
+            // 2. Girokonto eintragen (verknüpft mit asset_id)
+            const { error: giroError } = await supabase
+                .from("girokonto")
+                .insert({
+                    benutzer_id: user.id,
+                    asset_id: asset_id,
+                    name_der_bank: bank,
+                    asset_name: name,
+                    iban: iban,
+                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                    waehrung: waehrung,
+                    eroeffnungsdatum: eroeffnungsdatum
+                })
+
+            if (giroError) {
+                console.error("Fehler beim Erstellen des Girokontos:", giroError)
+                alert("Fehler beim Girokonto-Insert. Datenbank-Spalten der Tabelle 'girokonto' prüfen!")
+                return
+            }
+
+            // Formular zurücksetzen & Modal schließen
+            setName("")
+            setBank("")
+            setIban("")
+            setWert("")
+            setEinzahlung_bei_eroeffnung("")
+            setWaehrung("")
+            setEroeffnungsdatum("")
+            setModalOffenHinzu(false)
+            
+            // Daten neu laden
+            ladeGirokonto()
+
+        } catch (err) {
+            console.error("Unerwarteter Fehler:", err)
+        }
     }
 
 
