@@ -51,7 +51,7 @@ export default function Girokonto() {
                 .select()
 
             if (assetError || !assetData || assetData.length === 0) {
-                console.error("Fehler beim Erstellen des Assets:", assetError)
+                console.error("Fehler beim Erstellen des Assets:", assetError.message || JSON.stringify(assetError))
                 alert("Fehler beim Erstellen des übergeordneten Assets.")
                 return
             }
