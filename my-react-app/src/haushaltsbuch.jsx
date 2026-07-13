@@ -600,8 +600,8 @@ export default function haushaltsbuch() {
             >
               <option value="">Asset wählen</option>
               {asset.map((a) => (
-                <option key={a.id} value={a.name}>
-                  {a.name}
+                <option key={a.id} value={a.asset_name}>
+                  {a.asset_typ} | {a.asset_name}
                 </option>
               ))}
             </select>
