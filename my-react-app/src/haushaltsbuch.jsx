@@ -585,12 +585,14 @@ export default function haushaltsbuch() {
               <option value="ausgabe">Ausgabe</option>
               <option value="einnahme">Einnahme</option>
             </select>
-            <input
-              label="Wiederkehrend"
-              type="checkbox"
-              checked={wiederkehrendaktiv}
-              onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-            />
+            <div>
+              <label>Wiederkehrend:</label>
+              <input
+                type="checkbox"
+                checked={wiederkehrendaktiv}
+                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+              />
+            </div>
             {wiederkehrendaktiv && (<select
               value={intervall}
               onChange={(e) => setIntervall(e.target.value)}
