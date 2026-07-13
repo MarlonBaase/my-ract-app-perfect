@@ -487,16 +487,13 @@ export default function haushaltsbuch() {
               <Line type="monotone" dataKey="einnahmen" stroke="green" />
               <Line type="monotone" dataKey="ausgaben" stroke="red" />
             </LineChart>
-          </div>
-          <div>
-            {/* Buttons */}
-            <button onClick={() => setZeitraum("heute")}>Heute</button>
-            <button onClick={() => setZeitraum("woche")}>Woche</button>
-            <button onClick={() => setZeitraum("monat")}>Monat</button>
-            <button onClick={() => setZeitraum("jahr")}>Jahr</button>
-
-            {/* Anzeige */}
-
+            <div>
+              {/* Buttons */}
+              <button onClick={() => setZeitraum("heute")}>Heute</button>
+              <button onClick={() => setZeitraum("woche")}>Woche</button>
+              <button onClick={() => setZeitraum("monat")}>Monat</button>
+              <button onClick={() => setZeitraum("jahr")}>Jahr</button>
+            </div>
           </div>
         </div>
         <div>
