@@ -41,14 +41,15 @@ export default function Girokonto() {
         const { data: { user } } = await supabase.auth.getUser()
         const { data } = await supabase.from("asset").insert({
             benutzer_id: user.id,
-            name: name,
-            typ: "girokonto",
+            asset_name: name,
+            asset_typ: "girokonto",
         }).select()
         const asset_id = data[0].id
         await supabase.from("girokonto").insert({
             benutzer_id: user.id,
             asset_id: asset_id,
             name_der_bank: bank,
+            asset_name: name,
             iban: iban,
             einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             waehrung: waehrung,
