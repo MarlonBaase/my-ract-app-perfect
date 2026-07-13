@@ -10,7 +10,7 @@ export default function haushaltsbuch() {
   const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
   const [transaktionsTyp, setTransaktionsTyp] = useState("");
   const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
-
+  const [asset, setAsset] = useState("");
 
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
@@ -152,6 +152,13 @@ export default function haushaltsbuch() {
       .order("name", { ascending: true })
 
     if (data) setKategorien(data)
+  }
+
+  const ladeAssets = async () => {
+    const { data } = await supabase
+      .from("asset")
+      .select("*")
+      .order("asset_name", { ascending: true })
   }
 
 
@@ -584,6 +591,14 @@ export default function haushaltsbuch() {
               <option value="">Typ wählen</option>
               <option value="ausgabe">Ausgabe</option>
               <option value="einnahme">Einnahme</option>
+            </select>
+            <select value={asset} onChange={(e) => setAsset(e.target.value)}>
+              <option value="">Asset wählen</option>
+              {asset.map((a) => (
+                <option key={a.id} value={a.name}>
+                  {a.name}
+                </option>
+              ))}
             </select>
             <div>
               <input
