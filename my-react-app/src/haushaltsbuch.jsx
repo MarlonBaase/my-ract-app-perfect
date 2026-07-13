@@ -545,6 +545,7 @@ export default function haushaltsbuch() {
           width: "100%", height: "100%",  // bedeckt die ganze Seite
           backgroundColor: "rgba(0,0,0,0.5)",  // schwarz mit 50% Transparenz
           display: "flex", alignItems: "center", justifyContent: "center",  // zentriert die Box
+          flexDirection: "column",  // Inhalt in Spaltenrichtung
           zIndex: 1000  // sorgt dafür, dass das Modal über allem anderen liegt
         }}>
           <div style={{
