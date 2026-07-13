@@ -56,7 +56,7 @@ export default function Girokonto() {
                 return
             }
 
-            const asset_id = assetData[0].id
+            const asset_id = assetData[0].asset_id
 
             // 2. Girokonto eintragen (verknüpft mit asset_id)
             const { error: giroError } = await supabase
