@@ -10,7 +10,7 @@ export default function haushaltsbuch() {
   const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
   const [transaktionsTyp, setTransaktionsTyp] = useState("");
   const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
-  const [asset, setAsset] = useState("");
+  const [asset, setAsset] = useState([]);
 
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
@@ -47,6 +47,7 @@ export default function haushaltsbuch() {
       try {
         await ladeAlles()
         await ladeKategorien()
+        await ladeAssets()
         const daten = await ladeWiederkehrende()
         console.log("Daten:", daten)
         await pruefeWiederkehrende(daten)
@@ -159,6 +160,8 @@ export default function haushaltsbuch() {
       .from("asset")
       .select("*")
       .order("asset_name", { ascending: true })
+
+    if (data) setAsset(data)
   }
 
 
@@ -592,7 +595,9 @@ export default function haushaltsbuch() {
               <option value="ausgabe">Ausgabe</option>
               <option value="einnahme">Einnahme</option>
             </select>
-            <select value={asset} onChange={(e) => setAsset(e.target.value)}>
+            <select 
+              value={asset} onChange={(e) => setAsset(e.target.value)}
+            >
               <option value="">Asset wählen</option>
               {asset.map((a) => (
                 <option key={a.id} value={a.name}>
