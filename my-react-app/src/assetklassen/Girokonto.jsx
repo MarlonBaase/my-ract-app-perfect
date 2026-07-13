@@ -36,10 +36,10 @@ export default function Girokonto() {
     const girokontoHinzufuegen = async () => {
         // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
         if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
-        
+
         try {
             const { data: { user } } = await supabase.auth.getUser()
-            
+
             // 1. Asset eintragen
             const { data: assetData, error: assetError } = await supabase
                 .from("asset")
@@ -48,22 +48,23 @@ export default function Girokonto() {
                     asset_name: name,
                     asset_typ: "girokonto",
                 })
-                .select() // .select() erzwingt die Rückgabe des erstellten Datensatzes
+                .select()
 
             if (assetError || !assetData || assetData.length === 0) {
                 console.error("Fehler beim Erstellen des Assets:", assetError)
-                alert("Fehler beim Erstellen des übergeordneten Assets. Spaltennamen in der Tabelle 'asset' prüfen!")
+                alert("Fehler beim Erstellen des übergeordneten Assets.")
                 return
             }
 
+            // HIER WAR DER FEHLER: Ändere .id zu .asset_id !
             const asset_id = assetData[0].asset_id
 
-            // 2. Girokonto eintragen (verknüpft mit asset_id)
+            // 2. Girokonto eintragen (verknüpft mit der korrekten asset_id)
             const { error: giroError } = await supabase
                 .from("girokonto")
                 .insert({
                     benutzer_id: user.id,
-                    asset_id: asset_id,
+                    asset_id: asset_id, // nutzt jetzt die korrekte ID aus der DB
                     name_der_bank: bank,
                     asset_name: name,
                     iban: iban,
@@ -87,7 +88,7 @@ export default function Girokonto() {
             setWaehrung("")
             setEroeffnungsdatum("")
             setModalOffenHinzu(false)
-            
+
             // Daten neu laden
             ladeGirokonto()
 
@@ -147,7 +148,7 @@ export default function Girokonto() {
             </ul>
 
             <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
-            
+
             {modalOffenHinzu && (
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
@@ -158,7 +159,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung (z.B. EUR)" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
-                        
+
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                     </div>
@@ -175,7 +176,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
-                        
+
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
                     </div>
