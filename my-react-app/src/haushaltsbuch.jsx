@@ -557,52 +557,50 @@ export default function haushaltsbuch() {
             flexDirection: "column",
           }}>
             {/* dein bisheriger Modal Inhalt hier */}
-            <div>
-              <h4>Transaktion hinzufügen</h4>
-              <input
-                value={transaktionsBeschreibung}
-                onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
-                placeholder="Beschreibung"
-              />
-              <input
-                value={transaktionsBetrag}
-                onChange={(e) => setTransaktionsBetrag(e.target.value)}
-                placeholder="Betrag"
-                type="number"
-              />
-              <select
-                value={transaktionsKategorie}
-                onChange={(e) => setTransaktionsKategorie(e.target.value)}
-              >
-                <option value="">Kategorie wählen</option>
-                {kategorien.map((k) => (
-                  <option key={k.id} value={k.name}>
-                    {k.name}
-                  </option>
-                ))}
-              </select>
-              <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
-                <option value="">Typ wählen</option>
-                <option value="ausgabe">Ausgabe</option>
-                <option value="einnahme">Einnahme</option>
-              </select>
-              <input
-                type="checkbox"
-                checked={wiederkehrendaktiv}
-                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-              />
-              <label>Wiederkehrend</label>
-              {wiederkehrendaktiv && (<select
-                value={intervall}
-                onChange={(e) => setIntervall(e.target.value)}
-              >
-                <option value="">Intervall wählen</option>
-                <option value="täglich">Täglich</option>
-                <option value="wöchentlich">Wöchentlich</option>
-                <option value="monatlich">Monatlich</option>
-                <option value="jährlich">Jährlich</option>
-              </select>)}
-            </div>
+            <h4>Transaktion hinzufügen</h4>
+            <input
+              value={transaktionsBeschreibung}
+              onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
+              placeholder="Beschreibung"
+            />
+            <input
+              value={transaktionsBetrag}
+              onChange={(e) => setTransaktionsBetrag(e.target.value)}
+              placeholder="Betrag"
+              type="number"
+            />
+            <select
+              value={transaktionsKategorie}
+              onChange={(e) => setTransaktionsKategorie(e.target.value)}
+            >
+              <option value="">Kategorie wählen</option>
+              {kategorien.map((k) => (
+                <option key={k.id} value={k.name}>
+                  {k.name}
+                </option>
+              ))}
+            </select>
+            <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
+              <option value="">Typ wählen</option>
+              <option value="ausgabe">Ausgabe</option>
+              <option value="einnahme">Einnahme</option>
+            </select>
+            <input
+              type="checkbox"
+              checked={wiederkehrendaktiv}
+              onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+            />
+            <label>Wiederkehrend</label>
+            {wiederkehrendaktiv && (<select
+              value={intervall}
+              onChange={(e) => setIntervall(e.target.value)}
+            >
+              <option value="">Intervall wählen</option>
+              <option value="täglich">Täglich</option>
+              <option value="wöchentlich">Wöchentlich</option>
+              <option value="monatlich">Monatlich</option>
+              <option value="jährlich">Jährlich</option>
+            </select>)}
             <button onClick={transaktionHinzufuegen}>Transaktion hinzufügen</button>
             <button onClick={transaktionSchließen}>Abbrechen</button>
           </div>
