@@ -10,8 +10,8 @@ export default function haushaltsbuch() {
   const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
   const [transaktionsTyp, setTransaktionsTyp] = useState("");
   const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
-  const [asset, setAsset] = useState([]);
-
+  const [assets, setAssets] = useState([]);
+  const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
   const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
   const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
   const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
@@ -161,7 +161,7 @@ export default function haushaltsbuch() {
       .select("*")
       .order("asset_name", { ascending: true })
 
-    if (data) setAsset(data)
+    if (data) setAssets(data)
   }
 
 
@@ -595,12 +595,13 @@ export default function haushaltsbuch() {
               <option value="ausgabe">Ausgabe</option>
               <option value="einnahme">Einnahme</option>
             </select>
-            <select 
-              value={asset} onChange={(e) => setAsset(e.target.value)}
+            <select
+              value={ausgewaehltesAsset}
+              onChange={(e) => setAusgewaehltesAsset(e.target.value)}
             >
               <option value="">Asset wählen</option>
-              {asset.map((a) => (
-                <option key={a.id} value={a.asset_name}>
+              {assets.map((a) => (
+                <option key={a.asset_id} value={a.asset_name}>
                   {a.asset_typ} | {a.asset_name}
                 </option>
               ))}
