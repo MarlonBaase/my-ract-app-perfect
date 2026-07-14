@@ -73,10 +73,10 @@ export default function haushaltsbuch() {
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
       .select(`
-  *,
-  asset (asset_name, asset_typ),
-  transaktionskategorie (name)
-`)
+    *,
+    asset!asset_id (asset_name, asset_typ),
+    transaktionskategorie!kategorie_id (name)
+  `)
       .eq("benutzer_id", user.id)
       .eq("typ", "ausgabe")
       .order("erstellt_am", { ascending: false });
@@ -84,10 +84,10 @@ export default function haushaltsbuch() {
     const { data: einnahmen } = await supabase
       .from("transaktionsprotokoll")
       .select(`
-  *,
-  asset (asset_name, asset_typ),
-  transaktionskategorie (name)
-`)
+    *,
+    asset!asset_id (asset_name, asset_typ),
+    transaktionskategorie!kategorie_id (name)
+  `)
       .eq("benutzer_id", user.id)
       .eq("typ", "einnahme")
       .order("erstellt_am", { ascending: false });
