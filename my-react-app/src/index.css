@@ -95,5 +95,8 @@ body.dark {
   width: 80%;
   display: flex;
   flex-direction: column;
+}
+
+.eintrag-tabelle table, th, td {
   border: 1px solid black;
 }
