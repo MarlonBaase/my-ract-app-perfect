@@ -92,4 +92,10 @@ body.dark {
   border-radius: 5px;
   margin-right: 50px;
   margin-bottom: 50px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
