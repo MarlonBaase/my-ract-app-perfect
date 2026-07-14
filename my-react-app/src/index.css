@@ -95,6 +95,11 @@ body.dark {
   justify-content: center;
   margin-left: auto;
   margin-right: auto;
+}
+
+.eintrag-tabelle table {
+  width: 100%;
+  border-collapse: collapse;
   justify-content: space-between;
 }
 
