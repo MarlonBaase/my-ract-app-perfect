@@ -243,7 +243,7 @@ export default function haushaltsbuch() {
       benutzer_id: user.id,
       notizen: beschreibungInter,  // Spaltenname: Wert
       betrag: parseFloat(betragInter),  // betragInter nicht betrag!
-      kategorie: kategorieInter,
+      kategorie_id: kategorieInter,
       typ: typInter,
       wiederkehrend: true,
       intervall: intervall,
@@ -271,7 +271,7 @@ export default function haushaltsbuch() {
             benutzer_id: user.id,
             notizen: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
-            kategorie: eintrag.kategorie,
+            kategorie_id: eintrag.kategorie,
             typ: "ausgabe"
           })
         }
@@ -280,7 +280,7 @@ export default function haushaltsbuch() {
             benutzer_id: user.id,
             notizen: eintrag.beschreibung,
             betrag: parseFloat(eintrag.betrag),
-            kategorie: eintrag.kategorie,
+            kategorie_id: eintrag.kategorie,
             typ: "einnahme"
           })
         }
