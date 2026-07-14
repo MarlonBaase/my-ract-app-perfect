@@ -70,7 +70,7 @@ export default function haushaltsbuch() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const { data: ausgaben } = await supabase
+    const { data: ausgaben, error: ausgabenError } = await supabase
       .from("transaktionsprotokoll")
       .select(`
     *,
@@ -80,7 +80,10 @@ export default function haushaltsbuch() {
       .eq("benutzer_id", user.id)
       .eq("typ", "ausgabe")
       .order("erstellt_am", { ascending: false });
-
+        if (ausgabenError) {
+  console.error("Supabase-Fehler Details:", ausgabenError.message, ausgabenError.details, ausgabenError.hint);
+}
+      
     const { data: einnahmen } = await supabase
       .from("transaktionsprotokoll")
       .select(`
