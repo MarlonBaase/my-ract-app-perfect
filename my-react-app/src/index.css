@@ -97,6 +97,6 @@ body.dark {
   flex-direction: column;
 }
 
-.eintrag-tabelle table, th, td {
-  border: 1px solid black;
+.eintrag-tabelle table {
+  border-collapse: collapse;
 }
