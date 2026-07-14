@@ -12,14 +12,14 @@ export default function haushaltsbuch() {
   const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
   const [assets, setAssets] = useState([]);
   const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
-  const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
-  const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
-  const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
-  const [ausgabeBetrag, setAusgabeBetrag] = useState("");
+  //const [einnahmenBeschreibung, setEinnahmenBeschreibung] = useState("");
+  //const [einnahmenBetrag, setEinnahmenBetrag] = useState("");
+  //const [ausgabeBeschreibung, setAusgabeBeschreibung] = useState("");
+  //const [ausgabeBetrag, setAusgabeBetrag] = useState("");
   const [kategorien, setKategorien] = useState([])
-  const [ausgabeKategorie, setAusgabeKategorie] = useState("")
-  const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
-  const [neueKategorie, setNeueKategorie] = useState("")
+  //const [ausgabeKategorie, setAusgabeKategorie] = useState("")
+  //const [einnahmeKategorie, setEinnahmeKategorie] = useState("")
+  //const [neueKategorie, setNeueKategorie] = useState("")
   const [modalOffen, setModalOffen] = useState(false)// sichtbar: true oder false, nicht ""
   const [modalTransaktion, setModalTransaktion] = useState(false)
   const [zuBearbeiten, setZuBearbeiten] = useState(null) // kein Eintrag am Anfang = null
@@ -27,10 +27,10 @@ export default function haushaltsbuch() {
   const [editBetrag, setEditBetrag] = useState("")
   const [editKategorie, setEditKategorie] = useState("")
   const [wiederkehrende, setWiederkehrende] = useState([]);
-  const [beschreibungInter, setBeschreibungInter] = useState("");
-  const [betragInter, setBetragInter] = useState("");
-  const [kategorieInter, setkategorieInter] = useState("");
-  const [typInter, setTypInter] = useState("");
+  //const [beschreibungInter, setBeschreibungInter] = useState("");
+  //const [betragInter, setBetragInter] = useState("");
+  //const [kategorieInter, setkategorieInter] = useState("");
+  //const [typInter, setTypInter] = useState("");
   const [intervall, setIntervall] = useState("");
   const [zeitraum, setZeitraum] = useState("monat")
   const [summeEinnahmen, setSummeEinnahmen] = useState(0)
@@ -72,15 +72,23 @@ export default function haushaltsbuch() {
 
     const { data: ausgaben } = await supabase
       .from("transaktionsprotokoll")
-      .select("*")
+      .select(`
+  *,
+  asset (asset_name, asset_typ),
+  transaktionskategorie (name)
+`)
       .eq("benutzer_id", user.id)
       .eq("typ", "ausgabe")
       .order("erstellt_am", { ascending: false });
 
     const { data: einnahmen } = await supabase
       .from("transaktionsprotokoll")
-      .select("*")
-      .eq("benutzer_id", user.id)  // ← fehlt noch
+      .select(`
+  *,
+  asset (asset_name, asset_typ),
+  transaktionskategorie (name)
+`)
+      .eq("benutzer_id", user.id)
       .eq("typ", "einnahme")
       .order("erstellt_am", { ascending: false });
 
@@ -97,37 +105,39 @@ export default function haushaltsbuch() {
   };
 
 
-  const ausgabeHinzufuegen = async () => {
-    if (!ausgabeBeschreibung || !ausgabeBetrag || !ausgabeKategorie) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("transaktionsprotokoll").insert({
-      benutzer_id: user.id,
-      notizen: ausgabeBeschreibung,
-      betrag: parseFloat(ausgabeBetrag),
-      kategorie: ausgabeKategorie,
-      typ: "ausgabe"
-    })
-    setAusgabeBeschreibung("")
-    setAusgabeBetrag("")
-    setAusgabeKategorie("")
-    ladeAlles()
-  }
-
-  const einnahmeHinzufuegen = async () => {
-    if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from("transaktionsprotokoll").insert({
-      benutzer_id: user.id,
-      notizen: einnahmenBeschreibung,
-      betrag: parseFloat(einnahmenBetrag),
-      kategorie: einnahmeKategorie,
-      typ: "einnahme"
-    })
-    setEinnahmenBeschreibung("")
-    setEinnahmenBetrag("")
-    setEinnahmeKategorie("")
-    ladeAlles()
-  }
+  /* const ausgabeHinzufuegen = async () => {
+     if (!ausgabeBeschreibung || !ausgabeBetrag || !ausgabeKategorie) return
+     const { data: { user } } = await supabase.auth.getUser()
+     await supabase.from("transaktionsprotokoll").insert({
+       benutzer_id: user.id,
+       notizen: ausgabeBeschreibung,
+       betrag: parseFloat(ausgabeBetrag),
+       kategorie: ausgabeKategorie,
+       typ: "ausgabe"
+     })
+     setAusgabeBeschreibung("")
+     setAusgabeBetrag("")
+     setAusgabeKategorie("")
+     ladeAlles()
+   }
+ 
+   const einnahmeHinzufuegen = async () => {
+     if (!einnahmenBeschreibung || !einnahmenBetrag || !einnahmeKategorie) return
+     const { data: { user } } = await supabase.auth.getUser()
+     await supabase.from("transaktionsprotokoll").insert({
+       benutzer_id: user.id,
+       notizen: einnahmenBeschreibung,
+       betrag: parseFloat(einnahmenBetrag),
+       kategorie: einnahmeKategorie,
+       typ: "einnahme"
+     })
+     setEinnahmenBeschreibung("")
+     setEinnahmenBetrag("")
+     setEinnahmeKategorie("")
+     ladeAlles()
+   }
+ 
+   */
 
   const transaktionHinzufuegen = async () => {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return
@@ -136,7 +146,7 @@ export default function haushaltsbuch() {
       benutzer_id: user.id,
       notizen: transaktionsBeschreibung,
       betrag: parseFloat(transaktionsBetrag),
-      kategorie: transaktionsKategorie,
+      kategorie_id: transaktionsKategorie,
       typ: transaktionsTyp
     })
     setTransaktionsBeschreibung("")
@@ -178,9 +188,9 @@ export default function haushaltsbuch() {
 
   const bearbeitenOeffnen = (eintrag) => {
     setZuBearbeiten(eintrag)
-    setEditBeschreibung(eintrag.beschreibung)
+    setEditBeschreibung(eintrag.notizen)
     setEditBetrag(eintrag.betrag)
-    setEditKategorie(eintrag.kategorie)
+    setEditKategorie(eintrag.kategorie_id)
     setModalOffen(true)
   }
 
@@ -197,12 +207,13 @@ export default function haushaltsbuch() {
     ladeAlles()
   }
 
+
   const eintragSpeichern = async (id, typ) => {
     if (typ === "ausgabe") {
       await supabase.from("transaktionsprotokoll").update({
         notizen: editBeschreibung,
         betrag: parseFloat(editBetrag),
-        kategorie: editKategorie,
+        kategorie_id: editKategorie,
         typ: "ausgabe"
       }).eq("id", id)
     }
@@ -210,7 +221,7 @@ export default function haushaltsbuch() {
       await supabase.from("transaktionsprotokoll").update({
         notizen: editBeschreibung,
         betrag: parseFloat(editBetrag),
-        kategorie: editKategorie,
+        kategorie_id: editKategorie,
         typ: "einnahme"
       }).eq("id", id)
     }
@@ -231,6 +242,7 @@ export default function haushaltsbuch() {
     return data ?? []  // ← zurückgeben!
   }
 
+  /*
   const wiederkehrendHinzufuegen = async () => {
     if (!beschreibungInter || !betragInter || !kategorieInter || !typInter || !intervall)
       return
@@ -256,7 +268,7 @@ export default function haushaltsbuch() {
     setTypInter("")
     setIntervall("")
     ladeWiederkehrende()
-  }
+  }**/
 
   const pruefeWiederkehrende = async (liste) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -269,18 +281,18 @@ export default function haushaltsbuch() {
         if (eintrag.typ === "ausgabe") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            notizen: eintrag.beschreibung,
+            notizen: eintrag.notizen,
             betrag: parseFloat(eintrag.betrag),
-            kategorie_id: eintrag.kategorie,
+            kategorie_id: eintrag.kategorie_id,
             typ: "ausgabe"
           })
         }
         if (eintrag.typ === "einnahme") {
           await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            notizen: eintrag.beschreibung,
+            notizen: eintrag.notizen,
             betrag: parseFloat(eintrag.betrag),
-            kategorie_id: eintrag.kategorie,
+            kategorie_id: eintrag.kategorie_id,
             typ: "einnahme"
           })
         }
@@ -585,7 +597,7 @@ export default function haushaltsbuch() {
             >
               <option value="">Kategorie wählen</option>
               {kategorien.map((k) => (
-                <option key={k.id} value={k.name}>
+                <option key={k.id} value={k.id}>
                   {k.name}
                 </option>
               ))}
@@ -601,7 +613,7 @@ export default function haushaltsbuch() {
             >
               <option value="">Asset wählen</option>
               {assets.map((a) => (
-                <option key={a.asset_id} value={a.asset_name}>
+                <option key={a.asset_id} value={a.asset_id}>
                   {a.asset_typ} | {a.asset_name}
                 </option>
               ))}
@@ -670,7 +682,7 @@ export default function haushaltsbuch() {
                 >
                   <option value="">Kategorie wählen</option>
                   {kategorien.map((k) => (
-                    <option key={k.id} value={k.name}>
+                    <option key={k.id} value={k.id}>
                       {k.name}
                     </option>
                   ))}
@@ -759,7 +771,7 @@ export default function haushaltsbuch() {
           })
           .map((e) => (
             <li key={e.id + e.typ}>
-              {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} € {e.asset_name} {e.assetklasse}
+              {e.notizen} ({e.kategorie_id}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} € {e.asset_name} {e.assetklasse}
               <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
               <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
             </li>
