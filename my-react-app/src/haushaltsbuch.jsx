@@ -648,9 +648,29 @@ export default function haushaltsbuch() {
         .map((e) => (
           <li key={e.id + e.typ}>
             {/* HIER: Auf die verschachtelten Join-Objekte mit dem sicheren ?. Operator zugreifen */}
-            {e.notizen} ({e.transaktionskategorie?.name || "Keine Kategorie"}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} € {e.asset ? `[${e.asset.asset_typ}: ${e.asset.asset_name}]` : ""}
-            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-            <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
+            <table>
+              <thead>
+                <tr>
+                  <th>Notizen</th>
+                  <th>Kategorie</th>
+                  <th>Betrag</th>
+                  <th>Asset</th>
+                  <th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{e.notizen}</td>
+                  <td>{e.transaktionskategorie?.name || "Keine Kategorie"}</td>
+                  <td>{e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €</td>
+                  <td>{e.asset ? `[${e.asset.asset_typ}: ${e.asset.asset_name}]` : ""}</td>
+                  <td>
+                    <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+                    <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </li>
         ))
       }
