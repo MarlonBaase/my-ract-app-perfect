@@ -757,9 +757,9 @@ export default function haushaltsbuch() {
                 datum.getMonth() === tabellenMonat
             }
           })
-          .map((e, a) => (
-            <li key={e.id + e.typ + a.asset_id}>
-              {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} € {a.asset_typ}{a.asset_name}
+          .map((e) => (
+            <li key={e.id + e.typ}>
+              {e.beschreibung} ({e.kategorie}): {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} € {e.asset_name} {e.asset_typ}
               <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
               <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
             </li>
