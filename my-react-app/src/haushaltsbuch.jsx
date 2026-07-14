@@ -646,9 +646,9 @@ export default function haushaltsbuch() {
           }
         })
         .map((e) => (
-          <li key={e.id + e.typ}>
+          <li key={e.id + e.typ} className="eintrag-tabelle">
             {/* HIER: Auf die verschachtelten Join-Objekte mit dem sicheren ?. Operator zugreifen */}
-            <table className="eintrag-tabelle">
+            <table>
               <thead>
                 <tr>
                   <th>Notizen</th>
