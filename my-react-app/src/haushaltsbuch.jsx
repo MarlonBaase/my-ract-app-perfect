@@ -396,9 +396,15 @@ export default function haushaltsbuch() {
 
       <div className="uebersicht">
         <div className="zahl">
-          <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
-          <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
-          <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+          <div>
+            <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+          </div>
+          <div>
+            <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+          </div>
+          <div>
+            <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+          </div>
         </div>
         <div className="diagramm">
           <LineChart width={600} height={300} data={diagrammDaten}>
