@@ -100,6 +100,12 @@ body.dark {
   margin-left: 100px;
 }
 
+.zahlen{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 
 
 /* Container der Tabelle */
