@@ -395,14 +395,14 @@ export default function haushaltsbuch() {
       <h2>Haushaltsbuch</h2>
 
       <div className="uebersicht">
-        <div className="zahl">
-          <div>
+        <div className="zahlen">
+          <div className="zahl">
             <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
           </div>
-          <div>
+          <div className="zahl">
             <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
           </div>
-          <div>
+          <div className="zahl">
             <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
           </div>
         </div>
