@@ -87,6 +87,8 @@ body.dark {
   margin-right: 50px;
   margin-bottom: 50px;
   align-items: center;
+  dsiplay: flex;
+  flex-direction: column;
 }
 
 

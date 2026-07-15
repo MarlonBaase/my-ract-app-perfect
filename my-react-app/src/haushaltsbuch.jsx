@@ -74,7 +74,7 @@ export default function haushaltsbuch() {
     if (ausgabenError) {
       console.error("Supabase-Fehler Details:", ausgabenError.message, ausgabenError.details, ausgabenError.hint);
     }
-      
+
     // 2. Einnahmen mit Joins laden
     const { data: einnahmen } = await supabase
       .from("transaktionsprotokoll")
@@ -102,14 +102,14 @@ export default function haushaltsbuch() {
   const transaktionHinzufuegen = async () => {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     // HIER: asset_id hinzugefügt, damit das ausgewählte Asset in der DB landet!
     await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
       notizen: transaktionsBeschreibung,
       betrag: parseFloat(transaktionsBetrag),
       kategorie_id: transaktionsKategorie,
-      asset_id: ausgewaehltesAsset || null, 
+      asset_id: ausgewaehltesAsset || null,
       typ: transaktionsTyp
     });
 
@@ -395,61 +395,48 @@ export default function haushaltsbuch() {
       <h2>Haushaltsbuch</h2>
 
       <div className="uebersicht">
-        <div className="kapital">
-          <div className="zahl">
-            <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
-          </div>
-          <div className="diagramm">
-            <LineChart width={600} height={300} data={diagrammDaten}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="einnahmen" stroke="green" />
-              <Line type="monotone" dataKey="ausgaben" stroke="red" />
-            </LineChart>
-            <div>
-              <button onClick={() => setZeitraum("heute")}>Heute</button>
-              <button onClick={() => setZeitraum("woche")}>Woche</button>
-              <button onClick={() => setZeitraum("monat")}>Monat</button>
-              <button onClick={() => setZeitraum("jahr")}>Jahr</button>
-            </div>
-          </div>
+        <div className="zahl">
+          <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+          <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+          <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
         </div>
-        <div>
-          <div className="zahl">
-            <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+        <div className="diagramm">
+          <LineChart width={600} height={300} data={diagrammDaten}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="label" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="einnahmen" stroke="green" />
+            <Line type="monotone" dataKey="ausgaben" stroke="red" />
+          </LineChart>
+          <div>
+            <button onClick={() => setZeitraum("heute")}>Heute</button>
+            <button onClick={() => setZeitraum("woche")}>Woche</button>
+            <button onClick={() => setZeitraum("monat")}>Monat</button>
+            <button onClick={() => setZeitraum("jahr")}>Jahr</button>
           </div>
-          <div className="diagramm">
-            <h4>Einnahmen pro Kategorie</h4>
-            <PieChart width={300} height={300}>
-              <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-                {kreisDatenEinnahmen.map((entry, index) => (
-                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </div>
-        </div>
-        <div>
-          <div className="zahl">
-            <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
-          </div>
-          <div className="diagramm">
-            <h4>Ausgaben pro Kategorie</h4>
-            <PieChart width={300} height={300}>
-              <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-                {kreisDatenAusgaben.map((entry, index) => (
-                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </div>
+
+          <h4>Einnahmen pro Kategorie</h4>
+          <PieChart width={300} height={300}>
+            <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+              {kreisDatenEinnahmen.map((entry, index) => (
+                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+          <h4>Ausgaben pro Kategorie</h4>
+          <PieChart width={300} height={300}>
+            <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+              {kreisDatenAusgaben.map((entry, index) => (
+                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
         </div>
       </div>
 
@@ -675,5 +662,6 @@ export default function haushaltsbuch() {
         ))
       }
     </div>
+    </div >
   );
 }
