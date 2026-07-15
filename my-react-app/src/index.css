@@ -75,6 +75,7 @@ body.dark {
   flex-direction: row;
   padding-right: 50px;
   justify-content: center;
+  align-items: center;
 }
 
 .zahl , .diagramm{
