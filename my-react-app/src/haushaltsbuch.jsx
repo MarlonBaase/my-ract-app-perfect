@@ -662,6 +662,5 @@ export default function haushaltsbuch() {
         ))
       }
     </div>
-    </div >
   );
 }
