@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
 
-export default function haushaltsbuch() {
+export default function Haushaltsbuch() {
   const [kapital, setKapital] = useState(0);
   const [eintraege, setEintraege] = useState([]);
   const [transaktionsBeschreibung, setTransaktionsBeschreibung] = useState("");
@@ -103,7 +103,6 @@ export default function haushaltsbuch() {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
     const { data: { user } } = await supabase.auth.getUser();
 
-    // HIER: asset_id hinzugefügt, damit das ausgewählte Asset in der DB landet!
     await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
       notizen: transaktionsBeschreibung,
@@ -118,6 +117,7 @@ export default function haushaltsbuch() {
     setTransaktionsKategorie("");
     setAusgewaehltesAsset("");
     setTransaktionsTyp("");
+    setModalTransaktion(false);
     ladeAlles();
   };
 
@@ -372,7 +372,6 @@ export default function haushaltsbuch() {
       }
     };
 
-    // HIER: Auf das verschachtelte Objekt zugreifen (e.transaktionskategorie?.name)
     const gefilterteAusgaben = eintraege.filter(e => e.typ === "ausgabe" && zeitraumFilter(e));
     const ausgabenProKategorie = gefilterteAusgaben.reduce((acc, e) => {
       const katName = e.transaktionskategorie?.name || "Keine Kategorie";
@@ -391,73 +390,99 @@ export default function haushaltsbuch() {
   };
 
   return (
-    <div>
-      <h2>Haushaltsbuch</h2>
+    <div className="app-container">
+      <h1 className="Haushaltsbuch-title">Haushaltsbuch</h1>
 
       <div className="uebersicht">
+        
+        {/* --- 1. KARTEN-GRID (ZAHLEN) --- */}
         <div className="zahlen">
           <div className="zahl">
-            <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+            <small>Aktuelles Kapital</small>
+            <strong style={{ color: kapital < 0 ? '#ef4444' : '#10b981' }}>
+              {kapital.toFixed(2)} €
+            </strong>
           </div>
           <div className="zahl">
-            <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+            <small>Einnahmen</small>
+            <strong style={{ color: '#10b981' }}>{summeEinnahmen.toFixed(2)} €</strong>
           </div>
           <div className="zahl">
-            <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+            <small>Ausgaben</small>
+            <strong style={{ color: '#ef4444' }}>{summeAusgaben.toFixed(2)} €</strong>
           </div>
         </div>
+
+        {/* --- 2. DIAGRAMME-GRID --- */}
         <div className="diagramme">
+          {/* Liniendiagramm */}
           <div className="diagramm">
-            <LineChart width={600} height={300} data={diagrammDaten}>
+            <LineChart width={400} height={200} data={diagrammDaten}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="label" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="einnahmen" stroke="green" />
-              <Line type="monotone" dataKey="ausgaben" stroke="red" />
+              <Line type="monotone" dataKey="einnahmen" stroke="#10b981" strokeWidth={2} />
+              <Line type="monotone" dataKey="ausgaben" stroke="#ef4444" strokeWidth={2} />
             </LineChart>
-            <div>
-              <button onClick={() => setZeitraum("heute")}>Heute</button>
-              <button onClick={() => setZeitraum("woche")}>Woche</button>
-              <button onClick={() => setZeitraum("monat")}>Monat</button>
-              <button onClick={() => setZeitraum("jahr")}>Jahr</button>
+            
+            <div className="zeitraum">
+              <button className={zeitraum === "heute" ? "active" : ""} onClick={() => setZeitraum("heute")}>Heute</button>
+              <button className={zeitraum === "woche" ? "active" : ""} onClick={() => setZeitraum("woche")}>Woche</button>
+              <button className={zeitraum === "monat" ? "active" : ""} onClick={() => setZeitraum("monat")}>Monat</button>
+              <button className={zeitraum === "jahr" ? "active" : ""} onClick={() => setZeitraum("jahr")}>Jahr</button>
             </div>
           </div>
+
+          {/* Einnahmen-Kuchen */}
           <div className="diagramm">
             <h4>Einnahmen pro Kategorie</h4>
-            <PieChart width={300} height={300}>
-              <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-                {kreisDatenEinnahmen.map((entry, index) => (
-                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
+            {kreisDatenEinnahmen.length > 0 ? (
+              <PieChart width={250} height={220}>
+                <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                  {kreisDatenEinnahmen.map((entry, index) => (
+                    <Cell key={index} fill={["#10b981", "#3b82f6", "#f59e0b", "#06b6d4", "#8b5cf6"][index % 5]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            ) : (
+              <div style={{ margin: "auto", color: "#a0aec0", fontSize: "14px" }}>Keine Daten</div>
+            )}
           </div>
+
+          {/* Ausgaben-Kuchen */}
           <div className="diagramm">
             <h4>Ausgaben pro Kategorie</h4>
-            <PieChart width={300} height={300}>
-              <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-                {kreisDatenAusgaben.map((entry, index) => (
-                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
+            {kreisDatenAusgaben.length > 0 ? (
+              <PieChart width={250} height={220}>
+                <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
+                  {kreisDatenAusgaben.map((entry, index) => (
+                    <Cell key={index} fill={["#ef4444", "#3b82f6", "#f59e0b", "#ec4899", "#8b5cf6"][index % 5]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            ) : (
+              <div style={{ margin: "auto", color: "#a0aec0", fontSize: "14px" }}>Keine Daten</div>
+            )}
           </div>
         </div>
       </div>
 
+      {/* --- 3. AKTIONSLEISTE --- */}
       <div className="aktionen">
         <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
-        <div>
-          <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
-          <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
-          <button onClick={() => setTabellenZeitraum("monat")}>Monat</button>
-          <button onClick={() => setTabellenZeitraum("jahr")}>Jahr</button>
+        <div className="aktionen-filter">
+          <div className="zeitraum">
+            <button className={tabellenZeitraum === "heute" ? "active" : ""} onClick={() => setTabellenZeitraum("heute")}>Heute</button>
+            <button className={tabellenZeitraum === "woche" ? "active" : ""} onClick={() => setTabellenZeitraum("woche")}>Woche</button>
+            <button className={tabellenZeitraum === "monat" ? "active" : ""} onClick={() => setTabellenZeitraum("monat")}>Monat</button>
+            <button className={tabellenZeitraum === "jahr" ? "active" : ""} onClick={() => setTabellenZeitraum("jahr")}>Jahr</button>
+          </div>
 
           <select value={tabellenMonat} onChange={(e) => {
             setTabellenMonat(parseInt(e.target.value));
@@ -488,6 +513,72 @@ export default function haushaltsbuch() {
         </div>
       </div>
 
+      {/* --- 4. DATA TABLE --- */}
+      <div className="eintrag-tabelle">
+        <table>
+          <thead>
+            <tr>
+              <th>Notizen</th>
+              <th>Kategorie</th>
+              <th style={{ textAlign: 'right' }}>Betrag</th>
+              <th>Asset</th>
+              <th style={{ textAlign: 'center' }}>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {eintraege
+              .filter(e => {
+                const datum = new Date(e.erstellt_am);
+                const jetzt = new Date();
+
+                if (tabellenZeitraum === "heute") {
+                  return datum.getFullYear() === jetzt.getFullYear() &&
+                    datum.getMonth() === jetzt.getMonth() &&
+                    datum.getDate() === jetzt.getDate();
+                }
+                if (tabellenZeitraum === "woche") {
+                  const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24);
+                  return diffInTagen <= 7;
+                }
+                if (tabellenZeitraum === "monat") {
+                  return (
+                    datum.getMonth() === jetzt.getMonth() &&
+                    datum.getFullYear() === jetzt.getFullYear()
+                  );
+                }
+                if (tabellenZeitraum === "jahr") {
+                  return datum.getFullYear() === jetzt.getFullYear();
+                }
+                if (tabellenZeitraum === "spezifisch") {
+                  return datum.getFullYear() === tabellenJahr &&
+                    datum.getMonth() === tabellenMonat;
+                }
+                return true;
+              })
+              .map((e) => (
+                <tr key={e.id + e.typ}>
+                  <td>{e.notizen}</td>
+                  <td>{e.transaktionskategorie?.name || "Keine Kategorie"}</td>
+                  <td style={{ 
+                    textAlign: 'right', 
+                    fontWeight: '600', 
+                    color: e.typ === "ausgabe" ? "#ef4444" : "#10b981" 
+                  }}>
+                    {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
+                  </td>
+                  <td>{e.asset ? `[${e.asset.asset_typ}: ${e.asset.asset_name}]` : "—"}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button onClick={() => bearbeitenOeffnen(e)} style={{ border: 'none', background: 'none', cursor: 'pointer', marginRight: '8px' }}>✏️</button>
+                    <button onClick={() => eintragLoeschen(e.id, e.typ)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>🗑️</button>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      {/* --- 5. MODAL: TRANSAKTION HINZUFÜGEN --- */}
       {modalTransaktion && (
         <div style={{
           position: "fixed",
@@ -499,36 +590,43 @@ export default function haushaltsbuch() {
         }}>
           <div style={{
             backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            minWidth: "300px",
+            padding: "24px",
+            borderRadius: "12px",
+            minWidth: "320px",
             display: "flex",
             flexDirection: "column",
+            gap: "12px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
           }}>
-            <h4>Transaktion hinzufügen</h4>
+            <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
             <input
               value={transaktionsBeschreibung}
               onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
               placeholder="Beschreibung"
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
             />
             <input
               value={transaktionsBetrag}
               onChange={(e) => setTransaktionsBetrag(e.target.value)}
               placeholder="Betrag"
               type="number"
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
             />
             <select
               value={transaktionsKategorie}
               onChange={(e) => setTransaktionsKategorie(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
             >
               <option value="">Kategorie wählen</option>
               {kategorien.map((k) => (
-                <option key={k.id} value={k.id}>
-                  {k.name}
-                </option>
+                <option key={k.id} value={k.id}>{k.name}</option>
               ))}
             </select>
-            <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
+            <select 
+              value={transaktionsTyp} 
+              onChange={(e) => setTransaktionsTyp(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+            >
               <option value="">Typ wählen</option>
               <option value="ausgabe">Ausgabe</option>
               <option value="einnahme">Einnahme</option>
@@ -536,6 +634,7 @@ export default function haushaltsbuch() {
             <select
               value={ausgewaehltesAsset}
               onChange={(e) => setAusgewaehltesAsset(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
             >
               <option value="">Asset wählen</option>
               {assets.map((a) => (
@@ -544,18 +643,22 @@ export default function haushaltsbuch() {
                 </option>
               ))}
             </select>
-            <div>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <input
                 type="checkbox"
+                id="wiederkehrend"
                 checked={wiederkehrendaktiv}
                 onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
               />
-              <label>Wiederkehrend</label>
+              <label htmlFor="wiederkehrend">Wiederkehrend</label>
             </div>
+
             {wiederkehrendaktiv && (
               <select
                 value={intervall}
                 onChange={(e) => setIntervall(e.target.value)}
+                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
               >
                 <option value="">Intervall wählen</option>
                 <option value="täglich">Täglich</option>
@@ -564,12 +667,26 @@ export default function haushaltsbuch() {
                 <option value="jährlich">Jährlich</option>
               </select>
             )}
-            <button onClick={transaktionHinzufuegen}>Transaktion hinzufügen</button>
-            <button onClick={transaktionSchließen}>Abbrechen</button>
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+              <button 
+                onClick={transaktionHinzufuegen}
+                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+              >
+                Hinzufügen
+              </button>
+              <button 
+                onClick={transaktionSchließen}
+                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+              >
+                Abbrechen
+              </button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* --- 6. MODAL: EINTRAG BEARBEITEN --- */}
       {modalOffen && (
         <div style={{
           position: "fixed",
@@ -581,98 +698,56 @@ export default function haushaltsbuch() {
         }}>
           <div style={{
             backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            minWidth: "300px"
+            padding: "24px",
+            borderRadius: "12px",
+            minWidth: "300px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
           }}>
-            <div>
-              <h4>Eintrag bearbeiten</h4>
-              <input
-                value={editBeschreibung}
-                onChange={(e) => setEditBeschreibung(e.target.value)}
-                placeholder="Beschreibung"
-              />
-              <input
-                value={editBetrag}
-                onChange={(e) => setEditBetrag(e.target.value)}
-                placeholder="Betrag"
-                type="number"
-              />
-              <select
-                value={editKategorie}
-                onChange={(e) => setEditKategorie(e.target.value)}
+            <h4 style={{ fontWeight: "600" }}>Eintrag bearbeiten</h4>
+            <input
+              value={editBeschreibung}
+              onChange={(e) => setEditBeschreibung(e.target.value)}
+              placeholder="Beschreibung"
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+            />
+            <input
+              value={editBetrag}
+              onChange={(e) => setEditBetrag(e.target.value)}
+              placeholder="Betrag"
+              type="number"
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+            />
+            <select
+              value={editKategorie}
+              onChange={(e) => setEditKategorie(e.target.value)}
+              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+            >
+              <option value="">Kategorie wählen</option>
+              {kategorien.map((k) => (
+                <option key={k.id} value={k.id}>{k.name}</option>
+              ))}
+            </select>
+            
+            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+              <button 
+                onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}
+                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
-                <option value="">Kategorie wählen</option>
-                {kategorien.map((k) => (
-                  <option key={k.id} value={k.id}>
-                    {k.name}
-                  </option>
-                ))}
-              </select>
-              <button onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}>Speichern</button>
-              <button onClick={bearbeitenSchliessen}>Abbrechen</button>
+                Speichern
+              </button>
+              <button 
+                onClick={bearbeitenSchliessen}
+                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+              >
+                Abbrechen
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      {eintraege
-        .filter(e => {
-          const datum = new Date(e.erstellt_am);
-          const jetzt = new Date();
-
-          if (tabellenZeitraum === "heute") {
-            return datum.getFullYear() === jetzt.getFullYear() &&
-              datum.getMonth() === jetzt.getMonth() &&
-              datum.getDate() === jetzt.getDate();
-          }
-          if (tabellenZeitraum === "woche") {
-            const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24);
-            return diffInTagen <= 7;
-          }
-          if (tabellenZeitraum === "monat") {
-            return (
-              datum.getMonth() === jetzt.getMonth() &&
-              datum.getFullYear() === jetzt.getFullYear()
-            );
-          }
-          if (tabellenZeitraum === "jahr") {
-            return datum.getFullYear() === jetzt.getFullYear();
-          }
-          if (tabellenZeitraum === "spezifisch") {
-            return datum.getFullYear() === tabellenJahr &&
-              datum.getMonth() === tabellenMonat;
-          }
-        })
-        .map((e) => (
-          <li key={e.id + e.typ}>
-            {/* HIER: Auf die verschachtelten Join-Objekte mit dem sicheren ?. Operator zugreifen */}
-            <table className="eintrag-tabelle">
-              <thead>
-                <tr>
-                  <th>Notizen</th>
-                  <th>Kategorie</th>
-                  <th>Betrag</th>
-                  <th>Asset</th>
-                  <th>Aktionen</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{e.notizen}</td>
-                  <td>{e.transaktionskategorie?.name || "Keine Kategorie"}</td>
-                  <td>{e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €</td>
-                  <td>{e.asset ? `[${e.asset.asset_typ}: ${e.asset.asset_name}]` : ""}</td>
-                  <td>
-                    <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                    <button onClick={() => eintragLoeschen(e.id, e.typ)}>🗑️</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
-        ))
-      }
     </div>
   );
 }
