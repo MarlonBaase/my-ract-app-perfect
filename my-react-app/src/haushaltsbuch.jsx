@@ -451,7 +451,42 @@ export default function haushaltsbuch() {
         </div>
       </div>
 
-      <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
+      <div className="aktionen">
+        <button onClick={() => setModalTransaktion(true)}>Transaktion hinzufügen</button>
+        <div>
+          <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
+          <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
+          <button onClick={() => setTabellenZeitraum("monat")}>Monat</button>
+          <button onClick={() => setTabellenZeitraum("jahr")}>Jahr</button>
+
+          <select value={tabellenMonat} onChange={(e) => {
+            setTabellenMonat(parseInt(e.target.value));
+            setTabellenZeitraum("spezifisch");
+          }}>
+            <option value="0">Januar</option>
+            <option value="1">Februar</option>
+            <option value="2">März</option>
+            <option value="3">April</option>
+            <option value="4">Mai</option>
+            <option value="5">Juni</option>
+            <option value="6">Juli</option>
+            <option value="7">August</option>
+            <option value="8">September</option>
+            <option value="9">Oktober</option>
+            <option value="10">November</option>
+            <option value="11">Dezember</option>
+          </select>
+
+          <select value={tabellenJahr} onChange={(e) => {
+            setTabellenJahr(parseInt(e.target.value));
+            setTabellenZeitraum("spezifisch");
+          }}>
+            {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map(jahr => (
+              <option key={jahr} value={jahr}>{jahr}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {modalTransaktion && (
         <div style={{
@@ -580,40 +615,6 @@ export default function haushaltsbuch() {
           </div>
         </div>
       )}
-
-      <div>
-        <button onClick={() => setTabellenZeitraum("heute")}>Heute</button>
-        <button onClick={() => setTabellenZeitraum("woche")}>Woche</button>
-        <button onClick={() => setTabellenZeitraum("monat")}>Monat</button>
-        <button onClick={() => setTabellenZeitraum("jahr")}>Jahr</button>
-
-        <select value={tabellenMonat} onChange={(e) => {
-          setTabellenMonat(parseInt(e.target.value));
-          setTabellenZeitraum("spezifisch");
-        }}>
-          <option value="0">Januar</option>
-          <option value="1">Februar</option>
-          <option value="2">März</option>
-          <option value="3">April</option>
-          <option value="4">Mai</option>
-          <option value="5">Juni</option>
-          <option value="6">Juli</option>
-          <option value="7">August</option>
-          <option value="8">September</option>
-          <option value="9">Oktober</option>
-          <option value="10">November</option>
-          <option value="11">Dezember</option>
-        </select>
-
-        <select value={tabellenJahr} onChange={(e) => {
-          setTabellenJahr(parseInt(e.target.value));
-          setTabellenZeitraum("spezifisch");
-        }}>
-          {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map(jahr => (
-            <option key={jahr} value={jahr}>{jahr}</option>
-          ))}
-        </select>
-      </div>
 
       {eintraege
         .filter(e => {
