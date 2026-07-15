@@ -397,52 +397,57 @@ export default function haushaltsbuch() {
       <div className="uebersicht">
         <div className="zahlen">
           <div className="zahl">
-            <h3 color="darkblue">Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
+            <h3>Aktuelles Kapital: {kapital.toFixed(2)} €</h3>
           </div>
           <div className="zahl">
-            <span color="green">Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
+            <span>Einnahmen: {summeEinnahmen.toFixed(2)} €</span>
           </div>
           <div className="zahl">
-            <span color="red">Ausgaben: {summeAusgaben.toFixed(2)} €</span>
+            <span>Ausgaben: {summeAusgaben.toFixed(2)} €</span>
           </div>
         </div>
-        <div className="diagramm">
-          <LineChart width={600} height={300} data={diagrammDaten}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="einnahmen" stroke="green" />
-            <Line type="monotone" dataKey="ausgaben" stroke="red" />
-          </LineChart>
-          <div>
-            <button onClick={() => setZeitraum("heute")}>Heute</button>
-            <button onClick={() => setZeitraum("woche")}>Woche</button>
-            <button onClick={() => setZeitraum("monat")}>Monat</button>
-            <button onClick={() => setZeitraum("jahr")}>Jahr</button>
+        <div className="diagramme">
+          <div className="diagramm">
+            <LineChart width={600} height={300} data={diagrammDaten}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="label" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="einnahmen" stroke="green" />
+              <Line type="monotone" dataKey="ausgaben" stroke="red" />
+            </LineChart>
+            <div>
+              <button onClick={() => setZeitraum("heute")}>Heute</button>
+              <button onClick={() => setZeitraum("woche")}>Woche</button>
+              <button onClick={() => setZeitraum("monat")}>Monat</button>
+              <button onClick={() => setZeitraum("jahr")}>Jahr</button>
+            </div>
           </div>
-
-          <h4>Einnahmen pro Kategorie</h4>
-          <PieChart width={300} height={300}>
-            <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-              {kreisDatenEinnahmen.map((entry, index) => (
-                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-          <h4>Ausgaben pro Kategorie</h4>
-          <PieChart width={300} height={300}>
-            <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
-              {kreisDatenAusgaben.map((entry, index) => (
-                <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
+          <div className="diagramm">
+            <h4>Einnahmen pro Kategorie</h4>
+            <PieChart width={300} height={300}>
+              <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+                {kreisDatenEinnahmen.map((entry, index) => (
+                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </div>
+          <div className="diagramm">
+            <h4>Ausgaben pro Kategorie</h4>
+            <PieChart width={300} height={300}>
+              <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+                {kreisDatenAusgaben.map((entry, index) => (
+                  <Cell key={index} fill={["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"][index % 5]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </div>
         </div>
       </div>
 
