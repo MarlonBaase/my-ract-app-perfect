@@ -73,7 +73,7 @@ body.dark {
 /* Uebersicht perfekt zentriert */
 .uebersicht{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
@@ -87,8 +87,8 @@ body.dark {
   margin-right: 50px;
   margin-bottom: 50px;
   align-items: center;
-  dsiplay: flex;
-  flex-direction: column;
+  display: flex;
+  flex-direction: row;
 }
 
 
