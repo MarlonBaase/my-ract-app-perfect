@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. GLOBAL RESETS & BASICS
+   ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,158 +9,91 @@
 
 body {
   max-width: 100vw;
-  overflow-x: hidden; /* Verhindert hässliches horizontales Scrollen auf dem Handy */
-  font-size: 16px; /* Gute Lesbarkeit auf Mobilgeräten */
-  -webkit-text-size-adjust: 100%; /* Verhindert automatisches Text-Vergrößern auf iOS */
+  overflow-x: hidden; 
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%; 
 }
 
-/* Bilder und Inputs passen sich automatisch an */
 img, input, select, textarea {
   max-width: 100%;
 }
 
-/* Macht aus einer nebeneinander liegenden Reihe auf dem Handy eine Spalte */
-.flex-container {
-  display: flex;
-  flex-wrap: wrap; /* Erlaubt den Zeilenumbruch */
-  gap: 16px;
-}
-
-/* Für Modals: Sie dürfen auf dem Handy maximal so breit sein wie der Bildschirm */
-.modal-content {
-  width: 90%;
-  max-width: 500px;
-  margin: auto;
-}
-
-/* Gilt für alle Geräte mit einer Bildschirmbreite von 768px oder weniger (Handys & kleine Tablets) */
-@media (max-width: 768px) {
-  body {
-    padding: 12px; /* Weniger Abstand zum Rand auf dem Handy */
-  }
-
-  /* Beispiel: Buttons vollflächig machen, damit man sie leichter mit dem Daumen trifft */
-  button {
-    padding: 12px 16px; /* Größere Klickfläche */
-    width: 100%; /* Nimmt auf dem Handy die volle Breite ein */
-  }
-
-  /* Falls du Inputs nebeneinander hattest, brechen sie jetzt untereinander */
-  input, select {
-    width: 100% !important;
-  }
-  
-  /* Speziell für deine Tabellen/Listen, falls nötig */
-  li {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-
-
+/* ==========================================================================
+   2. THEMING (LIGHT & DARK MODE)
+   ========================================================================== */
 .app-container {
-  background-color: #ffffff;
-  color: #000000;
   min-height: 100vh;
 }
 
-/* Dark Mode */
-.app-container.dark,
-body.dark {
-  background-color: #121212;
-  color: #ffffff;
-}
+body.light, .app-container { background-color: #F8F9FC; color: #0F1117; }
+body.dark, .app-container.dark { background-color: #0F1117; color: #F1F3F9; }
 
-nav.dark a {
-  color: #ffffff;
-  text-decoration: none;
-}
+nav.light { background-color: #ffffff; color: #000000; }
+nav.dark { background-color: #1a1a1a; color: #ffffff; }
 
-nav.light a {
-  color: #000000;
-  text-decoration: none;
-}
+nav.light a { color: #000000; text-decoration: none; }
+nav.dark a { color: #ffffff; text-decoration: none; }
 
-body.dark {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
+body.light .zahl { background-color: #ffffff; border: 1px solid #e2e8f0; }
+body.dark .zahl { background-color: #1e2230; border: 1px solid #2d3142; }
 
-body.light {
-  background-color: #ffffff;
-  color: #000000;
-}
+body.light .diagramm { background-color: #ffffff; border: 1px solid #e2e8f0; }
+body.dark .diagramm { background-color: #1e2230; border: 1px solid #2d3142; }
 
-nav.dark {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
+body.light .aktionen { background-color: #ffffff; border: 1px solid #e2e8f0; }
+body.dark .aktionen { background-color: #1e2230; border: 1px solid #2d3142; }
 
-nav.light {
-  background-color: #ffffff;
-  color: #000000;
-}
+body.light .aktionen select { background-color: #ffffff; border: 1px solid #cbd5e1; color: #0f1117; }
+body.dark .aktionen select { background-color: #161925; border: 1px solid #4a5568; color: #f1f3f9; }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+body.light .eintrag-tabelle { border: 1px solid #e2e8f0; }
+body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
 
-body {
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-body.light {
-  background-color: #F8F9FC;
-  color: #0F1117;
-}
-
-body.dark {
-  background-color: #0F1117;
-  color: #F1F3F9;
-}
-
-/* Header-Titel */
+/* ==========================================================================
+   3. LAYOUT COMPONENTS & STRUCTURE
+   ========================================================================== */
 h1, .Haushaltsbuch-title {
   padding: 20px 5%;
   font-size: 24px;
   font-weight: 700;
 }
 
-/* --- FLEX-CONTAINER FÜR PRE-TABLE INFOS --- */
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .uebersicht {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-bottom: 30px;
-  width: 100%; /* Auf volle Breite für saubere Zentrierung */
+  width: 100%; 
 }
 
-/* --- RE-DESIGN DER KARTEN (ZAHLEN) --- */
+/* --- KARTEN (ZAHLEN) --- */
 .zahlen {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 24px; /* Gleichmäßiger Abstand statt hartem Margin */
+  gap: 24px; 
   width: 90%;
   margin-bottom: 40px;
-  flex-wrap: wrap; /* Verhindert Überlappen auf kleineren Bildschirmen */
+  flex-wrap: wrap; 
 }
 
 .zahl {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  width: 320px; /* Einheitliche, flexible Breite */
+  width: 320px; 
   height: 100px;
   display: flex;
-  flex-direction: column; /* Label über dem Wert */
+  flex-direction: column; 
   justify-content: center;
   align-items: flex-start;
   padding: 20px 24px;
@@ -169,18 +105,13 @@ h1, .Haushaltsbuch-title {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Hell/Dunkel-Unterscheidung für Karten */
-body.light .zahl { background-color: #ffffff; border: 1px solid #e2e8f0; }
-body.dark .zahl { background-color: #1e2230; border: 1px solid #2d3142; }
-
-/* Styling der Werte in den Karten */
 .zahl strong, .zahl span {
   font-size: 18px;
   font-weight: 700;
   margin-top: 4px;
 }
 
-/* --- RE-DESIGN DER DIAGRAMME --- */
+/* --- DIAGRAMME --- */
 .diagramme {
   display: flex;
   flex-direction: row;
@@ -196,7 +127,6 @@ body.dark .zahl { background-color: #1e2230; border: 1px solid #2d3142; }
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   padding: 24px;
-  margin: 0; /* Altes margin-right entfernt für Symmetrie */
   flex: 1;
   min-width: 300px;
   max-width: 450px;
@@ -207,10 +137,6 @@ body.dark .zahl { background-color: #1e2230; border: 1px solid #2d3142; }
   position: relative;
 }
 
-body.light .diagramm { background-color: #ffffff; border: 1px solid #e2e8f0; }
-body.dark .diagramm { background-color: #1e2230; border: 1px solid #2d3142; }
-
-/* Diagramm-Filterknöpfe sauber am Fuß des Liniendiagramms positionieren */
 .zeitraum {
   display: flex;
   gap: 2px;
@@ -238,7 +164,6 @@ body.dark .zeitraum button { color: #a0aec0; }
 body.light .zeitraum button:hover { background: rgba(255,255,255,0.5); }
 body.dark .zeitraum button:hover { background: rgba(255,255,255,0.1); }
 
-/* Aktiver Zeitraum-Button (Beispielklasse .active) */
 .zeitraum button.active {
   background: #ffffff !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -249,13 +174,12 @@ body.dark .zeitraum button.active {
   color: #ffffff !important;
 }
 
-
-/* --- RE-DESIGN DER AKTIONSLEISTE (MITTE) --- */
+/* --- AKTIONSLEISTE --- */
 .aktionen {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between; /* Links: Button, Rechts: Filter */
+  justify-content: space-between; 
   gap: 16px;
   width: 90%;
   margin: 0 auto 30px auto;
@@ -265,26 +189,20 @@ body.dark .zeitraum button.active {
   flex-wrap: wrap;
 }
 
-body.light .aktionen { background-color: #ffffff; border: 1px solid #e2e8f0; }
-body.dark .aktionen { background-color: #1e2230; border: 1px solid #2d3142; }
-
-/* Wrapper für Filter-Gruppe rechts */
 .aktionen-filter {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* Modernes Button & Select Styling */
 .aktionen button, 
 .aktionen select,
 .zeitraum button {
   font-family: 'Inter', sans-serif;
 }
 
-/* Haupt-Button "Transaktion hinzufügen" */
 .aktionen button:not(.zeitraum button) {
-  background-color: #3b82f6; /* Modernes Blau */
+  background-color: #3b82f6; 
   color: #ffffff;
   border: none;
   padding: 10px 18px;
@@ -305,7 +223,6 @@ body.dark .aktionen { background-color: #1e2230; border: 1px solid #2d3142; }
   transform: translateY(1px);
 }
 
-/* Dropdowns (Selects) */
 .aktionen select {
   padding: 10px 16px;
   font-size: 14px;
@@ -316,23 +233,10 @@ body.dark .aktionen { background-color: #1e2230; border: 1px solid #2d3142; }
   transition: border-color 0.2s;
 }
 
-body.light .aktionen select {
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #0f1117;
-}
-
-body.dark .aktionen select {
-  background-color: #161925;
-  border: 1px solid #4a5568;
-  color: #f1f3f9;
-}
-
 body.light .aktionen select:focus { border-color: #3b82f6; }
 body.dark .aktionen select:focus { border-color: #3b82f6; }
 
-
-/* --- TABELLE (ABGERUNDETE ECKEN FIX) --- */
+/* --- TABELLE --- */
 .eintrag-tabelle {
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   width: 90%;
@@ -340,19 +244,14 @@ body.dark .aktionen select:focus { border-color: #3b82f6; }
   margin-right: auto;
   margin-bottom: 50px;
   border-radius: 12px;
-  overflow: hidden; /* Wichtig für runde Ecken der inneren Tabelle */
+  overflow: hidden; 
 }
 
-body.light .eintrag-tabelle { border: 1px solid #e2e8f0; }
-body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
-
-/* Rechtsbündige Beträge für bessere Lesbarkeit von Zahlen */
 .eintrag-tabelle td:nth-child(3),
 .eintrag-tabelle th:nth-child(3) {
   text-align: right;
 }
 
-/* Aktions-Icons (Editieren & Löschen) */
 .eintrag-tabelle td:last-child {
   display: flex;
   gap: 8px;
@@ -360,7 +259,6 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
   align-items: center;
 }
 
-/* Einfache Transition für die Tabellen-Aktionsbuttons */
 .eintrag-tabelle td button,
 .eintrag-tabelle td img {
   cursor: pointer;
@@ -371,26 +269,28 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
   opacity: 0.7;
 }
 
-/* ==========================================
-   ROBUSTES MOBILE OVERRIDE (FÜR HANDYS)
-   ========================================== */
-@media (max-width: 900px) {
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+}
 
-  /* 1. JEDEN Flex-Container in der App zwingen, untereinander zu brechen */
+/* ==========================================================================
+   4. ROBUSTES MOBILE OVERRIDE (MEDIA QUERY FOR SMALLER SCREENS)
+   ========================================================================== */
+@media (max-width: 900px) {
   div, main, section, article {
     flex-direction: column !important;
     flex-wrap: wrap !important;
   }
 
-  /* 2. Starre Prozent- und Pixelbreiten für Hauptbereiche aushebeln */
-  /* Das gilt für deine Sidebar und deinen Inhaltsbereich */
   aside, 
   .AssetSidebar, 
   div[style*="width"], 
   div[style*="flex"] {
     width: 100% !important;
     max-width: 100% !important;
-    min-width: 0 !important; /* Wichtig, um Überbreite zu verhindern */
+    min-width: 0 !important; 
     flex: none !important;
     height: auto !important;
     position: relative !important;
@@ -398,7 +298,6 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
     padding: 10px !important;
   }
 
-  /* 3. Den Haupt-Inhaltsbereich auf volle Breite zwingen */
   .main-content, 
   .content-container,
   main {
@@ -407,8 +306,6 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
     padding: 15px !important;
   }
 
-  /* 4. Die blaue Sub-Navigationsleiste (Dashboard, Girokonto, Tagesgeld...) wieder lesbar machen */
-  /* Hier erlauben wir den Links, sich nebeneinander aufzureihen, aber umzubrechen */
   .main-content div,
   div[style*="display: flex"] a,
   div[style*="display: flex"] span {
@@ -417,15 +314,44 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
     flex-wrap: wrap !important;
     margin-right: 8px !important;
     margin-bottom: 8px !important;
-    font-size: 14px !important; /* Etwas größer für Touch-Bedienung */
+    font-size: 14px !important; 
   }
 
-  /* 5. padding-Korrektur für die gesamte App auf dem Handy */
   body {
     padding: 8px !important;
   }
 
-  /* 6. Deine Zahlen-Karten (.zahl) auf dem Handy zentrieren und vollflächig machen */
+  button {
+    padding: 12px 16px; 
+    width: 100%; 
+  }
+
+  input, select {
+    width: 100% !important;
+  }
+  
+  ul li, li {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px !important;
+    border-bottom: 1px solid #ccc;
+  }
+
+  ul li button {
+    width: auto !important;
+    display: inline-block !important;
+    margin-right: 8px !important;
+    padding: 8px 16px !important;
+  }
+
+  .eintrag-tabelle {
+    width: 100% !important;
+    overflow-x: auto !important;
+    display: block !important;
+  }
+
   .zahlen {
     width: 100% !important;
     gap: 12px !important;
