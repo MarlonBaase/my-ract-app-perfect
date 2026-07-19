@@ -18,8 +18,13 @@ export default function Girokonto() {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
             .from("girokonto")
-            .select("*")
-            .eq("benutzer_id", user.id)
+            .select(`*, 
+                asset!inner(
+                    benutzer_id,
+                    asset_name
+                )
+            `)
+            .eq("asset.benutzer_id", user.id)
             .order("asset_name", { ascending: true }) // Sortierung angepasst auf asset_name, falls name_der_bank nicht indiziert ist
 
         if (error) {
@@ -142,19 +147,6 @@ export default function Girokonto() {
             </ul>
 
             <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
-
-            {eintraege.length > 0 && (
-                <div>
-                    <h3>Einträge</h3>
-                    <ul>
-                        {eintraege.map((e) => (
-                            <li key={e.id}>
-                                {e.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
 
             {modalOffenHinzu && (
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
