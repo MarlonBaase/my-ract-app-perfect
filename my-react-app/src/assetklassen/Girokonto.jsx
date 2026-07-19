@@ -113,6 +113,7 @@ export default function Girokonto() {
     }
 
     const girokontoSpeichern = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
         if (!zuBearbeiten) return
 
         await supabase
@@ -124,7 +125,7 @@ export default function Girokonto() {
                 waehrung: waehrung,
                 eroeffnungsdatum: eroeffnungsdatum
             })
-            .eq("id", zuBearbeiten.id)
+            .eq("asset.benutzer_id", user.id)
 
         setModalOffen(false)
         setZuBearbeiten(null)
