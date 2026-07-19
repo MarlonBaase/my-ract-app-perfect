@@ -37,6 +37,7 @@ export default function Girokonto() {
     }
 
     const transaktionenOeffnen = async () => {
+        setModalOffenTransaktionen(true)
         const { data : { user }} = await supabase.auth.getUser()
         const { data, error } = await supabase
             .from("transaktionen")
@@ -49,7 +50,6 @@ export default function Girokonto() {
                 return
             }
         if (data) setListeTransaktionenGirokonto(data)
-        setModalOffenTransaktionen(true)
     }
 
     useEffect(() => {
