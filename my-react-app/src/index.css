@@ -370,3 +370,76 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
 .eintrag-tabelle td img:hover {
   opacity: 0.7;
 }
+
+/* ==========================================
+   MOBILE OVERRIDES (FÜR HANDYS & TABLETS)
+   ========================================== */
+@media (max-width: 900px) {
+  
+  /* 1. Haupt-Layout von Reihe auf Spalte umbrechen */
+  /* (Ersetze die Klassen hier ggf. mit den echten Namen aus deiner App) */
+  .app-container, 
+  .assetklassen-layout, 
+  div[style*="display: flex"] {
+    flex-direction: column !important;
+    display: block !important;
+  }
+
+  /* 2. Die Sidebar links anpassen oder einklappen */
+  .AssetSidebar,
+  aside,
+  div[style*="width: 25%"],
+  div[style*="width: 20%"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    margin-bottom: 20px !important;
+    padding: 10px !important;
+  }
+
+  /* 3. Den Hauptinhalt rechts auf volle Breite ziehen */
+  .main-content,
+  .content-container,
+  div[style*="width: 75%"],
+  div[style*="width: 80%"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+    margin: 0 !important;
+  }
+
+  /* 4. Sub-Navigation (Die blaue Link-Leiste unter der Überschrift) */
+  .main-content div,
+  .assetklassen-layout h4 + div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    line-height: 2 !important;
+  }
+
+  /* 5. Deine vorhandenen Listen-Elemente untereinander brechen */
+  ul li {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px !important;
+    border-bottom: 1px solid #ccc;
+  }
+
+  /* 6. Buttons in den Listen nebeneinander lassen, aber größer machen */
+  ul li button {
+    width: auto !important;
+    display: inline-block !important;
+    margin-right: 8px !important;
+    padding: 8px 16px !important;
+  }
+
+  /* 7. Tabellen mobil scrollbar machen, damit sie nicht quetschen */
+  .eintrag-tabelle {
+    width: 100% !important;
+    overflow-x: auto !important;
+    display: block !important;
+  }
+}
