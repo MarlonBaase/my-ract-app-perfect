@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
+import { handleApiError } from "../../utils/errorHandler";
 
 export default function Girokonto() {
     const [listeGirokonto, setListeGirokonto] = useState([])
@@ -40,10 +41,8 @@ export default function Girokonto() {
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
-        if (error) {
-            console.error("Fehler beim Laden:", error.message)
-            return
-        }
+        if (handleApiError(error, "Girokonto laden")) return;
+
         if (data) setListeGirokonto(data)
     }
 
@@ -57,10 +56,7 @@ export default function Girokonto() {
             .eq("asset_id", assetId)
             .order('datum', { ascending: false });
 
-        if (error) {
-            console.error("Fehler beim Laden der Transaktionen:", error.message)
-            return
-        }
+        if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenGirokonto(data)
     }
 
@@ -136,13 +132,18 @@ export default function Girokonto() {
     }
 
     const eintragLoeschen = async (id) => {
-        await supabase.from("girokonto").delete().eq("id", id)
+        const { data, error} = await supabase
+        .from("girokonto")
+        .delete()
+        .eq("id", id)
+
+        if (handleApiError(error, "Eintrag löschen")) return;
         ladeGirokonto()
     }
 
     const girokontoSpeichern = async () => {
 
-        await supabase
+        const { data, error} = await supabase
             .from("asset")
             .update({
                 asset_name: name
@@ -151,7 +152,9 @@ export default function Girokonto() {
 
         if (!zuBearbeiten) return
 
-        await supabase
+        if (handleApiError(error, "Assetnamen updaten")) return;
+
+        const { data, error} = await supabase
             .from("girokonto")
             .update({
                 name_der_bank: bank,
@@ -162,6 +165,8 @@ export default function Girokonto() {
             })
             .eq("asset_id", zuBearbeiten.asset_id)
 
+            if (handleApiError(error, "Girokontodaten updaten")) return;
+
         setModalOffen(false)
         setZuBearbeiten(null)
         ladeGirokonto()
@@ -171,7 +176,7 @@ export default function Girokonto() {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("transaktionsprotokoll").insert({
+    const { data, error} = await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
       notizen: transaktionsBeschreibung,
       betrag: parseFloat(transaktionsBetrag),
@@ -180,6 +185,8 @@ export default function Girokonto() {
       assetklasse: "girokonto",
       typ: transaktionsTyp
     });
+
+    if (handleApiError(error, "Transaktion hinzufügen")) return;
 
     setTransaktionsBeschreibung("");
     setTransaktionsBetrag("");
@@ -196,12 +203,13 @@ export default function Girokonto() {
   };
 
   const ladeKategorien = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("transaktionskategorie")
         .select("*")
         .order("name", { ascending: true });
   
       if (data) setKategorien(data);
+      if (handleApiError(error, "Kategorie laden")) return;
     };
 
 

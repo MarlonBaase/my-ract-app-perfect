@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import { StrictMode, useEffect, useState } from 'react'
 import { supabase } from './supabase'
+import { ErrorBoundary } from 'react-error-boundary'
 import Home from './Home'
 import Dashboard from './Dashboard'
 import Assetklassen from './Assetklassen'
@@ -19,6 +20,19 @@ import Navbar from './Navbar'
 import AssetSidebar from './AssetSidebar'
 import './index.css'
 
+function ErrorFallback({ error, resetErrorBoundary }) {
+  return (
+    <div style={{ padding: "20px", border: "1px solid red", borderRadius: "8px", margin: "20px", backgroundColor: "#fff5f5" }}>
+      <h2>Hoppla! Da ist etwas schiefgelaufen. 🙈</h2>
+      <p style={{ color: "red" }}>{error.message}</p>
+      <button onClick={resetErrorBoundary} style={{ padding: "8px 12px", cursor: "pointer" }}>
+        Erneut versuchen
+      </button>
+    </div>
+  );
+}
+
+
 function App() {
   const [session, setSession] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
@@ -35,27 +49,35 @@ function App() {
   if (!session) return <BrowserRouter><Home /></BrowserRouter>
 
   return (
-    <BrowserRouter>
-      <Navbar darkMode={darkMode} />
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
-        <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
-          <Route path="lf" element={<Lf darkMode={darkMode} />}>
-            <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
-            <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
-            <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => {
+        // Hier kannst du den App-State zurücksetzen, falls nötig
+        window.location.reload();
+      }}
+    >
+      <BrowserRouter>
+        <Navbar darkMode={darkMode} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<Dashboard darkMode={darkMode} />} />
+          <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
+            <Route path="lf" element={<Lf darkMode={darkMode} />}>
+              <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
+              <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
+              <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
+            </Route>
+            <Route path='wd' element={<Wd darkMode={darkMode} />} />
           </Route>
-          <Route path='wd' element={<Wd darkMode={darkMode} />} />
-        </Route>
-        <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
-        <Route path="/profil" element={<Profil darkMode={darkMode} />}>
-          <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode}  />} />
-        </Route>
-        <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
-        <Route path="/support" element={<Support darkMode={darkMode} />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
+          <Route path="/profil" element={<Profil darkMode={darkMode} />}>
+            <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode} />} />
+          </Route>
+          <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
+          <Route path="/support" element={<Support darkMode={darkMode} />} />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
