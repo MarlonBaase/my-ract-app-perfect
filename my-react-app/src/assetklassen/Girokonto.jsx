@@ -39,10 +39,17 @@ export default function Girokonto() {
     const transaktionenOeffnen = async () => {
         setModalOffenTransaktionen(true)
         const { data : { user }} = await supabase.auth.getUser()
+        const { data: { asset_id } } = await supabase
+            .from("asset")
+            .select("asset_id")
+            .eq("benutzer_id", user.id)
+            .eq("asset_name", name)
+            .single()
+
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
             .select("*")
-            .eq("asset_id", user.id)
+            .eq("asset_id", asset_id)
             .order('datum', { ascending: false });
         
             if (error) {
@@ -167,7 +174,7 @@ export default function Girokonto() {
                         {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
-                        <button onClick={() => transaktionenOeffnen()}>💰</button>
+                        <button onClick={() => transaktionenOeffnen(e.asset.asset_id)}>💰</button>
                     </li>
                 ))}
             </ul>
