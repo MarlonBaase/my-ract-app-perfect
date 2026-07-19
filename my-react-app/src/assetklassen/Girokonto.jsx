@@ -13,6 +13,8 @@ export default function Girokonto() {
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
     const [eintraege, setEintraege] = useState([])
+    const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
+    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
 
     const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -32,6 +34,21 @@ export default function Girokonto() {
             return
         }
         if (data) setListeGirokonto(data)
+    }
+
+    const transaktionenOeffnen = async (eintrag) => {
+        setModalOffenTransaktionen(true)
+        const { data: transaktionen, error } = await supabase
+            .from("transaktionen")
+            .select("*")
+            .eq("asset_id", eintrag.asset_id)
+            .order('datum', { ascending: false });
+
+        if (error) {
+            console.error("Fehler beim Laden der Transaktionen:", error.message)
+            return
+        }
+        if (transaktionen) setListeTransaktionenGirokonto(transaktionen)
     }
 
     useEffect(() => {
@@ -149,11 +166,26 @@ export default function Girokonto() {
                         {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
+                        <button onClick={() => transaktionenOeffnen(e)}>💰</button>
                     </li>
                 ))}
             </ul>
 
             <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
+
+            {modalOffenTransaktionen && (
+                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
+
+                        {listeTransaktionenGirokonto.map((transaktion) => (
+                            <li key={transaktion.id}>
+                                {transaktion.betrag} {transaktion.waehrung} | {transaktion.datum}
+                            </li>
+                        ))}
+                        <button onClick={() => setModalOffenTransaktionen(false)}>Schließen</button>
+                    </div>
+                </div>
+            )}
 
             {modalOffenHinzu && (
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
