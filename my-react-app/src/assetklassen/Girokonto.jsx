@@ -98,7 +98,7 @@ export default function Girokonto() {
 
     const bearbeitenOeffnen = (eintrag) => {
         setZuBearbeiten(eintrag)
-        setName(eintrag.asset_name || "")
+        setName(eintrag.asset.asset_name || "")
         setBank(eintrag.name_der_bank || "")
         setIban(eintrag.iban || "")
         setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
@@ -119,7 +119,6 @@ export default function Girokonto() {
             .from("girokonto")
             .update({
                 name_der_bank: bank,
-                asset_name: name,
                 iban: iban,
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 waehrung: waehrung,
@@ -139,7 +138,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
+                        {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                     </li>
