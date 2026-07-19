@@ -25,7 +25,7 @@ export default function Girokonto() {
                 )
             `)
             .eq("asset.benutzer_id", user.id)
-            .order("asset_name", { ascending: true }) // Sortierung angepasst auf asset_name, falls name_der_bank nicht indiziert ist
+            .order('asset_name', { referencedTable: 'asset', ascending: true });
 
         if (error) {
             console.error("Fehler beim Laden:", error.message)
