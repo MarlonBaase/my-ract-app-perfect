@@ -372,74 +372,66 @@ body.dark .eintrag-tabelle { border: 1px solid #2d3142; }
 }
 
 /* ==========================================
-   MOBILE OVERRIDES (FÜR HANDYS & TABLETS)
+   ROBUSTES MOBILE OVERRIDE (FÜR HANDYS)
    ========================================== */
 @media (max-width: 900px) {
-  
-  /* 1. Haupt-Layout von Reihe auf Spalte umbrechen */
-  /* (Ersetze die Klassen hier ggf. mit den echten Namen aus deiner App) */
-  .app-container, 
-  .assetklassen-layout, 
-  div[style*="display: flex"] {
+
+  /* 1. JEDEN Flex-Container in der App zwingen, untereinander zu brechen */
+  div, main, section, article {
     flex-direction: column !important;
-    display: block !important;
+    flex-wrap: wrap !important;
   }
 
-  /* 2. Die Sidebar links anpassen oder einklappen */
-  .AssetSidebar,
-  aside,
-  div[style*="width: 25%"],
-  div[style*="width: 20%"] {
+  /* 2. Starre Prozent- und Pixelbreiten für Hauptbereiche aushebeln */
+  /* Das gilt für deine Sidebar und deinen Inhaltsbereich */
+  aside, 
+  .AssetSidebar, 
+  div[style*="width"], 
+  div[style*="flex"] {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important; /* Wichtig, um Überbreite zu verhindern */
+    flex: none !important;
     height: auto !important;
     position: relative !important;
-    margin-bottom: 20px !important;
+    margin: 0 0 20px 0 !important;
     padding: 10px !important;
   }
 
-  /* 3. Den Hauptinhalt rechts auf volle Breite ziehen */
-  .main-content,
+  /* 3. Den Haupt-Inhaltsbereich auf volle Breite zwingen */
+  .main-content, 
   .content-container,
-  div[style*="width: 75%"],
-  div[style*="width: 80%"] {
+  main {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 10px !important;
-    margin: 0 !important;
+    padding: 15px !important;
   }
 
-  /* 4. Sub-Navigation (Die blaue Link-Leiste unter der Überschrift) */
+  /* 4. Die blaue Sub-Navigationsleiste (Dashboard, Girokonto, Tagesgeld...) wieder lesbar machen */
+  /* Hier erlauben wir den Links, sich nebeneinander aufzureihen, aber umzubrechen */
   .main-content div,
-  .assetklassen-layout h4 + div {
-    display: flex !important;
+  div[style*="display: flex"] a,
+  div[style*="display: flex"] span {
+    display: inline-flex !important;
+    flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 8px !important;
-    line-height: 2 !important;
-  }
-
-  /* 5. Deine vorhandenen Listen-Elemente untereinander brechen */
-  ul li {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 8px !important;
-    padding: 12px !important;
-    border-bottom: 1px solid #ccc;
-  }
-
-  /* 6. Buttons in den Listen nebeneinander lassen, aber größer machen */
-  ul li button {
-    width: auto !important;
-    display: inline-block !important;
     margin-right: 8px !important;
-    padding: 8px 16px !important;
+    margin-bottom: 8px !important;
+    font-size: 14px !important; /* Etwas größer für Touch-Bedienung */
   }
 
-  /* 7. Tabellen mobil scrollbar machen, damit sie nicht quetschen */
-  .eintrag-tabelle {
+  /* 5. padding-Korrektur für die gesamte App auf dem Handy */
+  body {
+    padding: 8px !important;
+  }
+
+  /* 6. Deine Zahlen-Karten (.zahl) auf dem Handy zentrieren und vollflächig machen */
+  .zahlen {
     width: 100% !important;
-    overflow-x: auto !important;
-    display: block !important;
+    gap: 12px !important;
+  }
+  .zahl {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
