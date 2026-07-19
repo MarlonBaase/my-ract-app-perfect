@@ -8,7 +8,7 @@ export default function Girokonto() {
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
-    const [waehrung, setWaehrung] = useState("")<
+    const [waehrung, setWaehrung] = useState("")
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
     const [modalOffen, setModalOffen] = useState(false)
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
