@@ -113,8 +113,16 @@ export default function Girokonto() {
     }
 
     const girokontoSpeichern = async () => {
-        if (!zuBearbeiten) return
-
+        
+        await supabase
+            .from("asset")
+            .update({
+                asset_name: name
+            })
+            .eq("asset_id", zuBearbeiten.asset.asset_id)
+        
+        if (!zuBearbeiten) return        
+        
         await supabase
             .from("girokonto")
             .update({
