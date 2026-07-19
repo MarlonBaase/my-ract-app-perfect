@@ -132,7 +132,7 @@ export default function Girokonto() {
     }
 
     const eintragLoeschen = async (id) => {
-        const { data, error} = await supabase
+        const { error} = await supabase
         .from("girokonto")
         .delete()
         .eq("id", id)
@@ -143,7 +143,7 @@ export default function Girokonto() {
 
     const girokontoSpeichern = async () => {
 
-        const { data, error} = await supabase
+        const { error} = await supabase
             .from("asset")
             .update({
                 asset_name: name
@@ -152,9 +152,8 @@ export default function Girokonto() {
 
         if (!zuBearbeiten) return
 
-        if (handleApiError(error, "Assetnamen updaten")) return;
 
-        const { data, error} = await supabase
+        await supabase
             .from("girokonto")
             .update({
                 name_der_bank: bank,
