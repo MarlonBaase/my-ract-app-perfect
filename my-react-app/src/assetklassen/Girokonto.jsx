@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
-import { handleApiError } from "../../utils/errorHandler";
+import { handleApiError } from "../utils/errorHandler";
 
 export default function Girokonto() {
     const [listeGirokonto, setListeGirokonto] = useState([])
