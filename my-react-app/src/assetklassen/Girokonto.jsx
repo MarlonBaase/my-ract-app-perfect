@@ -56,17 +56,13 @@ export default function Girokonto() {
                 return
             }
 
-            // HIER WAR DER FEHLER: Ändere .id zu .asset_id !
             const asset_id = assetData[0].asset_id
 
-            // 2. Girokonto eintragen (verknüpft mit der korrekten asset_id)
             const { error: giroError } = await supabase
                 .from("girokonto")
                 .insert({
-                    benutzer_id: user.id,
-                    asset_id: asset_id, // nutzt jetzt die korrekte ID aus der DB
+                    asset_id: asset_id,
                     name_der_bank: bank,
-                    asset_name: name,
                     iban: iban,
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     waehrung: waehrung,
