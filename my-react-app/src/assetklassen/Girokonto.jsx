@@ -40,7 +40,7 @@ export default function Girokonto() {
         setModalOffenTransaktionen(true)
         const { data : { user }} = await supabase.auth.getUser()
         const { data, error } = await supabase
-            .from("transaktionen")
+            .from("transaktionsprotokoll")
             .select("*")
             .eq("asset_id", user.id)
             .order('datum', { ascending: false });
