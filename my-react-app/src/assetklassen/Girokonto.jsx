@@ -36,15 +36,9 @@ export default function Girokonto() {
         if (data) setListeGirokonto(data)
     }
 
-    const transaktionenOeffnen = async () => {
+    const transaktionenOeffnen = async ({ asset_id }) => {
         setModalOffenTransaktionen(true)
         const { data : { user }} = await supabase.auth.getUser()
-        const { data: { asset_id } } = await supabase
-            .from("asset")
-            .select("asset_id")
-            .eq("benutzer_id", user.id)
-            .eq("asset_name", name)
-            .single()
 
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
