@@ -63,10 +63,7 @@ export default function Girokonto() {
         if (data) setListeTransaktionenGirokonto(data)
     }
 
-    useEffect(() => {
-        ladeGirokonto()
-        await ladeKategorien();
-    }, [])
+    
 
     const girokontoHinzufuegen = async () => {
         // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
@@ -204,6 +201,13 @@ export default function Girokonto() {
       if (data) setKategorien(data);
     };
 
+
+    useEffect(() => {
+        ladeGirokonto()
+        ladeKategorien();
+    }, [])
+
+    
     return (
         <div>
             <h2>Girokonto</h2>
