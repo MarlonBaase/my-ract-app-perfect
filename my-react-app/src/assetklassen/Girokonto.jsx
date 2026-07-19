@@ -65,6 +65,7 @@ export default function Girokonto() {
 
     useEffect(() => {
         ladeGirokonto()
+        await ladeKategorien();
     }, [])
 
     const girokontoHinzufuegen = async () => {
@@ -193,6 +194,15 @@ export default function Girokonto() {
   const transaktionSchließen = () => {
     setModalTranskationenHinzufuegen(false);
   };
+
+  const ladeKategorien = async () => {
+      const { data } = await supabase
+        .from("transaktionskategorie")
+        .select("*")
+        .order("name", { ascending: true });
+  
+      if (data) setKategorien(data);
+    };
 
     return (
         <div>
