@@ -49,6 +49,7 @@ export default function Girokonto() {
 
     const transaktionenOeffnen = async (assetId) => {
         setModalOffenTransaktionen(true)
+        setAusgewaehltesAsset(assetId)
 
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
@@ -166,7 +167,7 @@ export default function Girokonto() {
         ladeGirokonto()
     }
 
-    const transaktionHinzufuegen = async (assetId) => {
+    const transaktionHinzufuegen = async () => {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -175,7 +176,7 @@ export default function Girokonto() {
       notizen: transaktionsBeschreibung,
       betrag: parseFloat(transaktionsBetrag),
       kategorie_id: transaktionsKategorie,
-      asset_id: assetId,
+      asset_id: ausgewaehltesAsset,
       assetklasse: "girokonto",
       typ: transaktionsTyp
     });
@@ -183,8 +184,10 @@ export default function Girokonto() {
     setTransaktionsBeschreibung("");
     setTransaktionsBetrag("");
     setTransaktionsKategorie("");
-    setAusgewaehltesAsset("");
     setTransaktionsTyp("");
+
+    ladeGirokonto();
+    transaktionenOeffnen(ausgewaehltesAsset);
     setModalTranskationenHinzufuegen(false);
   };
 
@@ -207,7 +210,7 @@ export default function Girokonto() {
         ladeKategorien();
     }, [])
 
-    
+
     return (
         <div>
             <h2>Girokonto</h2>
@@ -277,6 +280,7 @@ export default function Girokonto() {
 
 
             {modalTranskationenHinzufuegen && (
+                
                 <div style={{
                     position: "fixed",
                     top: 0, left: 0,
