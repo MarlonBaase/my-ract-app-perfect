@@ -113,34 +113,26 @@ export default function Girokonto() {
     }
 
     const girokontoSpeichern = async () => {
-        try {
-            // 1. Update in der Haupttabelle 'asset' (für den Namen)
-            const { error: assetError } = await supabase
-                .from('asset')
-                .update({ asset_name: name }) // 'name' ist dein State aus dem Input-Feld
-                .eq('asset_id', zuBearbeiten.asset_id);
-
-            if (assetError) throw assetError;
-
-            // 2. Update in der Detailtabelle 'girokonto' (für die Bankdaten)
-            const { error: girokontoError } = await supabase
-                .from('girokonto')
-                .update({
-                    name_der_bank: bank,
-                    iban: iban,
-                    einzahlung_bei_eroeffnung: einzahlung_bei_eroeffnung,
-                    waehrung: waehrung,
-                    eroeffnungsdatum: eroeffnungsdatum
-                })
-                .eq('asset_id', zuBearbeiten.asset_id);
-
-            if (girokontoError) throw girokontoError;
-
-
-
-        } catch (error) {
-            console.error("Fehler beim Aktualisieren:", error.message);
-        }
+        
+        await supabase
+            .from("asset")
+            .update({
+                asset_name: name
+            })
+            .eq("asset_id", zuBearbeiten.asset_id)
+        
+        if (!zuBearbeiten) return        
+        
+        await supabase
+            .from("girokonto")
+            .update({
+                name_der_bank: bank,
+                iban: iban,
+                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                waehrung: waehrung,
+                eroeffnungsdatum: eroeffnungsdatum
+            })
+            .eq("asset_id", zuBearbeiten.asset_id)
 
         setModalOffen(false)
         setZuBearbeiten(null)
