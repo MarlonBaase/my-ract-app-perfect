@@ -36,19 +36,20 @@ export default function Girokonto() {
         if (data) setListeGirokonto(data)
     }
 
-    const transaktionenOeffnen = async (eintrag) => {
-        setModalOffenTransaktionen(true)
-        const { data: transaktionen, error } = await supabase
+    const transaktionenOeffnen = async () => {
+        const { data : { user }} = await supabase.auth.getUser()
+        const { data, error } = await supabase
             .from("transaktionen")
             .select("*")
-            .eq("asset_id", eintrag.asset_id)
+            .eq("asset_id", user.id)
             .order('datum', { ascending: false });
-
-        if (error) {
-            console.error("Fehler beim Laden der Transaktionen:", error.message)
-            return
-        }
-        if (transaktionen) setListeTransaktionenGirokonto(transaktionen)
+        
+            if (error) {
+                console.error("Fehler beim Laden der Transaktionen:", error.message)
+                return
+            }
+        if (data) setListeTransaktionenGirokonto(data)
+        setModalOffenTransaktionen(true)
     }
 
     useEffect(() => {
@@ -166,7 +167,7 @@ export default function Girokonto() {
                         {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
-                        <button onClick={() => transaktionenOeffnen(e)}>💰</button>
+                        <button onClick={() => transaktionenOeffnen()}>💰</button>
                     </li>
                 ))}
             </ul>
