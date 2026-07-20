@@ -7,6 +7,13 @@ export default function Girokonto() {
     const [name, setName] = useState("")
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
+    const [kontoinhaber, setKontoinhaber] = useState("")
+    const [istAktiv, setIstAktiv] = useState("")
+    const [hauptkonto, setHauptkonto] = useState("")
+    const [elternkonto, setElternkonto] = useState("")
+    const [dispoLimit, setDispoLimit] = useState("")
+    const [bic, setBic] = useState("")
+    const [zinssatz, setZinssatz] = useState("")
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [waehrung, setWaehrung] = useState("")
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
@@ -96,7 +103,14 @@ export default function Girokonto() {
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     waehrung: waehrung,
                     eroeffnungsdatum: eroeffnungsdatum,
-                    bemerkung: transaktionsBeschreibung
+                    bemerkung: transaktionsBeschreibung,
+                    kontoinhaber: kontoinhaber,
+                    istAktiv: true,
+                    hauptkonto: hauptkonto,
+                    elternkonto: elternkonto,
+                    dispoLimit: dispoLimit,
+                    bic: bic,
+                    zinssatz: zinssatz
                 })
 
             if (giroError) {
@@ -111,6 +125,14 @@ export default function Girokonto() {
             setEinzahlung_bei_eroeffnung("")
             setWaehrung("")
             setEroeffnungsdatum("")
+            setTransaktionsBeschreibung("")
+            setKontoinhaber("")
+            setIstAktiv("")
+            setHauptkonto("")
+            setElternkonto("")
+            setDispoLimit("")
+            setBic("")
+            setZinssatz("")
             setModalOffenHinzu(false)
 
             // Daten neu laden
@@ -130,6 +152,13 @@ export default function Girokonto() {
         setWaehrung(eintrag.waehrung || "")
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setTransaktionsBeschreibung(eintrag.bemerkung || "")
+        setKontoinhaber(eintrag.kontoinhaber || "")
+        setIstAktiv(eintrag.istAktiv || "")
+        setHauptkonto(eintrag.hauptkonto || "")
+        setElternkonto(eintrag.elternkonto || "")
+        setDispoLimit(eintrag.dispoLimit || "")
+        setBic(eintrag.bic || "")
+        setZinssatz(eintrag.zinssatz || "")
         setModalOffen(true)
     }
 
@@ -163,7 +192,14 @@ export default function Girokonto() {
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 waehrung: waehrung,
                 eroeffnungsdatum: eroeffnungsdatum,
-                bemerkung: transaktionsBeschreibung
+                bemerkung: transaktionsBeschreibung,
+                kontoinhaber: kontoinhaber,
+                istAktiv: istAktiv,
+                hauptkonto: hauptkonto,
+                elternkonto: elternkonto,
+                dispoLimit: dispoLimit,
+                bic: bic,
+                zinssatz: zinssatz
             })
             .eq("asset_id", zuBearbeiten.asset_id)
 
@@ -228,7 +264,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum}
+                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset.asset_id)}>💰</button>
@@ -264,6 +300,12 @@ export default function Girokonto() {
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung (z.B. EUR)" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
+                        <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto (e.target.value)}/>
+                        <input value={elternkonto} onChange={(e) => setElternkonto (e.target.value)} placeholder="elternkonto" />
+                        <input value={dispoLimit} onChange={(e) => setDispoLimit (e.target.value)} placeholder="Dispo Limit" />
+                        <input value={bic} onChange={(e) => setBic (e.target.value)} placeholder="BIC" />
+                        <input value={zinssatz} onChange={(e) => setZinssatz (e.target.value)} placeholder="Zinssatz" />
 
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
@@ -282,6 +324,13 @@ export default function Girokonto() {
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
+                        <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+                        <input type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv (e.target.value)} />
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto (e.target.value)}/>
+                        <input value={elternkonto} onChange={(e) => setElternkonto (e.target.value)} placeholder="elternkonto" />
+                        <input value={dispoLimit} onChange={(e) => setDispoLimit (e.target.value)} placeholder="Dispo Limit" />
+                        <input value={bic} onChange={(e) => setBic (e.target.value)} placeholder="BIC" />
+                        <input value={zinssatz} onChange={(e) => setZinssatz (e.target.value)} placeholder="Zinssatz" />
 
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
