@@ -59,131 +59,102 @@ const navStruktur = [
 export default function Navbar({ darkMode }) {
   const location = useLocation()
   const [offenIndex, setOffenIndex] = useState(null)
-  const [mobileMenuOffen, setMobileMenuOffen] = useState(false)
 
   const istAktiv = (path) => location.pathname.startsWith(path)
-
-  const toggleDropdown = (index) => {
-    setOffenIndex(offenIndex === index ? null : index)
-  }
 
   return (
     <nav style={{
       backgroundColor: darkMode ? '#1e1e2e' : '#ffffff',
       borderBottom: darkMode ? '1px solid #333' : '1px solid #e0e0e0',
-      padding: '0 1.5rem',
+      padding: '0 1rem',
+      display: 'flex',
+      alignItems: 'center',
+      height: '56px',
       position: 'sticky',
       top: 0,
       zIndex: 1000,
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      gap: '0.25rem',
+      maxWidth: '100vw',
+      overflowX: 'auto', // Macht die Leiste am Handy wischbar
+      whiteSpace: 'nowrap'
     }}>
-      {/* HEADER LEISTE */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: '56px',
-      }}>
-        <div style={{ fontWeight: '700', fontSize: '1.1rem', color: darkMode ? '#ffffff' : '#0f1117' }}>
-          Mein Portfolio
-        </div>
-
-        {/* Hamburger Button für Mobilgeräte */}
-        <button
-          onClick={() => setMobileMenuOffen(!mobileMenuOffen)}
-          style={{
-            display: 'block',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            color: darkMode ? '#ffffff' : '#374151',
-          }}
+      {navStruktur.map((item, index) => (
+        <div
+          key={index}
+          style={{ position: 'relative', flexShrink: 0 }}
+          onMouseEnter={() => setOffenIndex(index)}
+          onMouseLeave={() => setOffenIndex(null)}
         >
-          {mobileMenuOffen ? '✕' : '☰'}
-        </button>
-      </div>
-
-      {/* MENÜLISTE (Aufklappbar auf dem Handy) */}
-      <div style={{
-        display: mobileMenuOffen ? 'block' : 'none',
-        paddingBottom: '1rem',
-        maxHeight: 'calc(100vh - 60px)',
-        overflowY: 'auto'
-      }}>
-        {navStruktur.map((item, index) => (
-          <div key={index} style={{ borderBottom: darkMode ? '1px solid #2d3142' : '1px solid #f0f0f0' }}>
+          {/* Hauptmenüpunkt */}
+          <Link
+            to={item.path}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 0.75rem',
+              height: '56px',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              fontWeight: istAktiv(item.path) ? '600' : '400',
+              color: istAktiv(item.path)
+                ? '#4f8ef7'
+                : darkMode ? '#c9d1e0' : '#374151',
+              borderBottom: istAktiv(item.path)
+                ? '2px solid #4f8ef7'
+                : '2px solid transparent',
+              transition: 'color 0.15s, border-color 0.15s',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {item.label}
+            {item.unterseiten.length > 0 && (
+              <span style={{ marginLeft: '4px', fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
+            )}
+          </Link>
             
-            {/* Hauptlink & Pfeil */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Link
-                to={item.path}
-                onClick={() => {
-                  if (item.unterseiten.length === 0) setMobileMenuOffen(false)
-                }}
-                style={{
-                  display: 'block',
-                  padding: '0.75rem 0',
-                  textDecoration: 'none',
-                  fontSize: '0.95rem',
-                  fontWeight: istAktiv(item.path) ? '600' : '400',
-                  color: istAktiv(item.path)
-                    ? '#4f8ef7'
-                    : darkMode ? '#c9d1e0' : '#374151',
-                }}
-              >
-                {item.label}
-              </Link>
 
-              {item.unterseiten.length > 0 && (
-                <button
-                  onClick={() => toggleDropdown(index)}
+          {/* Dropdown */}
+          {item.unterseiten.length > 0 && offenIndex === index && (
+            <div style={{
+              position: 'absolute',
+              top: '56px',
+              left: 0,
+              backgroundColor: darkMode ? '#2a2a3e' : '#ffffff',
+              border: darkMode ? '1px solid #444' : '1px solid #e0e0e0',
+              borderRadius: '8px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              minWidth: '220px',
+              zIndex: 1001,
+              overflow: 'hidden',
+            }}>
+              {item.unterseiten.map((unter, uIndex) => (
+                <Link
+                  key={uIndex}
+                  to={unter.path}
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: '0.75rem',
-                    color: darkMode ? '#c9d1e0' : '#374151',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
+                    display: 'block',
+                    padding: '0.6rem 1rem',
+                    textDecoration: 'none',
+                    fontSize: '0.85rem',
+                    color: istAktiv(unter.path)
+                      ? '#4f8ef7'
+                      : darkMode ? '#c9d1e0' : '#374151',
+                    backgroundColor: istAktiv(unter.path)
+                      ? darkMode ? '#1a1a2e' : '#f0f5ff'
+                      : 'transparent',
+                    fontWeight: istAktiv(unter.path) ? '600' : '400',
+                    borderLeft: istAktiv(unter.path) ? '3px solid #4f8ef7' : '3px solid transparent',
+                    transition: 'background 0.1s',
                   }}
                 >
-                  {offenIndex === index ? '▲' : '▼'}
-                </button>
-              )}
+                  {unter.label}
+                </Link>
+              ))}
             </div>
-
-            {/* Unterseiten (Dropdown) */}
-            {item.unterseiten.length > 0 && offenIndex === index && (
-              <div style={{
-                backgroundColor: darkMode ? '#161925' : '#f8f9fc',
-                borderRadius: '6px',
-                padding: '0.5rem 0',
-                marginBottom: '0.5rem'
-              }}>
-                {item.unterseiten.map((unter, uIndex) => (
-                  <Link
-                    key={uIndex}
-                    to={unter.path}
-                    onClick={() => setMobileMenuOffen(false)}
-                    style={{
-                      display: 'block',
-                      padding: '0.5rem 1rem',
-                      textDecoration: 'none',
-                      fontSize: '0.85rem',
-                      color: istAktiv(unter.path)
-                        ? '#4f8ef7'
-                        : darkMode ? '#a0aec0' : '#4a5568',
-                      fontWeight: istAktiv(unter.path) ? '600' : '400',
-                    }}
-                  >
-                    {unter.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
+      ))}
     </nav>
   )
 }
