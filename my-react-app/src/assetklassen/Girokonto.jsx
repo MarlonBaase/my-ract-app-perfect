@@ -95,7 +95,8 @@ export default function Girokonto() {
                     iban: iban,
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     waehrung: waehrung,
-                    eroeffnungsdatum: eroeffnungsdatum
+                    eroeffnungsdatum: eroeffnungsdatum,
+                    bemerkung: transaktionsBeschreibung
                 })
 
             if (giroError) {
@@ -128,6 +129,7 @@ export default function Girokonto() {
         setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
         setWaehrung(eintrag.waehrung || "")
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
+        setTransaktionsBeschreibung(eintrag.bemerkung || "")
         setModalOffen(true)
     }
 
@@ -160,7 +162,8 @@ export default function Girokonto() {
                 iban: iban,
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 waehrung: waehrung,
-                eroeffnungsdatum: eroeffnungsdatum
+                eroeffnungsdatum: eroeffnungsdatum,
+                bemerkung: transaktionsBeschreibung
             })
             .eq("asset_id", zuBearbeiten.asset_id)
 
@@ -177,7 +180,7 @@ export default function Girokonto() {
 
     const { data, error} = await supabase.from("transaktionsprotokoll").insert({
       benutzer_id: user.id,
-      notizen: transaktionsBeschreibung,
+      bemerkung: transaktionsBeschreibung,
       betrag: parseFloat(transaktionsBetrag),
       kategorie_id: transaktionsKategorie,
       asset_id: ausgewaehltesAsset,
@@ -225,7 +228,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.eroeffnungsdatum}
+                        {e.asset.asset_name} ({e.name_der_bank}) | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset.asset_id)}>💰</button>
@@ -260,6 +263,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung (z.B. EUR)" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                        <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
 
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
@@ -277,6 +281,7 @@ export default function Girokonto() {
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                        <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
 
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
