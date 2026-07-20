@@ -63,6 +63,8 @@ export default function Navbar({ darkMode }) {
   const istAktiv = (path) => location.pathname.startsWith(path)
 
   return (
+    <div>
+    <h1 style={{color: 'red'}}>HALO TEST</h1>
     <nav style={{
       backgroundColor: darkMode ? '#1e1e2e' : '#ffffff',
       borderBottom: darkMode ? '1px solid #333' : '1px solid #e0e0e0',
@@ -156,5 +158,6 @@ export default function Navbar({ darkMode }) {
         </div>
       ))}
     </nav>
+    </div>
   )
 }
