@@ -66,7 +66,7 @@ export default function Navbar({ darkMode }) {
     <nav style={{
       backgroundColor: darkMode ? '#1e1e2e' : '#ffffff',
       borderBottom: darkMode ? '1px solid #333' : '1px solid #e0e0e0',
-      padding: '0 2rem',
+      padding: '0 1rem',
       display: 'flex',
       alignItems: 'center',
       height: '56px',
@@ -75,11 +75,14 @@ export default function Navbar({ darkMode }) {
       zIndex: 1000,
       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
       gap: '0.25rem',
+      maxWidth: '100vw',
+      overflowX: 'auto', // Macht die Leiste am Handy wischbar
+      whiteSpace: 'nowrap'
     }}>
       {navStruktur.map((item, index) => (
         <div
           key={index}
-          style={{ position: 'relative' }}
+          style={{ position: 'relative', flexShrink: 0 }}
           onMouseEnter={() => setOffenIndex(index)}
           onMouseLeave={() => setOffenIndex(null)}
         >
@@ -109,7 +112,7 @@ export default function Navbar({ darkMode }) {
               <span style={{ marginLeft: '4px', fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
             )}
           </Link>
-           
+            
 
           {/* Dropdown */}
           {item.unterseiten.length > 0 && offenIndex === index && (
@@ -143,16 +146,6 @@ export default function Navbar({ darkMode }) {
                     fontWeight: istAktiv(unter.path) ? '600' : '400',
                     borderLeft: istAktiv(unter.path) ? '3px solid #4f8ef7' : '3px solid transparent',
                     transition: 'background 0.1s',
-                  }}
-                  onMouseEnter={e => {
-                    if (!istAktiv(unter.path)) {
-                      e.currentTarget.style.backgroundColor = darkMode ? '#333350' : '#f5f7ff'
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!istAktiv(unter.path)) {
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                    }
                   }}
                 >
                   {unter.label}

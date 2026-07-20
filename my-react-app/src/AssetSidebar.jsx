@@ -107,26 +107,22 @@ export default function AssetSidebar({ darkMode: dark }) {
     setOffen(prev => ({ ...prev, [label]: !prev[label] }))
   }
  
-  // Sidebar nur im Assetklassen-Bereich anzeigen
   if (!location.pathname.startsWith("/assetklassen")) return null
  
   return (
     <div style={{
-      width: "260px",
-      minWidth: "260px",
+      width: "100%",
+      maxWidth: "260px",
       backgroundColor: dark ? "#1A1D27" : "#ffffff",
       borderRight: dark ? "1px solid #2a2d3a" : "1px solid #e8eaf0",
-      height: "calc(100vh - 56px)",
+      height: "auto",
+      maxHeight: "calc(100vh - 56px)",
       overflowY: "auto",
-      position: "sticky",
-      top: "56px",
       padding: "1rem 0",
       fontSize: "0.82rem",
     }}>
       {struktur.map((block) => (
         <div key={block.block} style={{ marginBottom: "1.5rem" }}>
- 
-          {/* Block Header */}
           <div style={{
             padding: "0.4rem 1rem",
             fontSize: "0.7rem",
@@ -141,8 +137,6 @@ export default function AssetSidebar({ darkMode: dark }) {
  
           {block.bereiche.map((bereich) => (
             <div key={bereich.label}>
- 
-              {/* Bereichs-Dashboard Link */}
               <div style={{ display: "flex", alignItems: "center" }}>
                 <Link
                   to={bereich.path}
@@ -167,7 +161,6 @@ export default function AssetSidebar({ darkMode: dark }) {
                   {bereich.label}
                 </Link>
  
-                {/* Toggle Button */}
                 {bereich.unterseiten.length > 0 && (
                   <button
                     onClick={() => toggleBereich(bereich.label)}
@@ -185,7 +178,6 @@ export default function AssetSidebar({ darkMode: dark }) {
                 )}
               </div>
  
-              {/* Unterseiten */}
               {(offen[bereich.label] || istBereichAktiv(bereich.path)) && bereich.unterseiten.map((unter) => (
                 <Link
                   key={unter.path}
