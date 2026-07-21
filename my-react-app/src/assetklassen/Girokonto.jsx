@@ -290,8 +290,24 @@ export default function Girokonto() {
             )}
 
             {modalOffenHinzu && (
-                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
+                <div style={{
+          position: "fixed",
+          top: 0, left: 0,
+          width: "100%", height: "100%",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            padding: "24px",
+            borderRadius: "12px",
+            minWidth: "320px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+          }}>
                         <h4>Neues Girokonto hinzufügen</h4>
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name (z.B. Hauptkonto)" />
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank Name (z.B. Sparkasse)" />
