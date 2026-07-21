@@ -10,7 +10,9 @@ export default function Girokonto() {
     const [kontoinhaber, setKontoinhaber] = useState("")
     const [istAktiv, setIstAktiv] = useState("")
     const [hauptkonto, setHauptkonto] = useState("")
-    const [elternkonto, setElternkonto] = useState([]);
+    const [elternkonto, setElternkonto] = useState("")
+    const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
+    const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState(""); // Der ausgewählte Wert
     const [dispoLimit, setDispoLimit] = useState("")
     const [bic, setBic] = useState("")
     const [zinssatz, setZinssatz] = useState("")
@@ -174,17 +176,16 @@ export default function Girokonto() {
 
     const girokontoSpeichern = async () => {
 
-        const { error } = await supabase
+        if (!zuBearbeiten) return;
+
+        const { error: assetError } = await supabase
             .from("asset")
-            .update({
-                asset_name: name
-            })
-            .eq("asset_id", zuBearbeiten.asset_id)
+            .update({ asset_name: name })
+            .eq("asset_id", zuBearbeiten.asset_id);
 
-        if (!zuBearbeiten) return
+        if (handleApiError(assetError, "Asset Name updaten")) return;
 
-
-        await supabase
+        const { error: giroError } = await supabase
             .from("girokonto")
             .update({
                 name_der_bank: bank,
@@ -201,9 +202,9 @@ export default function Girokonto() {
                 bic: bic,
                 zinssatz: zinssatz
             })
-            .eq("asset_id", zuBearbeiten.asset_id)
+            .eq("asset_id", zuBearbeiten.asset_id);
 
-        if (handleApiError(error, "Girokontodaten updaten")) return;
+        if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
         setModalOffen(false)
         setZuBearbeiten(null)
@@ -252,27 +253,27 @@ export default function Girokonto() {
 
 
     useEffect(() => {
-    const init = async () => {
-      try {
-        await ladeGirokonto()
-        await ladeKategorien();
-        await ladeElternkonto();
-    } catch (err) {
-        console.error("Fehler in init:", err);
-      }
+        const init = async () => {
+            try {
+                await ladeGirokonto()
+                await ladeKategorien();
+                await ladeElternkontoListe();
+            } catch (err) {
+                console.error("Fehler in init:", err);
+            }
+        };
+        init();
+    }, []);
+
+    const ladeElternkontoListe = async () => {
+        const { data } = await supabase
+            .from("girokonto")
+            .select("*")
+            .eq("hauptkonto", true)
+            .order("hauptkonto", { ascending: true });
+
+        if (data) setElternkonto(data);
     };
-    init();
-  }, []);
-
-  const ladeElternkonto = async () => {
-    const { data } = await supabase
-      .from("girokonto")
-      .select("*")
-      .eq("true" , hauptkonto)
-      .order("hauptkonto", { ascending: true });
-
-    if (data) setElternkonto(data);
-  };
 
 
     return (
@@ -335,7 +336,7 @@ export default function Girokonto() {
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                         <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
@@ -378,20 +379,21 @@ export default function Girokonto() {
                         <input title="Aktiv" type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.value)} />
                         <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
                         <select
-                            value={elternkonto}
-                            onChange={(e) => setElternkonto(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            value={ausgewaehltesElternkonto}
+                            onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
                         >
-                            <option value="">Elternkonto wählen</option>
-                            {elternkonto.map((a) => (
-                                <option key={a.hauptkonto} value={a.hauptkonto}>
-                                    {a.hauptkonto} | {a.iban} | 
+                            <option value="">Elternkonto wählen (Optional)</option>
+                            {elternkontoListe.map((a) => (
+                                <option key={a.id} value={a.id}>
+                                    {a.name_der_bank} | {a.iban}
                                 </option>
                             ))}
                         </select>
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
+
+                        
 
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
