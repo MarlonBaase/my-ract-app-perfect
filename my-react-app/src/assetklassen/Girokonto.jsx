@@ -357,7 +357,26 @@ export default function Girokonto() {
                         <button
                             onClick={() => {
                                 girokontoHinzufuegen,
-                                setZuBearbeiten(""),
+                                    setZuBearbeiten(""),
+                                    setName(""),
+                                    setBank(""),
+                                    setIban(""),
+                                    setEinzahlung_bei_eroeffnung(""),
+                                    setWaehrung(""),
+                                    setEroeffnungsdatum(""),
+                                    setTransaktionsBeschreibung(""),
+                                    setKontoinhaber(""),
+                                    setIstAktiv(""),
+                                    setHauptkonto(""),
+                                    setElternkonto(""),
+                                    setDispoLimit(""),
+                                    setBic(""),
+                                    setZinssatz(""),
+                                    setModalOffenHinzu(false)
+                            }}
+                        >Girokonto hinzufügen</button>
+                        <button onClick={() => {
+                            setZuBearbeiten(""),
                                 setName(""),
                                 setBank(""),
                                 setIban(""),
@@ -373,9 +392,8 @@ export default function Girokonto() {
                                 setBic(""),
                                 setZinssatz(""),
                                 setModalOffenHinzu(false)
-                            }}
-                        >Girokonto hinzufügen</button>
-                        <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
+                        }}
+                        >Abbrechen</button>
                     </div>
 
                 </div>
@@ -435,7 +453,26 @@ export default function Girokonto() {
                             <button
                                 onClick={() => {
                                     girokontoSpeichern,
-                                    setZuBearbeiten(""),
+                                        setZuBearbeiten(""),
+                                        setName(""),
+                                        setBank(""),
+                                        setIban(""),
+                                        setEinzahlung_bei_eroeffnung(""),
+                                        setWaehrung(""),
+                                        setEroeffnungsdatum(""),
+                                        setTransaktionsBeschreibung(""),
+                                        setKontoinhaber(""),
+                                        setIstAktiv(""),
+                                        setHauptkonto(""),
+                                        setElternkonto(""),
+                                        setDispoLimit(""),
+                                        setBic(""),
+                                        setZinssatz(""),
+                                        setModalOffenHinzu(false)
+                                }}
+                            >Speichern</button>
+                            <button onClick={() => {
+                                setZuBearbeiten(""),
                                     setName(""),
                                     setBank(""),
                                     setIban(""),
@@ -450,10 +487,9 @@ export default function Girokonto() {
                                     setDispoLimit(""),
                                     setBic(""),
                                     setZinssatz(""),
-                                    setModalOffenHinzu(false)
-                                }}
-                            >Speichern</button>
-                            <button onClick={() => setModalOffen(false)}>Abbrechen</button>
+                                    setModalOffen(false)
+                            }}
+                            >Abbrechen</button>
                         </div>
                     </div>
                 )
