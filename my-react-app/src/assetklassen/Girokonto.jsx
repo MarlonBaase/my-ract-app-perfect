@@ -355,205 +355,209 @@ export default function Girokonto() {
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
                         <button
-                            onClick={() => girokontoHinzufuegen,
-                                        setZuBearbeiten(""),
-                                        setName(""),
-                                        setBank(""),
-                                        setIban(""),
-                                        setEinzahlung_bei_eroeffnung(""),
-                                        setWaehrung(""),
-                                        setEroeffnungsdatum(""),
-                                        setTransaktionsBeschreibung(""),
-                                        setKontoinhaber(""),
-                                        setIstAktiv(""),
-                                        setHauptkonto(""),
-                                        setElternkonto(""),
-                                        setDispoLimit(""),
-                                        setBic(""),
-                                        setZinssatz(""),
-                                        setModalOffenHinzu(false)}
+                            onClick={() => {
+                                girokontoHinzufuegen,
+                                setZuBearbeiten(""),
+                                setName(""),
+                                setBank(""),
+                                setIban(""),
+                                setEinzahlung_bei_eroeffnung(""),
+                                setWaehrung(""),
+                                setEroeffnungsdatum(""),
+                                setTransaktionsBeschreibung(""),
+                                setKontoinhaber(""),
+                                setIstAktiv(""),
+                                setHauptkonto(""),
+                                setElternkonto(""),
+                                setDispoLimit(""),
+                                setBic(""),
+                                setZinssatz(""),
+                                setModalOffenHinzu(false)
+                            }}
                         >Girokonto hinzufügen</button>
-                    <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
+                        <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
+                    </div>
+
                 </div>
-                        
-                </div>
-    )
-}
+            )
+            }
 
 
 
-{
-    modalOffen && (
-        <div style={{
-            position: "fixed",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 1000
-        }}>
-            <div style={{
-                backgroundColor: "white",
-                padding: "24px",
-                borderRadius: "12px",
-                minWidth: "320px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-            }}>
-                <h4>Girokonto bearbeiten</h4>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
-                <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
-                <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
-                <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
-                <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
-                <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
-                <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
-                <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                <input title="Aktiv" type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.value)} />
-                <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
-                <select
-                    value={ausgewaehltesElternkonto}
-                    onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
-                >
-                    <option value="">Elternkonto wählen (Optional)</option>
-                    {elternkontoListe.map((a) => (
-                        <option key={a.asset_id} value={a.asset_id}>
-                            {a.name_der_bank} | {a.iban}
-                        </option>
-                    ))}
-                </select>
-                <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
-                <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
-                <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
+            {
+                modalOffen && (
+                    <div style={{
+                        position: "fixed",
+                        top: 0, left: 0,
+                        width: "100%", height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        zIndex: 1000
+                    }}>
+                        <div style={{
+                            backgroundColor: "white",
+                            padding: "24px",
+                            borderRadius: "12px",
+                            minWidth: "320px",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                        }}>
+                            <h4>Girokonto bearbeiten</h4>
+                            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
+                            <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
+                            <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+                            <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
+                            <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
+                            <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                            <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
+                            <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+                            <input title="Aktiv" type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
+                            <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
+                            <select
+                                value={ausgewaehltesElternkonto}
+                                onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
+                            >
+                                <option value="">Elternkonto wählen (Optional)</option>
+                                {elternkontoListe.map((a) => (
+                                    <option key={a.asset_id} value={a.asset_id}>
+                                        {a.name_der_bank} | {a.iban}
+                                    </option>
+                                ))}
+                            </select>
+                            <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+                            <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
+                            <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
 
 
-                <button
-                            onClick={() => girokontoSpeichern,
-                                        setZuBearbeiten(""),
-                                        setName(""),
-                                        setBank(""),
-                                        setIban(""),
-                                        setEinzahlung_bei_eroeffnung(""),
-                                        setWaehrung(""),
-                                        setEroeffnungsdatum(""),
-                                        setTransaktionsBeschreibung(""),
-                                        setKontoinhaber(""),
-                                        setIstAktiv(""),
-                                        setHauptkonto(""),
-                                        setElternkonto(""),
-                                        setDispoLimit(""),
-                                        setBic(""),
-                                        setZinssatz(""),
-                                        setModalOffenHinzu(false)}
-                        >Speichern</button>
-                <button onClick={() => setModalOffen(false)}>Abbrechen</button>
-            </div>
-        </div>
-    )
-}
+                            <button
+                                onClick={() => {
+                                    girokontoSpeichern,
+                                    setZuBearbeiten(""),
+                                    setName(""),
+                                    setBank(""),
+                                    setIban(""),
+                                    setEinzahlung_bei_eroeffnung(""),
+                                    setWaehrung(""),
+                                    setEroeffnungsdatum(""),
+                                    setTransaktionsBeschreibung(""),
+                                    setKontoinhaber(""),
+                                    setIstAktiv(""),
+                                    setHauptkonto(""),
+                                    setElternkonto(""),
+                                    setDispoLimit(""),
+                                    setBic(""),
+                                    setZinssatz(""),
+                                    setModalOffenHinzu(false)
+                                }}
+                            >Speichern</button>
+                            <button onClick={() => setModalOffen(false)}>Abbrechen</button>
+                        </div>
+                    </div>
+                )
+            }
 
 
 
-{
-    modalTranskationenHinzufuegen && (
+            {
+                modalTranskationenHinzufuegen && (
 
-        <div style={{
-            position: "fixed",
-            top: 0, left: 0,
-            width: "100%", height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 1000
-        }}>
-            <div style={{
-                backgroundColor: "white",
-                padding: "24px",
-                borderRadius: "12px",
-                minWidth: "320px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-            }}>
-                <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
-                <input
-                    value={transaktionsBeschreibung}
-                    onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
-                    placeholder="Beschreibung"
-                    style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                />
-                <input
-                    value={transaktionsBetrag}
-                    onChange={(e) => setTransaktionsBetrag(e.target.value)}
-                    placeholder="Betrag"
-                    type="number"
-                    style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                />
-                <select
-                    value={transaktionsKategorie}
-                    onChange={(e) => setTransaktionsKategorie(e.target.value)}
-                    style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                >
-                    <option value="">Kategorie wählen</option>
-                    {kategorien.map((k) => (
-                        <option key={k.id} value={k.id}>{k.name}</option>
-                    ))}
-                </select>
-                <select
-                    value={transaktionsTyp}
-                    onChange={(e) => setTransaktionsTyp(e.target.value)}
-                    style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                >
-                    <option value="">Typ wählen</option>
-                    <option value="ausgabe">Ausgabe</option>
-                    <option value="einnahme">Einnahme</option>
-                </select>
+                    <div style={{
+                        position: "fixed",
+                        top: 0, left: 0,
+                        width: "100%", height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        zIndex: 1000
+                    }}>
+                        <div style={{
+                            backgroundColor: "white",
+                            padding: "24px",
+                            borderRadius: "12px",
+                            minWidth: "320px",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                        }}>
+                            <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
+                            <input
+                                value={transaktionsBeschreibung}
+                                onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
+                                placeholder="Beschreibung"
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            />
+                            <input
+                                value={transaktionsBetrag}
+                                onChange={(e) => setTransaktionsBetrag(e.target.value)}
+                                placeholder="Betrag"
+                                type="number"
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            />
+                            <select
+                                value={transaktionsKategorie}
+                                onChange={(e) => setTransaktionsKategorie(e.target.value)}
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            >
+                                <option value="">Kategorie wählen</option>
+                                {kategorien.map((k) => (
+                                    <option key={k.id} value={k.id}>{k.name}</option>
+                                ))}
+                            </select>
+                            <select
+                                value={transaktionsTyp}
+                                onChange={(e) => setTransaktionsTyp(e.target.value)}
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            >
+                                <option value="">Typ wählen</option>
+                                <option value="ausgabe">Ausgabe</option>
+                                <option value="einnahme">Einnahme</option>
+                            </select>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <input
-                        type="checkbox"
-                        id="wiederkehrend"
-                        checked={wiederkehrendaktiv}
-                        onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-                    />
-                    <label htmlFor="wiederkehrend">Wiederkehrend</label>
-                </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <input
+                                    type="checkbox"
+                                    id="wiederkehrend"
+                                    checked={wiederkehrendaktiv}
+                                    onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+                                />
+                                <label htmlFor="wiederkehrend">Wiederkehrend</label>
+                            </div>
 
-                {wiederkehrendaktiv && (
-                    <select
-                        value={intervall}
-                        onChange={(e) => setIntervall(e.target.value)}
-                        style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                    >
-                        <option value="">Intervall wählen</option>
-                        <option value="täglich">Täglich</option>
-                        <option value="wöchentlich">Wöchentlich</option>
-                        <option value="monatlich">Monatlich</option>
-                        <option value="jährlich">Jährlich</option>
-                    </select>
-                )}
+                            {wiederkehrendaktiv && (
+                                <select
+                                    value={intervall}
+                                    onChange={(e) => setIntervall(e.target.value)}
+                                    style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                                >
+                                    <option value="">Intervall wählen</option>
+                                    <option value="täglich">Täglich</option>
+                                    <option value="wöchentlich">Wöchentlich</option>
+                                    <option value="monatlich">Monatlich</option>
+                                    <option value="jährlich">Jährlich</option>
+                                </select>
+                            )}
 
-                <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                    <button
-                        onClick={transaktionHinzufuegen}
-                        style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                    >
-                        Hinzufügen
-                    </button>
-                    <button
-                        onClick={transaktionSchließen}
-                        style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                    >
-                        Abbrechen
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
+                            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+                                <button
+                                    onClick={transaktionHinzufuegen}
+                                    style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+                                >
+                                    Hinzufügen
+                                </button>
+                                <button
+                                    onClick={transaktionSchließen}
+                                    style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+                                >
+                                    Abbrechen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         </div >
     )
 }
