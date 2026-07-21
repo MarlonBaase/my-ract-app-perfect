@@ -67,7 +67,7 @@ export default function Girokonto() {
         if (data) setListeTransaktionenGirokonto(data)
     }
 
-    
+
 
     const girokontoHinzufuegen = async () => {
         // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
@@ -163,10 +163,10 @@ export default function Girokonto() {
     }
 
     const eintragLoeschen = async (id) => {
-        const { error} = await supabase
-        .from("girokonto")
-        .delete()
-        .eq("id", id)
+        const { error } = await supabase
+            .from("girokonto")
+            .delete()
+            .eq("id", id)
 
         if (handleApiError(error, "Eintrag löschen")) return;
         ladeGirokonto()
@@ -174,7 +174,7 @@ export default function Girokonto() {
 
     const girokontoSpeichern = async () => {
 
-        const { error} = await supabase
+        const { error } = await supabase
             .from("asset")
             .update({
                 asset_name: name
@@ -203,7 +203,7 @@ export default function Girokonto() {
             })
             .eq("asset_id", zuBearbeiten.asset_id)
 
-            if (handleApiError(error, "Girokontodaten updaten")) return;
+        if (handleApiError(error, "Girokontodaten updaten")) return;
 
         setModalOffen(false)
         setZuBearbeiten(null)
@@ -211,43 +211,43 @@ export default function Girokonto() {
     }
 
     const transaktionHinzufuegen = async () => {
-    if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
-    const { data: { user } } = await supabase.auth.getUser();
+        if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
+        const { data: { user } } = await supabase.auth.getUser();
 
-    const { data, error} = await supabase.from("transaktionsprotokoll").insert({
-      benutzer_id: user.id,
-      bemerkung: transaktionsBeschreibung,
-      betrag: parseFloat(transaktionsBetrag),
-      kategorie_id: transaktionsKategorie,
-      asset_id: ausgewaehltesAsset,
-      assetklasse: "girokonto",
-      typ: transaktionsTyp
-    });
+        const { data, error } = await supabase.from("transaktionsprotokoll").insert({
+            benutzer_id: user.id,
+            bemerkung: transaktionsBeschreibung,
+            betrag: parseFloat(transaktionsBetrag),
+            kategorie_id: transaktionsKategorie,
+            asset_id: ausgewaehltesAsset,
+            assetklasse: "girokonto",
+            typ: transaktionsTyp
+        });
 
-    if (handleApiError(error, "Transaktion hinzufügen")) return;
+        if (handleApiError(error, "Transaktion hinzufügen")) return;
 
-    setTransaktionsBeschreibung("");
-    setTransaktionsBetrag("");
-    setTransaktionsKategorie("");
-    setTransaktionsTyp("");
+        setTransaktionsBeschreibung("");
+        setTransaktionsBetrag("");
+        setTransaktionsKategorie("");
+        setTransaktionsTyp("");
 
-    ladeGirokonto();
-    transaktionenOeffnen(ausgewaehltesAsset);
-    setModalTranskationenHinzufuegen(false);
-  };
+        ladeGirokonto();
+        transaktionenOeffnen(ausgewaehltesAsset);
+        setModalTranskationenHinzufuegen(false);
+    };
 
-  const transaktionSchließen = () => {
-    setModalTranskationenHinzufuegen(false);
-  };
+    const transaktionSchließen = () => {
+        setModalTranskationenHinzufuegen(false);
+    };
 
-  const ladeKategorien = async () => {
-      const { data, error } = await supabase
-        .from("transaktionskategorie")
-        .select("*")
-        .order("name", { ascending: true });
-  
-      if (data) setKategorien(data);
-      if (handleApiError(error, "Kategorie laden")) return;
+    const ladeKategorien = async () => {
+        const { data, error } = await supabase
+            .from("transaktionskategorie")
+            .select("*")
+            .order("name", { ascending: true });
+
+        if (data) setKategorien(data);
+        if (handleApiError(error, "Kategorie laden")) return;
     };
 
 
@@ -291,23 +291,23 @@ export default function Girokonto() {
 
             {modalOffenHinzu && (
                 <div style={{
-          position: "fixed",
-          top: 0, left: 0,
-          width: "100%", height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "12px",
-            minWidth: "320px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-          }}>
+                    position: "fixed",
+                    top: 0, left: 0,
+                    width: "100%", height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: "white",
+                        padding: "24px",
+                        borderRadius: "12px",
+                        minWidth: "320px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "12px",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                    }}>
                         <h4>Neues Girokonto hinzufügen</h4>
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name (z.B. Hauptkonto)" />
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank Name (z.B. Sparkasse)" />
@@ -317,11 +317,11 @@ export default function Girokonto() {
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto (e.target.value)}/>
-                        <input value={elternkonto} onChange={(e) => setElternkonto (e.target.value)} placeholder="elternkonto" />
-                        <input value={dispoLimit} onChange={(e) => setDispoLimit (e.target.value)} placeholder="Dispo Limit" />
-                        <input value={bic} onChange={(e) => setBic (e.target.value)} placeholder="BIC" />
-                        <input value={zinssatz} onChange={(e) => setZinssatz (e.target.value)} placeholder="Zinssatz" />
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
+                        <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
+                        <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+                        <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
+                        <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
                         <button onClick={girokontoHinzufuegen}>Girokonto hinzufügen</button>
                         <button onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
@@ -330,8 +330,24 @@ export default function Girokonto() {
             )}
 
             {modalOffen && (
-                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
+                <div style={{
+                    position: "fixed",
+                    top: 0, left: 0,
+                    width: "100%", height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: "white",
+                        padding: "24px",
+                        borderRadius: "12px",
+                        minWidth: "320px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "12px",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                    }}>
                         <h4>Girokonto bearbeiten</h4>
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
@@ -341,12 +357,12 @@ export default function Girokonto() {
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                        <input type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv (e.target.value)} />
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto (e.target.value)}/>
-                        <input value={elternkonto} onChange={(e) => setElternkonto (e.target.value)} placeholder="elternkonto" />
-                        <input value={dispoLimit} onChange={(e) => setDispoLimit (e.target.value)} placeholder="Dispo Limit" />
-                        <input value={bic} onChange={(e) => setBic (e.target.value)} placeholder="BIC" />
-                        <input value={zinssatz} onChange={(e) => setZinssatz (e.target.value)} placeholder="Zinssatz" />
+                        <input type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.value)} />
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
+                        <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
+                        <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+                        <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
+                        <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
@@ -357,7 +373,7 @@ export default function Girokonto() {
 
 
             {modalTranskationenHinzufuegen && (
-                
+
                 <div style={{
                     position: "fixed",
                     top: 0, left: 0,
