@@ -3,26 +3,12 @@ import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
 
 export default function Girokonto() {
-    const [listeGirokonto, setListeGirokonto] = useState([])
-    const [name, setName] = useState("")
-    const [bank, setBank] = useState("")
-    const [iban, setIban] = useState("")
-    const [kontoinhaber, setKontoinhaber] = useState("")
-    const [istAktiv, setIstAktiv] = useState("")
-    const [hauptkonto, setHauptkonto] = useState(true)
-    const [elternkonto, setElternkonto] = useState("")
-    const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
-    const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState(""); // Der ausgewählte Wert
-    const [dispoLimit, setDispoLimit] = useState("")
-    const [bic, setBic] = useState("")
-    const [zinssatz, setZinssatz] = useState("")
-    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
-    const [waehrung, setWaehrung] = useState("")
-    const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
-    const [modalOffen, setModalOffen] = useState(false)
-    const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
-    const [zuBearbeiten, setZuBearbeiten] = useState(null)
-    const [eintraege, setEintraege] = useState([])
+
+
+    const [modalDaten, setModalDaten] = useEffect(false)
+    const [elternkontoListe, setElternkontoListe] = useState([]); 
+
+
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
     const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
@@ -30,11 +16,15 @@ export default function Girokonto() {
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
     const [transaktionsTyp, setTransaktionsTyp] = useState("");
-    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
+    const [modalOffen, setModalOffen] = useState(false)
+    const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
+    const [zuBearbeiten, setZuBearbeiten] = useState(null)
+    const [listeGirokonto, setListeGirokonto] = useState([])
     const [assets, setAssets] = useState([]);
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
-    const [intervall, setIntervall] = useState("");
+    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
+    const [intervall, setIntervall] = useState("")
 
     const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -135,7 +125,7 @@ export default function Girokonto() {
             setDispoLimit("")
             setBic("")
             setZinssatz("")
-            setModalOffenHinzu(false)
+            setModalDaten(false)
 
             // Daten neu laden
             ladeGirokonto()
@@ -206,7 +196,7 @@ export default function Girokonto() {
 
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
-        setModalOffen(false)
+        setModalDaten(false)
         setZuBearbeiten(null)
         ladeGirokonto()
     }
@@ -261,6 +251,70 @@ export default function Girokonto() {
         if (data) setElternkonto(data);
     };
 
+
+    const handleSpeichern = async (formData) => {
+        if (modalDaten?.id) {
+            // --- 1. BEARBEITEN (UPDATE) ---
+            // Update in der Asset-Tabelle
+            const { error: assetError } = await supabase
+                .from("asset")
+                .update({ asset_name: formData.name })
+                .eq("asset_id", modalDaten.asset_id);
+
+            if (handleApiError(assetError, "Asset Name updaten")) return;
+
+            // Update in der Girokonto-Tabelle
+            const { error: giroError } = await supabase
+                .from("girokonto")
+                .update({
+                    name_der_bank: formData.bank,
+                    iban: formData.iban,
+                    einzahlung_bei_eroeffnung: formData.einzahlung,
+                    hauptkonto: formData.hauptkonto,
+                    // ... hier restliche Felder aus formData eintragen
+                })
+                .eq("asset_id", modalDaten.asset_id);
+
+            if (handleApiError(giroError, "Girokontodaten updaten")) return;
+
+        } else {
+            // --- 2. NEU ANLEGEN (INSERT) ---
+            const { data: { user } } = await supabase.auth.getUser();
+
+            // Zuerst Asset anlegen
+            const { data: assetData, error: assetError } = await supabase
+                .from("asset")
+                .insert({
+                    benutzer_id: user.id,
+                    asset_name: formData.name,
+                    asset_typ: "girokonto",
+                })
+                .select();
+
+            if (handleApiError(assetError, "Asset anlegen")) return;
+
+            // Dann Girokonto anlegen mit der neuen asset_id
+            const asset_id = assetData[0].asset_id;
+
+            const { error: giroError } = await supabase
+                .from("girokonto")
+                .insert({
+                    asset_id: asset_id,
+                    name_der_bank: formData.bank,
+                    iban: formData.iban,
+                    einzahlung_bei_eroeffnung: formData.einzahlung,
+                    hauptkonto: formData.hauptkonto,
+                    // ... hier restliche Felder aus formData eintragen
+                });
+
+            if (handleApiError(giroError, "Girokonto anlegen")) return;
+        }
+
+        // Nach dem Speichern: Modal schließen & Liste neu laden
+        setModalDaten(null);
+        ladeGirokonto();
+    };
+
     useEffect(() => {
         const init = async () => {
             try {
@@ -283,14 +337,52 @@ export default function Girokonto() {
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
                         {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
-                        <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+                        <button onClick={() => setModalDaten(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset.asset_id)}>💰</button>
                     </li>
                 ))}
             </ul>
 
-            <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
+            <button onClick={() => setModalDaten(true)}>Girokonto hinzufügen</button>
+
+            {modalDaten && (
+                <div style={{
+                    position: "fixed",
+                    top: 0, left: 0,
+                    width: "100%", height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: "white",
+                        padding: "24px",
+                        borderRadius: "12px",
+                        minWidth: "320px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "12px",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                    }}>
+                        <GirokontoFormular
+                            initialDaten={modalDaten.id ? modalDaten : null}
+                            elternkontoListe={elternkontoListe}
+                            onSpeichern={handleSpeichern}
+                            onAbbrechen={() => setModalDaten(null)}
+                        />
+
+
+
+                    </div>
+
+                </div>
+
+            )}
+
+
+
+
 
             {modalOffenTransaktionen && (
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -510,6 +602,8 @@ export default function Girokonto() {
                     </div>
                 </div>
             )}
+
+
         </div>
     )
 }
