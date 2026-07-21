@@ -336,7 +336,8 @@ export default function Girokonto() {
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                        <input title="hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
+                        <label for="hauptkonto">Hauptkonto</label>
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                         <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
