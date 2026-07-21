@@ -344,7 +344,7 @@ export default function Girokonto() {
                             >
                                 <option value="">Elternkonto wählen (Optional)</option>
                                 {elternkontoListe.map((a) => (
-                                    <option key={a.id} value={a.id}>
+                                    <option key={a.asset_id} value={a.asset_id}>
                                         {a.name_der_bank} | {a.iban}
                                     </option>
                                 ))}
@@ -396,7 +396,7 @@ export default function Girokonto() {
                         >
                             <option value="">Elternkonto wählen (Optional)</option>
                             {elternkontoListe.map((a) => (
-                                <option key={a.id} value={a.id}>
+                                <option key={a.asset_id} value={a.asset_id}>
                                     {a.name_der_bank} | {a.iban}
                                 </option>
                             ))}
