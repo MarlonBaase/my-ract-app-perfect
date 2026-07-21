@@ -251,6 +251,15 @@ export default function Girokonto() {
         if (handleApiError(error, "Kategorie laden")) return;
     };
 
+    const ladeElternkontoListe = async () => {
+        const { data } = await supabase
+            .from("girokonto")
+            .select("*")
+            .eq("hauptkonto", true)
+            .order("hauptkonto", { ascending: true });
+
+        if (data) setElternkonto(data);
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -264,16 +273,6 @@ export default function Girokonto() {
         };
         init();
     }, []);
-
-    const ladeElternkontoListe = async () => {
-        const { data } = await supabase
-            .from("girokonto")
-            .select("*")
-            .eq("hauptkonto", true)
-            .order("hauptkonto", { ascending: true });
-
-        if (data) setElternkonto(data);
-    };
 
 
     return (
@@ -337,9 +336,19 @@ export default function Girokonto() {
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
                         <label for="hauptkonto">Hauptkonto</label>
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)}/>
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                         {!hauptkonto && (
-                            <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
+                            <select
+                                value={ausgewaehltesElternkonto}
+                                onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
+                            >
+                                <option value="">Elternkonto wählen (Optional)</option>
+                                {elternkontoListe.map((a) => (
+                                    <option key={a.id} value={a.id}>
+                                        {a.name_der_bank} | {a.iban}
+                                    </option>
+                                ))}
+                            </select>
                         )}
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
@@ -396,7 +405,7 @@ export default function Girokonto() {
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
-                        
+
 
                         <button onClick={girokontoSpeichern}>Speichern</button>
                         <button onClick={() => setModalOffen(false)}>Abbrechen</button>
