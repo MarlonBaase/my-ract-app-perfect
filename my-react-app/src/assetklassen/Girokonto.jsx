@@ -9,7 +9,7 @@ export default function Girokonto() {
     const [iban, setIban] = useState("")
     const [kontoinhaber, setKontoinhaber] = useState("")
     const [istAktiv, setIstAktiv] = useState("")
-    const [hauptkonto, setHauptkonto] = useState("")
+    const [hauptkonto, setHauptkonto] = useState(true)
     const [elternkonto, setElternkonto] = useState("")
     const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
     const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState(""); // Der ausgewählte Wert
@@ -337,7 +337,7 @@ export default function Girokonto() {
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
                         <label for="hauptkonto">Hauptkonto</label>
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} defaultChecked/>
+                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)}/>
                         <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
