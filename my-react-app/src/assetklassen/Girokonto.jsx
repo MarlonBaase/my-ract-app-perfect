@@ -355,7 +355,7 @@ export default function Girokonto() {
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
                         <button
-                            onClick={girokontoHinzufuegen,
+                            onClick={() => girokontoHinzufuegen,
                                         setZuBearbeiten(""),
                                         setName(""),
                                         setBank(""),
@@ -431,7 +431,7 @@ export default function Girokonto() {
 
 
                 <button
-                            onClick={girokontoSpeichern,
+                            onClick={() => girokontoSpeichern,
                                         setZuBearbeiten(""),
                                         setName(""),
                                         setBank(""),
