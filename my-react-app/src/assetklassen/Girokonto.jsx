@@ -10,7 +10,7 @@ export default function Girokonto() {
     const [kontoinhaber, setKontoinhaber] = useState("")
     const [istAktiv, setIstAktiv] = useState("")
     const [hauptkonto, setHauptkonto] = useState("")
-    const [elternkonto, setElternkonto] = useState("")
+    const [elternkonto, setElternkonto] = useState([]);
     const [dispoLimit, setDispoLimit] = useState("")
     const [bic, setBic] = useState("")
     const [zinssatz, setZinssatz] = useState("")
@@ -252,9 +252,27 @@ export default function Girokonto() {
 
 
     useEffect(() => {
-        ladeGirokonto()
-        ladeKategorien();
-    }, [])
+    const init = async () => {
+      try {
+        await ladeGirokonto()
+        await ladeKategorien();
+        await ladeElternkonto();
+    } catch (err) {
+        console.error("Fehler in init:", err);
+      }
+    };
+    init();
+  }, []);
+
+  const ladeElternkonto = async () => {
+    const { data } = await supabase
+      .from("girokonto")
+      .select("*")
+      .eq("true" , hauptkonto)
+      .order("hauptkonto", { ascending: true });
+
+    if (data) setElternkonto(data);
+  };
 
 
     return (
@@ -357,9 +375,20 @@ export default function Girokonto() {
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                        <input type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.value)} />
-                        <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
-                        <input value={elternkonto} onChange={(e) => setElternkonto(e.target.value)} placeholder="elternkonto" />
+                        <input title="Aktiv" type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.value)} />
+                        <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.value)} />
+                        <select
+                            value={elternkonto}
+                            onChange={(e) => setElternkonto(e.target.value)}
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        >
+                            <option value="">Elternkonto wählen</option>
+                            {elternkonto.map((a) => (
+                                <option key={a.hauptkonto} value={a.hauptkonto}>
+                                    {a.hauptkonto} | {a.iban} | 
+                                </option>
+                            ))}
+                        </select>
                         <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
