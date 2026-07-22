@@ -114,7 +114,7 @@ export default function Girokonto() {
                     eroeffnungsdatum: eroeffnungsdatum,
                     bemerkung: transaktionsBeschreibung,
                     kontoinhaber: kontoinhaber,
-                    istAktiv: true,
+                    ist_Aktiv: true,
                     hauptkonto: hauptkonto,
                     elternkonto: elternkonto,
                     dispo_limit: dispo_limit,
@@ -162,7 +162,7 @@ export default function Girokonto() {
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setTransaktionsBeschreibung(eintrag.bemerkung || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
-        setIstAktiv(eintrag.istAktiv || "")
+        setIstAktiv(eintrag.ist_Aktiv || "")
         setHauptkonto(eintrag.hauptkonto || "")
         setElternkonto(eintrag.elternkonto || "")
         setDispoLimit(eintrag.dispo_limit || "")
@@ -214,7 +214,7 @@ export default function Girokonto() {
                 eroeffnungsdatum: eroeffnungsdatum,
                 bemerkung: transaktionsBeschreibung,
                 kontoinhaber: kontoinhaber,
-                istAktiv: istAktiv,
+                ist_Aktiv: istAktiv,
                 hauptkonto: hauptkonto,
                 elternkonto: elternkonto,
                 dispo_limit: dispo_limit,
