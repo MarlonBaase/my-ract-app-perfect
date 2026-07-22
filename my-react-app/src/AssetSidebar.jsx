@@ -11,7 +11,8 @@ const struktur = [
         path: "/assetklassen/lf",
         unterseiten: [
           { label: "🏦 Girokonten", path: "/assetklassen/lf/girokonto" },
-          { label: "🐷 Tagesgeld & Festgeld", path: "/assetklassen/lf/tagesgeld" },
+          { label: "🐷 Tagesgeld", path: "/assetklassen/lf/tagesgeld" },
+          { label: "🐷 Festgeld", path: "/assetklassen/lf/festgeld" },
           { label: "💶 Geldmarktfonds", path: "/assetklassen/lf/geldmarktfonds" },
           { label: "🌐 Fremdwährungen", path: "/assetklassen/lf/fremdwaehrung" },
         ]
