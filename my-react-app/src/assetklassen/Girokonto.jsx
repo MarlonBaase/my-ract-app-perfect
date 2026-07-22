@@ -321,7 +321,6 @@ export default function Girokonto() {
                     setTransaktionsBeschreibung(""),
                     setKontoinhaber(""),
                     setIstAktiv(""),
-                    setHauptkonto(""),
                     setElternkonto(""),
                     setDispoLimit(""),
                     setBic(""),
