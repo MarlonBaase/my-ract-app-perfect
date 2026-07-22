@@ -116,7 +116,7 @@ export default function Girokonto() {
                     kontoinhaber: kontoinhaber,
                     ist_aktiv: true,
                     hauptkonto: hauptkonto,
-                    elternkonto: elternkonto,
+                    elternkonto: ausgewaehltesElternkonto || null,
                     dispo_limit: dispo_limit,
                     bic: bic,
                     zinssatz: zinssatz
