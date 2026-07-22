@@ -305,7 +305,7 @@ export default function Girokonto() {
                     const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
 
 
-                    const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "Kein Elternkonto";
+                    const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "";
                     return (
                         <li key={e.id}>
                             {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_aktiv} | {e.hauptkonto} | {elternkontoName} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
