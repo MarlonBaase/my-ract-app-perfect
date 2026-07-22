@@ -72,6 +72,22 @@ export default function Girokonto() {
 
 
     const girokontoHinzufuegen = async () => {
+        setZuBearbeiten("")
+        setName("")
+        setBank("")
+        setIban("")
+        setEinzahlung_bei_eroeffnung("")
+        setWaehrung("")
+        setEroeffnungsdatum("")
+        setTransaktionsBeschreibung("")
+        setKontoinhaber("")
+        setIstAktiv("")
+        setHauptkonto("")
+        setElternkonto("")
+        setDispoLimit("")
+        setBic("")
+        setZinssatz("")
+        
         // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
         if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
 
@@ -209,21 +225,6 @@ export default function Girokonto() {
         setModalOffen(false)
         setZuBearbeiten(null)
         ladeGirokonto()
-        setZuBearbeiten("")
-        setName("")
-        setBank("")
-        setIban("")
-        setEinzahlung_bei_eroeffnung("")
-        setWaehrung("")
-        setEroeffnungsdatum("")
-        setTransaktionsBeschreibung("")
-        setKontoinhaber("")
-        setIstAktiv("")
-        setHauptkonto("")
-        setElternkonto("")
-        setDispoLimit("")
-        setBic("")
-        setZinssatz("")
     }
 
     const transaktionHinzufuegen = async () => {
@@ -369,7 +370,7 @@ export default function Girokonto() {
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
-                        <button onClick={() => { girokontoSpeichern, setModalOffenHinzu(false) }}>Speichern</button>
+                        <button onClick={() => { girokontoHinzufuegen, setModalOffenHinzu(false) }}>Speichern</button>
                         <button onClick={() => { setModalOffenHinzu(false) }}>Abbrechen</button>
                     </div>
                 </div>
