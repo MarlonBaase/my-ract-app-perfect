@@ -435,19 +435,23 @@ export default function Girokonto() {
                             <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                             <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                             <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+                            <label for="ist_aktiv">ist Aktiv</label>
                             <input title="Aktiv" type="checkbox" id="ist_aktiv" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
-                            <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
-                            <select
-                                value={ausgewaehltesElternkonto}
-                                onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
-                            >
-                                <option value="">Elternkonto wählen (Optional)</option>
-                                {elternkontoListe.map((a) => (
-                                    <option key={a.asset_id} value={a.asset_id}>
-                                        {a.name_der_bank} | {a.iban}
-                                    </option>
-                                ))}
-                            </select>
+                            <label for="hauptkonto">Hauptkonto</label>
+                            <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
+                            {!hauptkonto && (
+                                <select
+                                    value={ausgewaehltesElternkonto}
+                                    onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
+                                >
+                                    <option value="">Elternkonto wählen (Optional)</option>
+                                    {listeGirokonto.map((e) => (
+                                        <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
+                                            {e.name_der_bank} | {e.iban}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
                             <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                             <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                             <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
