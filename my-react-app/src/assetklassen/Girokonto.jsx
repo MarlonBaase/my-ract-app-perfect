@@ -72,22 +72,7 @@ export default function Girokonto() {
 
 
     const girokontoHinzufuegen = async () => {
-        setZuBearbeiten("")
-        setName("")
-        setBank("")
-        setIban("")
-        setEinzahlung_bei_eroeffnung("")
-        setWaehrung("")
-        setEroeffnungsdatum("")
-        setTransaktionsBeschreibung("")
-        setKontoinhaber("")
-        setIstAktiv("")
-        setHauptkonto("")
-        setElternkonto("")
-        setDispoLimit("")
-        setBic("")
-        setZinssatz("")
-        
+
         // Validierung: Prüfen, ob alle Pflichtfelder ausgefüllt sind
         if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
 
@@ -306,7 +291,24 @@ export default function Girokonto() {
                 ))}
             </ul>
 
-            <button onClick={() => setModalOffenHinzu(true)}>Girokonto hinzufügen</button>
+            <button onClick={() => {
+                setModalOffenHinzu(true),
+                setZuBearbeiten(""),
+                setName(""),
+                setBank(""),
+                setIban(""),
+                setEinzahlung_bei_eroeffnung(""),
+                setWaehrung(""),
+                setEroeffnungsdatum(""),
+                setTransaktionsBeschreibung(""),
+                setKontoinhaber(""),
+                setIstAktiv(""),
+                setHauptkonto(""),
+                setElternkonto(""),
+                setDispoLimit(""),
+                setBic(""),
+                setZinssatz("")
+            }}>Girokonto hinzufügen</button>
 
             {modalOffenTransaktionen && (
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
