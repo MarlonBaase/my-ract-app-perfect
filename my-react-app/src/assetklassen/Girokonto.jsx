@@ -56,12 +56,12 @@ export default function Girokonto() {
     }
 
     const transaktionenOeffnen = async (assetId) => {
-        
+
         if (!assetId) {
             console.warn("Keine Asset-ID vorhanden!");
             return;
         }
-        
+
         setModalOffenTransaktionen(true)
         setAusgewaehltesAsset(assetId)
 
@@ -171,13 +171,27 @@ export default function Girokonto() {
         setModalOffen(true)
     }
 
-    const eintragLoeschen = async () => {
+    const eintragLoeschen = async (assetId) => {
+
+        if (!assetId) return;
+
+
         const { error } = await supabase
             .from("girokonto")
             .delete()
-            .eq("asset_id", zuBearbeiten.asset_id)
+            .eq("asset_id", assetId)
 
         if (handleApiError(error, "Eintrag löschen")) return;
+
+
+        const { error: assetError } = await supabase
+            .from("asset")
+            .delete()
+            .eq("asset_id", assetId);
+
+        if (handleApiError(assetError, "Asset löschen")) return;
+
+
         ladeGirokonto()
     }
 
@@ -292,28 +306,28 @@ export default function Girokonto() {
                         {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
-                        <button onClick={() => transaktionenOeffnen(e.asset.asset_id)}>💰</button>
+                        <button onClick={() => transaktionenOeffnen(e.asset_id)}>💰</button>
                     </li>
                 ))}
             </ul>
 
             <button onClick={() => {
                 setModalOffenHinzu(true),
-                setZuBearbeiten(""),
-                setName(""),
-                setBank(""),
-                setIban(""),
-                setEinzahlung_bei_eroeffnung(""),
-                setWaehrung(""),
-                setEroeffnungsdatum(""),
-                setTransaktionsBeschreibung(""),
-                setKontoinhaber(""),
-                setIstAktiv(""),
-                setHauptkonto(""),
-                setElternkonto(""),
-                setDispoLimit(""),
-                setBic(""),
-                setZinssatz("")
+                    setZuBearbeiten(""),
+                    setName(""),
+                    setBank(""),
+                    setIban(""),
+                    setEinzahlung_bei_eroeffnung(""),
+                    setWaehrung(""),
+                    setEroeffnungsdatum(""),
+                    setTransaktionsBeschreibung(""),
+                    setKontoinhaber(""),
+                    setIstAktiv(""),
+                    setHauptkonto(""),
+                    setElternkonto(""),
+                    setDispoLimit(""),
+                    setBic(""),
+                    setZinssatz("")
             }}>Girokonto hinzufügen</button>
 
             {modalOffenTransaktionen && (
