@@ -164,7 +164,7 @@ export default function Girokonto() {
         setKontoinhaber(eintrag.kontoinhaber || "")
         setIstAktiv(eintrag.ist_aktiv || "")
         setHauptkonto(eintrag.hauptkonto || "")
-        setElternkonto(eintrag.elternkonto || "")
+        setAusgewaehltesElternkonto(eintrag.elternkonto || "")
         setDispoLimit(eintrag.dispo_limit || "")
         setBic(eintrag.bic || "")
         setZinssatz(eintrag.zinssatz || "")
@@ -216,7 +216,7 @@ export default function Girokonto() {
                 kontoinhaber: kontoinhaber,
                 ist_aktiv: ist_aktiv,
                 hauptkonto: hauptkonto,
-                elternkonto: elternkonto,
+                elternkonto: ausgewaehltesElternkonto || null,
                 dispo_limit: dispo_limit,
                 bic: bic,
                 zinssatz: zinssatz
@@ -379,7 +379,7 @@ export default function Girokonto() {
                             >
                                 <option value="">Elternkonto wählen (Optional)</option>
                                 {listeGirokonto.map((e) => (
-                                    <option key={e.asset_id} value={e.asset_id}>
+                                    <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
                                         {e.name_der_bank} | {e.iban}
                                     </option>
                                 ))}
