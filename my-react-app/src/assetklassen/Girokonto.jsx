@@ -165,11 +165,11 @@ export default function Girokonto() {
         setModalOffen(true)
     }
 
-    const eintragLoeschen = async (id) => {
+    const eintragLoeschen = async (asset_id) => {
         const { error } = await supabase
             .from("girokonto")
             .delete()
-            .eq("id", id)
+            .eq("asset_id", asset_id)
 
         if (handleApiError(error, "Eintrag löschen")) return;
         ladeGirokonto()
