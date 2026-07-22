@@ -298,7 +298,7 @@ export default function Girokonto() {
                         {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
-                        <button onClick={() => transaktionenOeffnen(e.asset_id)}>💰</button>
+                        <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
                     </li>
                 ))}
             </ul>
