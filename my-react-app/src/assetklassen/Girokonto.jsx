@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
+import { SettingsContext } from './SettingsContext';
 
 export default function Girokonto() {
     const [listeGirokonto, setListeGirokonto] = useState([])
@@ -35,6 +36,8 @@ export default function Girokonto() {
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
     const [intervall, setIntervall] = useState("");
+
+    const { ansicht } = useContext(SettingsContext);
 
     const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -296,272 +299,550 @@ export default function Girokonto() {
 
 
     return (
-        <div>
-            <h2>Girokonto</h2>
+        <div className="girokonto-container">
+            <div className="header-bar">
+                <h2>Girokonto</h2>
+                <button className="btn-primary" onClick={() => {
+                    setModalOffenHinzu(true);
+                    setZuBearbeiten("");
+                    setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
+                    setWaehrung(""); setEroeffnungsdatum(""); setTransaktionsBeschreibung("");
+                    setKontoinhaber(""); setIstAktiv(""); setElternkonto(""); setDispoLimit("");
+                    setBic(""); setZinssatz("");
+                }}>
+                    + Girokonto hinzufügen
+                </button>
+            </div>
 
-            <ul>
-                {listeGirokonto.map((e) => {
+            {/* 💡 Hier schalten wir zwischen Karten-Grid und Tabelle um */}
+            {ansicht === 'card' ? (
+                <div className="karten-grid">
+                    {listeGirokonto.map((e) => {
+                        const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+                        const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
 
-                    const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+                        return (
+                            <div className="account-card" key={e.id}>
+                                <div className="card-header">
+                                    <div>
+                                        <h3>{e.asset?.asset_name}</h3>
+                                        <span className="bank-name">{e.name_der_bank}</span>
+                                    </div>
+                                    {e.hauptkonto && <span className="badge">Hauptkonto</span>}
+                                </div>
 
+                                <div className="card-body">
+                                    <div className="amount">
+                                        {e.einzahlung_bei_eroeffnung} {e.waehrung}
+                                    </div>
+                                    <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
+                                    {elternkontoName && <p className="parent"><strong>Elternkonto:</strong> {elternkontoName}</p>}
+                                    {e.bemerkung && <p className="note">{e.bemerkung}</p>}
+                                </div>
 
-                    const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "";
-                    return (
-                        <li key={e.id}>
-                            {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_aktiv} | {e.hauptkonto} | {elternkontoName} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
-                            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
-                            <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
-                        </li>
-                    );
-                })}
-            </ul>
+                                <div className="card-actions">
+                                    <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
+                                    <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                                    <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="table-responsive">
+                    <table className="konto-tabelle">
+                        <thead>
+                            <tr>
+                                <th>Asset / Bank</th>
+                                <th>IBAN</th>
+                                <th>Guthaben</th>
+                                <th>Inhaber</th>
+                                <th>Elternkonto</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {listeGirokonto.map((e) => {
+                                const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+                                const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
-            <button onClick={() => {
-                setModalOffenHinzu(true),
-                    setZuBearbeiten(""),
-                    setName(""),
-                    setBank(""),
-                    setIban(""),
-                    setEinzahlung_bei_eroeffnung(""),
-                    setWaehrung(""),
-                    setEroeffnungsdatum(""),
-                    setTransaktionsBeschreibung(""),
-                    setKontoinhaber(""),
-                    setIstAktiv(""),
-                    setElternkonto(""),
-                    setDispoLimit(""),
-                    setBic(""),
-                    setZinssatz("")
-            }}>Girokonto hinzufügen</button>
+                                return (
+                                    <tr key={e.id}>
+                                        <td>
+                                            <strong>{e.asset?.asset_name}</strong>
+                                            <div className="subtext">{e.name_der_bank}</div>
+                                        </td>
+                                        <td className="code-text">{e.iban}</td>
+                                        <td><strong>{e.einzahlung_bei_eroeffnung} {e.waehrung}</strong></td>
+                                        <td>{e.kontoinhaber || "—"}</td>
+                                        <td>{elternkontoName}</td>
+                                        <td className="table-actions">
+                                            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+                                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
+                                            <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {modalOffenTransaktionen && (
+
                 <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+
                     <div style={{ backgroundColor: "white", padding: "20px", borderRadius: "8px", minWidth: "300px" }}>
 
+
+
                         {listeTransaktionenGirokonto.map((transaktion) => (
+
                             <li key={transaktion.id}>
+
                                 {transaktion.betrag} {transaktion.waehrung} | {transaktion.datum}
+
                             </li>
+
                         ))}
+
                         <button onClick={() => setModalOffenTransaktionen(false)}>Schließen</button>
+
                         <button onClick={() => setModalTranskationenHinzufuegen(true)}>Transaktion hinzufügen</button>
+
                     </div>
+
                 </div>
+
             )}
+
+
 
             {modalOffenHinzu && (
+
                 <div style={{
+
                     position: "fixed",
+
                     top: 0, left: 0,
+
                     width: "100%", height: "100%",
+
                     backgroundColor: "rgba(0,0,0,0.5)",
+
                     display: "flex", alignItems: "center", justifyContent: "center",
+
                     zIndex: 1000
+
                 }}>
+
                     <div style={{
+
                         backgroundColor: "white",
+
                         padding: "24px",
+
                         borderRadius: "12px",
+
                         minWidth: "320px",
+
                         display: "flex",
+
                         flexDirection: "column",
+
                         gap: "12px",
+
                         boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+
                     }}>
+
                         <h4>Neues Girokonto hinzufügen</h4>
+
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name (z.B. Hauptkonto)" />
+
                         <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank Name (z.B. Sparkasse)" />
+
                         <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+
                         <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
+
                         <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung (z.B. EUR)" />
+
                         <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+
                         <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
+
                         <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+
                         <label for="hauptkonto">Hauptkonto</label>
+
                         <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
+
                         {!hauptkonto && (
+
                             <select
+
                                 value={ausgewaehltesElternkonto}
+
                                 onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
+
                             >
+
                                 <option value="">Elternkonto wählen (Optional)</option>
+
                                 {listeGirokonto.map((e) => (
+
                                     <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
+
                                         {e.name_der_bank} | {e.iban}
+
                                     </option>
+
                                 ))}
+
                             </select>
+
                         )}
+
                         <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
+
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
+
+
                         <button onClick={() => { girokontoHinzufuegen(), setModalOffenHinzu(false) }}>Speichern</button>
+
                         <button onClick={() => { setModalOffenHinzu(false) }}>Abbrechen</button>
+
                     </div>
+
                 </div>
 
+
+
             )}
+
+
+
+
 
 
 
             {
+
                 modalOffen && (
+
                     <div style={{
+
                         position: "fixed",
+
                         top: 0, left: 0,
+
                         width: "100%", height: "100%",
+
                         backgroundColor: "rgba(0,0,0,0.5)",
+
                         display: "flex", alignItems: "center", justifyContent: "center",
+
                         zIndex: 1000
+
                     }}>
+
                         <div style={{
+
                             backgroundColor: "white",
+
                             padding: "24px",
+
                             borderRadius: "12px",
+
                             minWidth: "320px",
+
                             display: "flex",
+
                             flexDirection: "column",
+
                             gap: "12px",
+
                             boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+
                         }}>
+
                             <h4>Girokonto bearbeiten</h4>
+
                             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
+
                             <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
+
                             <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+
                             <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="Einzahlung bei Eröffnung" type="number" />
+
                             <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="Währung" />
+
                             <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+
                             <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
+
                             <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
+
                             <label for="ist_aktiv">ist Aktiv</label>
+
                             <input title="Aktiv" type="checkbox" id="ist_aktiv" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
+
                             <label for="hauptkonto">Hauptkonto</label>
+
                             <input type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
+
                             {!hauptkonto && (
+
                                 <select
+
                                     value={ausgewaehltesElternkonto}
+
                                     onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
+
                                 >
+
                                     <option value="">Elternkonto wählen (Optional)</option>
+
                                     {listeGirokonto.map((e) => (
+
                                         <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
+
                                             {e.name_der_bank} | {e.iban}
+
                                         </option>
+
                                     ))}
+
                                 </select>
+
                             )}
+
                             <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+
                             <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
+
                             <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
 
 
+
+
+
+
                             <button onClick={() => { girokontoSpeichern(), setModalOffen(false) }}>Speichern</button>
+
                             <button onClick={() => { setModalOffen(false) }}>Abbrechen</button>
+
                         </div>
+
                     </div>
+
                 )
+
             }
+
+
 
             {
+
                 modalTranskationenHinzufuegen && (
 
+
+
                     <div style={{
+
                         position: "fixed",
+
                         top: 0, left: 0,
+
                         width: "100%", height: "100%",
+
                         backgroundColor: "rgba(0,0,0,0.5)",
+
                         display: "flex", alignItems: "center", justifyContent: "center",
+
                         zIndex: 1000
+
                     }}>
+
                         <div style={{
+
                             backgroundColor: "white",
+
                             padding: "24px",
+
                             borderRadius: "12px",
+
                             minWidth: "320px",
+
                             display: "flex",
+
                             flexDirection: "column",
+
                             gap: "12px",
+
                             boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+
                         }}>
+
                             <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
+
                             <input
+
                                 value={transaktionsBeschreibung}
+
                                 onChange={(e) => setTransaktionsBeschreibung(e.target.value)}
+
                                 placeholder="Beschreibung"
+
                                 style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+
                             />
+
                             <input
+
                                 value={transaktionsBetrag}
+
                                 onChange={(e) => setTransaktionsBetrag(e.target.value)}
+
                                 placeholder="Betrag"
+
                                 type="number"
+
                                 style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+
                             />
+
                             <select
+
                                 value={transaktionsKategorie}
+
                                 onChange={(e) => setTransaktionsKategorie(e.target.value)}
+
                                 style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+
                             >
+
                                 <option value="">Kategorie wählen</option>
+
                                 {kategorien.map((k) => (
+
                                     <option key={k.id} value={k.id}>{k.name}</option>
+
                                 ))}
+
                             </select>
+
                             <select
+
                                 value={transaktionsTyp}
+
                                 onChange={(e) => setTransaktionsTyp(e.target.value)}
+
                                 style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+
                             >
+
                                 <option value="">Typ wählen</option>
+
                                 <option value="ausgabe">Ausgabe</option>
+
                                 <option value="einnahme">Einnahme</option>
+
                             </select>
+
+
 
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+
                                 <input
+
                                     type="checkbox"
+
                                     id="wiederkehrend"
+
                                     checked={wiederkehrendaktiv}
+
                                     onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+
                                 />
+
                                 <label htmlFor="wiederkehrend">Wiederkehrend</label>
+
                             </div>
+
+
 
                             {wiederkehrendaktiv && (
+
                                 <select
+
                                     value={intervall}
+
                                     onChange={(e) => setIntervall(e.target.value)}
+
                                     style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+
                                 >
+
                                     <option value="">Intervall wählen</option>
+
                                     <option value="täglich">Täglich</option>
+
                                     <option value="wöchentlich">Wöchentlich</option>
+
                                     <option value="monatlich">Monatlich</option>
+
                                     <option value="jährlich">Jährlich</option>
+
                                 </select>
+
                             )}
 
+
+
                             <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+
                                 <button
+
                                     onClick={transaktionHinzufuegen}
+
                                     style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+
                                 >
+
                                     Hinzufügen
+
                                 </button>
+
                                 <button
+
                                     onClick={transaktionSchließen}
+
                                     style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+
                                 >
+
                                     Abbrechen
+
                                 </button>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 )
+
             }
-        </div >
-    )
+        </div>
+    );
 }
