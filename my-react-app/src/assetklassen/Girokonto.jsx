@@ -56,6 +56,12 @@ export default function Girokonto() {
     }
 
     const transaktionenOeffnen = async (assetId) => {
+        
+        if (!assetId) {
+            console.warn("Keine Asset-ID vorhanden!");
+            return;
+        }
+        
         setModalOffenTransaktionen(true)
         setAusgewaehltesAsset(assetId)
 
@@ -208,6 +214,7 @@ export default function Girokonto() {
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
         setModalOffen(false)
+        setZuBearbeiten(null)
         ladeGirokonto()
     }
 
@@ -292,6 +299,7 @@ export default function Girokonto() {
 
             <button onClick={() => {
                 setModalOffenHinzu(true),
+                setZuBearbeiten(""),
                 setName(""),
                 setBank(""),
                 setIban(""),
