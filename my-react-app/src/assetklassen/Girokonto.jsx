@@ -378,9 +378,9 @@ export default function Girokonto() {
                                 onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
                             >
                                 <option value="">Elternkonto wählen (Optional)</option>
-                                {elternkontoListe.map((a) => (
-                                    <option key={a.asset_id} value={a.asset_id}>
-                                        {a.name_der_bank} | {a.iban}
+                                {listeGirokonto.map((e) => (
+                                    <option key={e.id}>
+                                        {e.name_der_bank} | {e.iban}
                                     </option>
                                 ))}
                             </select>
