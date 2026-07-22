@@ -26,7 +26,7 @@ export default function Girokonto() {
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
     const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
-    const [transaktionsBeschreibung, setTransaktionsBeschreibung] = useState("");
+    const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
     const [transaktionsTyp, setTransaktionsTyp] = useState("");
@@ -106,7 +106,7 @@ export default function Girokonto() {
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     waehrung: waehrung,
                     eroeffnungsdatum: eroeffnungsdatum,
-                    bemerkung: transaktionsBeschreibung,
+                    notizen: transaktionsNotizen,
                     kontoinhaber: kontoinhaber,
                     ist_aktiv: true,
                     hauptkonto: hauptkonto,
@@ -128,7 +128,7 @@ export default function Girokonto() {
             setEinzahlung_bei_eroeffnung("")
             setWaehrung("EUR")
             setEroeffnungsdatum("")
-            setTransaktionsBeschreibung("")
+            setTransaktionsNotizen("")
             setKontoinhaber("")
             setIstAktiv(true)
             setHauptkonto(false)
@@ -152,7 +152,7 @@ export default function Girokonto() {
         setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
         setWaehrung(eintrag.waehrung || "EUR")
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
-        setTransaktionsBeschreibung(eintrag.bemerkung || "")
+        setTransaktionsNotizen(eintrag.notizen || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
         setIstAktiv(eintrag.ist_aktiv ?? true)
         setHauptkonto(eintrag.hauptkonto ?? false)
@@ -201,7 +201,7 @@ export default function Girokonto() {
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 waehrung: waehrung,
                 eroeffnungsdatum: eroeffnungsdatum,
-                bemerkung: transaktionsBeschreibung,
+                notizen: transaktionsNotizen,
                 kontoinhaber: kontoinhaber,
                 ist_aktiv: ist_aktiv,
                 hauptkonto: hauptkonto,
@@ -220,12 +220,12 @@ export default function Girokonto() {
     }
 
     const transaktionHinzufuegen = async () => {
-        if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
+        if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
         const { data: { user } } = await supabase.auth.getUser();
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
-            bemerkung: transaktionsBeschreibung,
+            notizen: transaktionsNotizen,
             betrag: parseFloat(transaktionsBetrag),
             kategorie_id: transaktionsKategorie,
             asset_id: ausgewaehltesAsset,
@@ -235,7 +235,7 @@ export default function Girokonto() {
 
         if (handleApiError(error, "Transaktion hinzufügen")) return;
 
-        setTransaktionsBeschreibung("");
+        setTransaktionsNotizen("");
         setTransaktionsBetrag("");
         setTransaktionsKategorie("");
         setTransaktionsTyp("");
@@ -286,7 +286,7 @@ export default function Girokonto() {
                     setModalOffenHinzu(true);
                     setZuBearbeiten(null);
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
-                    setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsBeschreibung("");
+                    setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
                     setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto(""); setDispoLimit("");
                     setBic(""); setZinssatz("");
                 }}>
@@ -316,7 +316,7 @@ export default function Girokonto() {
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
                                     {elternkontoName && <p className="parent"><strong>Elternkonto:</strong> {elternkontoName}</p>}
-                                    {e.bemerkung && <p className="note">{e.bemerkung}</p>}
+                                    {e.notizen && <p className="note">{e.notizen}</p>}
                                 </div>
 
                                 <div className="card-actions">
@@ -385,7 +385,7 @@ export default function Girokonto() {
                                     {listeTransaktionenGirokonto.map((t) => (
                                         <li key={t.id} className="transaction-item">
                                             <div className="tx-info">
-                                                <span className="tx-desc">{t.bemerkung || "Ohne Beschreibung"}</span>
+                                                <span className="tx-desc">{t.notizen || "Ohne Notizen"}</span>
                                                 <span className="tx-date">{t.datum}</span>
                                             </div>
                                             <span className={`tx-amount ${t.typ === 'einnahme' ? 'positive' : 'negative'}`}>
@@ -455,8 +455,8 @@ export default function Girokonto() {
                                     <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="0.00" type="number" step="0.01" />
                                 </div>
                                 <div className="form-group col-span-2">
-                                    <label>Bemerkung</label>
-                                    <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Optionale Notiz..." />
+                                    <label>Notizen</label>
+                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
                                 </div>
                                 
                                 <div className="form-group checkbox-group col-span-2">
@@ -540,8 +540,8 @@ export default function Girokonto() {
                                     <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} type="number" step="0.01" />
                                 </div>
                                 <div className="form-group col-span-2">
-                                    <label>Bemerkung</label>
-                                    <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} />
+                                    <label>notizen</label>
+                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} />
                                 </div>
 
                                 <div className="form-group checkbox-group col-span-2">
@@ -589,8 +589,8 @@ export default function Girokonto() {
                         <div className="modal-body">
                             <div className="form-grid">
                                 <div className="form-group col-span-2">
-                                    <label>Beschreibung*</label>
-                                    <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="z.B. Gehalt, Supermarkt..." />
+                                    <label>Notizen*</label>
+                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="z.B. Gehalt, Supermarkt..." />
                                 </div>
                                 <div className="form-group">
                                     <label>Betrag*</label>
