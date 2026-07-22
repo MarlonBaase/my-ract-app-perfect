@@ -208,7 +208,6 @@ export default function Girokonto() {
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
         setModalOffen(false)
-        setZuBearbeiten(null)
         ladeGirokonto()
     }
 
@@ -293,7 +292,6 @@ export default function Girokonto() {
 
             <button onClick={() => {
                 setModalOffenHinzu(true),
-                setZuBearbeiten(""),
                 setName(""),
                 setBank(""),
                 setIban(""),
