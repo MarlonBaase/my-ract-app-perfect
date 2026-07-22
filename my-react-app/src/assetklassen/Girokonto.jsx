@@ -8,7 +8,7 @@ export default function Girokonto() {
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
     const [kontoinhaber, setKontoinhaber] = useState("")
-    const [istAktiv, setIstAktiv] = useState("")
+    const [ist_Aktiv, setIstAktiv] = useState("")
     const [hauptkonto, setHauptkonto] = useState(true)
     const [elternkonto, setElternkonto] = useState("")
     const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
@@ -214,7 +214,7 @@ export default function Girokonto() {
                 eroeffnungsdatum: eroeffnungsdatum,
                 bemerkung: transaktionsBeschreibung,
                 kontoinhaber: kontoinhaber,
-                ist_Aktiv: istAktiv,
+                ist_Aktiv: ist_Aktiv,
                 hauptkonto: hauptkonto,
                 elternkonto: elternkonto,
                 dispo_limit: dispo_limit,
@@ -301,7 +301,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
+                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_Aktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
@@ -428,7 +428,7 @@ export default function Girokonto() {
                             <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                             <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                             <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                            <input title="Aktiv" type="checkbox" id="istAktiv" checked={istAktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
+                            <input title="Aktiv" type="checkbox" id="ist_Aktiv" checked={ist_Aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
                             <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                             <select
                                 value={ausgewaehltesElternkonto}
