@@ -294,19 +294,27 @@ export default function Girokonto() {
     }, []);
 
 
+
     return (
         <div>
             <h2>Girokonto</h2>
 
             <ul>
-                {listeGirokonto.map((e) => (
-                    <li key={e.id}>
-                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_aktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
-                        <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                        <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
-                        <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
-                    </li>
-                ))}
+                {listeGirokonto.map((e) => {
+
+                    const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+
+
+                    const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "Kein Elternkonto";
+                    return (
+                        <li key={e.id}>
+                            {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_aktiv} | {e.hauptkonto} | {elternkontoName} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
+                            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
+                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
+                            <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
+                        </li>
+                    );
+                })}
             </ul>
 
             <button onClick={() => {
