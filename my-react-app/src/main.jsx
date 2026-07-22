@@ -23,7 +23,7 @@ import './index.css'
 
 
 
-const [ansicht, setAnsicht] = useState("card")
+
 
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
@@ -41,6 +41,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 function App() {
   const [session, setSession] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
+  const [ansicht, setAnsicht] = useState("card")
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
