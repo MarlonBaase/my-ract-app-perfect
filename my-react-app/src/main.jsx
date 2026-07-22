@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import { StrictMode, useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import { ErrorBoundary } from 'react-error-boundary'
-import { SettingsContext } from './src/SettingsContext';
+import { SettingsContext } from './SettingsContext';
 import Home from './Home'
 import Dashboard from './Dashboard'
 import Assetklassen from './Assetklassen'
