@@ -13,7 +13,7 @@ export default function Girokonto() {
     const [elternkonto, setElternkonto] = useState("")
     const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
     const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState(""); // Der ausgewählte Wert
-    const [dispoLimit, setDispoLimit] = useState("")
+    const [dispo_limit, setDispoLimit] = useState("")
     const [bic, setBic] = useState("")
     const [zinssatz, setZinssatz] = useState("")
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
@@ -117,7 +117,7 @@ export default function Girokonto() {
                     istAktiv: true,
                     hauptkonto: hauptkonto,
                     elternkonto: elternkonto,
-                    dispoLimit: dispoLimit,
+                    dispo_limit: dispo_limit,
                     bic: bic,
                     zinssatz: zinssatz
                 })
@@ -165,7 +165,7 @@ export default function Girokonto() {
         setIstAktiv(eintrag.istAktiv || "")
         setHauptkonto(eintrag.hauptkonto || "")
         setElternkonto(eintrag.elternkonto || "")
-        setDispoLimit(eintrag.dispoLimit || "")
+        setDispoLimit(eintrag.dispo_limit || "")
         setBic(eintrag.bic || "")
         setZinssatz(eintrag.zinssatz || "")
         setModalOffen(true)
@@ -217,7 +217,7 @@ export default function Girokonto() {
                 istAktiv: istAktiv,
                 hauptkonto: hauptkonto,
                 elternkonto: elternkonto,
-                dispoLimit: dispoLimit,
+                dispo_limit: dispo_limit,
                 bic: bic,
                 zinssatz: zinssatz
             })
@@ -301,7 +301,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
+                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
@@ -386,7 +386,7 @@ export default function Girokonto() {
                                 ))}
                             </select>
                         )}
-                        <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+                        <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
@@ -441,7 +441,7 @@ export default function Girokonto() {
                                     </option>
                                 ))}
                             </select>
-                            <input value={dispoLimit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
+                            <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="Dispo Limit" />
                             <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                             <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
