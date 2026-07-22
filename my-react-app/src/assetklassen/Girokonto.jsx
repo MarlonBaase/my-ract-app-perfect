@@ -297,7 +297,7 @@ export default function Girokonto() {
                     <li key={e.id}>
                         {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.istAktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispoLimit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                        <button onClick={() => eintragLoeschen(e.id)}>🗑️</button>
+                        <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
                     </li>
                 ))}
@@ -384,7 +384,7 @@ export default function Girokonto() {
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
-                        <button onClick={() => { girokontoHinzufuegen, setModalOffenHinzu(false) }}>Speichern</button>
+                        <button onClick={() => { girokontoHinzufuegen(), setModalOffenHinzu(false) }}>Speichern</button>
                         <button onClick={() => { setModalOffenHinzu(false) }}>Abbrechen</button>
                     </div>
                 </div>
@@ -441,7 +441,7 @@ export default function Girokonto() {
 
 
 
-                            <button onClick={() => { girokontoSpeichern, setModalOffen(false) }}>Speichern</button>
+                            <button onClick={() => { girokontoSpeichern(), setModalOffen(false) }}>Speichern</button>
                             <button onClick={() => { setModalOffen(false) }}>Abbrechen</button>
                         </div>
                     </div>
