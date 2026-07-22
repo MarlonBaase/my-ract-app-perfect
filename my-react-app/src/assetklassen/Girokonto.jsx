@@ -176,14 +176,6 @@ export default function Girokonto() {
         if (!assetId) return;
 
 
-        const { error } = await supabase
-            .from("girokonto")
-            .delete()
-            .eq("asset_id", assetId)
-
-        if (handleApiError(error, "Eintrag löschen")) return;
-
-
         const { error: assetError } = await supabase
             .from("asset")
             .delete()
