@@ -8,7 +8,7 @@ export default function Girokonto() {
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
     const [kontoinhaber, setKontoinhaber] = useState("")
-    const [ist_Aktiv, setIstAktiv] = useState("")
+    const [ist_aktiv, setIstAktiv] = useState("")
     const [hauptkonto, setHauptkonto] = useState(true)
     const [elternkonto, setElternkonto] = useState("")
     const [elternkontoListe, setElternkontoListe] = useState([]); // Das Array für die Optionen
@@ -114,7 +114,7 @@ export default function Girokonto() {
                     eroeffnungsdatum: eroeffnungsdatum,
                     bemerkung: transaktionsBeschreibung,
                     kontoinhaber: kontoinhaber,
-                    ist_Aktiv: true,
+                    ist_aktiv: true,
                     hauptkonto: hauptkonto,
                     elternkonto: elternkonto,
                     dispo_limit: dispo_limit,
@@ -162,7 +162,7 @@ export default function Girokonto() {
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setTransaktionsBeschreibung(eintrag.bemerkung || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
-        setIstAktiv(eintrag.ist_Aktiv || "")
+        setIstAktiv(eintrag.ist_aktiv || "")
         setHauptkonto(eintrag.hauptkonto || "")
         setElternkonto(eintrag.elternkonto || "")
         setDispoLimit(eintrag.dispo_limit || "")
@@ -214,7 +214,7 @@ export default function Girokonto() {
                 eroeffnungsdatum: eroeffnungsdatum,
                 bemerkung: transaktionsBeschreibung,
                 kontoinhaber: kontoinhaber,
-                ist_Aktiv: ist_Aktiv,
+                ist_aktiv: ist_aktiv,
                 hauptkonto: hauptkonto,
                 elternkonto: elternkonto,
                 dispo_limit: dispo_limit,
@@ -301,7 +301,7 @@ export default function Girokonto() {
             <ul>
                 {listeGirokonto.map((e) => (
                     <li key={e.id}>
-                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_Aktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
+                        {e.asset.asset_name}| {e.name_der_bank} | {e.iban} | {e.einzahlung_bei_eroeffnung} {e.waehrung} | {e.bemerkung} | {e.eroeffnungsdatum} | {e.kontoinhaber} | {e.ist_aktiv} | {e.hauptkonto} | {e.elternkonto} | {e.dispo_limit} | {e.bic} | {e.zinssatz}
                         <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                         <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                         <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
@@ -428,7 +428,7 @@ export default function Girokonto() {
                             <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                             <input value={transaktionsBeschreibung} onChange={(e) => setTransaktionsBeschreibung(e.target.value)} placeholder="Bemerkung" />
                             <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Kontoinhaber" />
-                            <input title="Aktiv" type="checkbox" id="ist_Aktiv" checked={ist_Aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
+                            <input title="Aktiv" type="checkbox" id="ist_aktiv" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
                             <input title="Hauptkonto" type="checkbox" id="hauptkonto" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                             <select
                                 value={ausgewaehltesElternkonto}
