@@ -209,6 +209,21 @@ export default function Girokonto() {
         setModalOffen(false)
         setZuBearbeiten(null)
         ladeGirokonto()
+        setZuBearbeiten("")
+        setName("")
+        setBank("")
+        setIban("")
+        setEinzahlung_bei_eroeffnung("")
+        setWaehrung("")
+        setEroeffnungsdatum("")
+        setTransaktionsBeschreibung("")
+        setKontoinhaber("")
+        setIstAktiv("")
+        setHauptkonto("")
+        setElternkonto("")
+        setDispoLimit("")
+        setBic("")
+        setZinssatz("")
     }
 
     const transaktionHinzufuegen = async () => {
@@ -354,51 +369,12 @@ export default function Girokonto() {
                         <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC" />
                         <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="Zinssatz" />
 
-                        <button
-                            onClick={() => {
-                                girokontoHinzufuegen,
-                                    setZuBearbeiten(""),
-                                    setName(""),
-                                    setBank(""),
-                                    setIban(""),
-                                    setEinzahlung_bei_eroeffnung(""),
-                                    setWaehrung(""),
-                                    setEroeffnungsdatum(""),
-                                    setTransaktionsBeschreibung(""),
-                                    setKontoinhaber(""),
-                                    setIstAktiv(""),
-                                    setHauptkonto(""),
-                                    setElternkonto(""),
-                                    setDispoLimit(""),
-                                    setBic(""),
-                                    setZinssatz(""),
-                                    setModalOffenHinzu(false)
-                            }}
-                        >Girokonto hinzufügen</button>
-                        <button onClick={() => {
-                            setZuBearbeiten(""),
-                                setName(""),
-                                setBank(""),
-                                setIban(""),
-                                setEinzahlung_bei_eroeffnung(""),
-                                setWaehrung(""),
-                                setEroeffnungsdatum(""),
-                                setTransaktionsBeschreibung(""),
-                                setKontoinhaber(""),
-                                setIstAktiv(""),
-                                setHauptkonto(""),
-                                setElternkonto(""),
-                                setDispoLimit(""),
-                                setBic(""),
-                                setZinssatz(""),
-                                setModalOffenHinzu(false)
-                        }}
-                        >Abbrechen</button>
+                        <button onClick={() => { girokontoSpeichern, setModalOffenHinzu(false) }}>Speichern</button>
+                        <button onClick={() => { setModalOffenHinzu(false) }}>Abbrechen</button>
                     </div>
-
                 </div>
-            )
-            }
+
+            )}
 
 
 
@@ -450,52 +426,12 @@ export default function Girokonto() {
 
 
 
-                            <button
-                                onClick={() => {
-                                    girokontoSpeichern,
-                                        setZuBearbeiten(""),
-                                        setName(""),
-                                        setBank(""),
-                                        setIban(""),
-                                        setEinzahlung_bei_eroeffnung(""),
-                                        setWaehrung(""),
-                                        setEroeffnungsdatum(""),
-                                        setTransaktionsBeschreibung(""),
-                                        setKontoinhaber(""),
-                                        setIstAktiv(""),
-                                        setHauptkonto(""),
-                                        setElternkonto(""),
-                                        setDispoLimit(""),
-                                        setBic(""),
-                                        setZinssatz(""),
-                                        setModalOffenHinzu(false)
-                                }}
-                            >Speichern</button>
-                            <button onClick={() => {
-                                setZuBearbeiten(""),
-                                    setName(""),
-                                    setBank(""),
-                                    setIban(""),
-                                    setEinzahlung_bei_eroeffnung(""),
-                                    setWaehrung(""),
-                                    setEroeffnungsdatum(""),
-                                    setTransaktionsBeschreibung(""),
-                                    setKontoinhaber(""),
-                                    setIstAktiv(""),
-                                    setHauptkonto(""),
-                                    setElternkonto(""),
-                                    setDispoLimit(""),
-                                    setBic(""),
-                                    setZinssatz(""),
-                                    setModalOffen(false)
-                            }}
-                            >Abbrechen</button>
+                            <button onClick={() => { girokontoSpeichern, setModalOffen(false) }}>Speichern</button>
+                            <button onClick={() => { setModalOffen(false) }}>Abbrechen</button>
                         </div>
                     </div>
                 )
             }
-
-
 
             {
                 modalTranskationenHinzufuegen && (
