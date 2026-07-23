@@ -46,7 +46,7 @@ export default function Girokonto() {
                     benutzer_id,
                     asset_name,
                     asset_id,
-                    transaktionsprotokoll(*)
+                    transaktionsprotokoll(betrag)
                 )
             `)
             .eq("asset.benutzer_id", user.id)
