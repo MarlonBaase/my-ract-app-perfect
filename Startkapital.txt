@@ -1,0 +1,29 @@
+  const [startkapital, setStartkapital] = useState(0)
+
+  const [neuesStartkapital, setNeuesStartkapital] = useState('')
+    setStartkapital(start)
+
+
+
+
+const startkapitalSpeichern = async () => {
+    if (!neuesStartkapital) return
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('kapital').upsert({
+      user_id: user.id,
+      betrag: parseFloat(neuesStartkapital)
+    }, { onConflict: 'user_id' })
+    setNeuesStartkapital('')
+    ladeAlles()
+  }
+
+      <div>
+        <h4>Startkapital setzen</h4>
+        <input
+          placeholder={`Aktuell: ${startkapital.toFixed(2)} €`}
+          type="number"
+          value={neuesStartkapital}
+          onChange={e => setNeuesStartkapital(e.target.value)}
+        />
+        <button onClick={startkapitalSpeichern}>Speichern</button>
+      </div>

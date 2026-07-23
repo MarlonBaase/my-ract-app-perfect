@@ -66,7 +66,7 @@ export default function Girokonto() {
 
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
-            .select("*")
+            .select("betrag")
             .eq("asset_id", assetId)
             .order('datum', { ascending: false });
 
@@ -315,7 +315,7 @@ export default function Girokonto() {
                                 <div className="card-body">
                                     
                                     <div className="amount">
-                                        {listeTransaktionenGirokonto.betrag}
+                                        {listeTransaktionenGirokonto.betrag} <br></br>
                                         {wert.toFixed(2)}
                                         {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
