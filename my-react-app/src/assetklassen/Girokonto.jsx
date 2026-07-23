@@ -282,6 +282,7 @@ useEffect(() => {
             await ladeGirokonto()
             await ladeKategorien();
             await ladeElternkontoListe();
+            await transaktionsWerte();
         } catch (err) {
             console.error("Fehler in init:", err);
         }
@@ -326,7 +327,7 @@ return (
                             <div className="card-body">
 
                                 {listeTransaktionsWerte} 
-                                
+
                                 <div className="amount">
                                     
                                     
