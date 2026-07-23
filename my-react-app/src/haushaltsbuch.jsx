@@ -65,10 +65,12 @@ export default function Haushaltsbuch() {
       .select(`
         *,
         asset!asset_id (asset_name, asset_typ),
-        transaktionskategorie!kategorie_id (name)
+        transaktionskategorie!kategorie_id (name),
+        transaktionskategorie.sichtbar
       `)
       .eq("benutzer_id", user.id)
       .eq("typ", "ausgabe")
+      .eq("transaktionskategorie.sichtbar" , true)
       .order("erstellt_am", { ascending: false });
 
     if (ausgabenError) {
@@ -81,10 +83,12 @@ export default function Haushaltsbuch() {
       .select(`
         *,
         asset!asset_id (asset_name, asset_typ),
-        transaktionskategorie!kategorie_id (name)
+        transaktionskategorie!kategorie_id (name),
+        transaktionskategorie.sichtbar
       `)
       .eq("benutzer_id", user.id)
       .eq("typ", "einnahme")
+      .eq("transaktionskategorie.sichtbar" , true)
       .order("erstellt_am", { ascending: false });
 
     const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
