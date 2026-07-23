@@ -79,6 +79,7 @@ export default function Girokonto() {
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
             .select("betrag")
+            .select("asset_id")
             .eq("asset_id", assetId);
 
     if (handleApiError(error, "TransaktionensWerte öffnen")) return;
