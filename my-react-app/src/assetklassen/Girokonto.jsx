@@ -368,6 +368,13 @@ export default function Girokonto() {
                                 const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                                 const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
+                                const transaktionen = e.asset?.transaktionsprotokoll || [];
+                                const summe = transaktionen.reduce((acc, t) => {
+                                    const betrag = Number(t.betrag || 0);
+                                    return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
+                                }, 0);
+                                const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
+
                                 return (
                                     <tr key={e.id}>
                                         <td>
@@ -375,7 +382,7 @@ export default function Girokonto() {
                                             <div className="subtext">{e.name_der_bank}</div>
                                         </td>
                                         <td className="code-text">{e.iban}</td>
-                                        <td><strong>{e.einzahlung_bei_eroeffnung} {e.waehrung}</strong></td>
+                                        <td><strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong></td>
                                         <td>{e.kontoinhaber || "—"}</td>
                                         <td>{elternkontoName}</td>
                                         <td className="table-actions">
