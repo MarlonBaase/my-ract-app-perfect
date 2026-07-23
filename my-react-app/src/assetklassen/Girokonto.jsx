@@ -46,7 +46,8 @@ export default function Girokonto() {
                     benutzer_id,
                     asset_name,
                     asset_id
-                )
+                ),
+                transaktionsprotokoll(*)
             `)
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
@@ -271,7 +272,6 @@ export default function Girokonto() {
                 await ladeGirokonto()
                 await ladeKategorien();
                 await ladeElternkontoListe();
-                await transaktionenOeffnen();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
