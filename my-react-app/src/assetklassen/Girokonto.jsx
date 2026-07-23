@@ -24,7 +24,7 @@ export default function Girokonto() {
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
-    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([] , "keine Werte vorhanden")
+    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
@@ -299,7 +299,7 @@ export default function Girokonto() {
                     {listeGirokonto.map((e) => {
                         const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
-                        const summe = listeTransaktionenGirokonto.reduce((akkumulator, aktuellerWert) => { return akkumulator + Number(aktuellerWert.betrag || 0);}, 0);
+                        const summe = listeTransaktionenGirokonto.reduce((summe, transaktion) => { return summe + Number(transaktion.betrag || 0);}, 0);
                         const wert =  einzahlung_bei_eroeffnung - summe;
 
                         return (
@@ -315,7 +315,7 @@ export default function Girokonto() {
                                 <div className="card-body">
                                     
 
-                                    {listeTransaktionenGirokonto}
+                                    {summe.toFixed(2)}
 
 
                                     <div className="amount">
