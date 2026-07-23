@@ -299,6 +299,8 @@ export default function Girokonto() {
                     {listeGirokonto.map((e) => {
                         const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
+                        console.log("Erste Transaktion:", listeTransaktionenGirokonto[0]);
+
                         const summe = listeTransaktionenGirokonto.reduce((summe, transaktion) => { return summe + Number(transaktion.betrag || 0);}, 0);
                         const wert =  einzahlung_bei_eroeffnung - summe;
 
@@ -316,7 +318,7 @@ export default function Girokonto() {
                                     
 
                                     {summe.toFixed(2)}
-
+                                    
 
                                     <div className="amount">
                                         
