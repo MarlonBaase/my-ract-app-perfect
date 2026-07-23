@@ -315,7 +315,7 @@ export default function Girokonto() {
                                 <div className="card-body">
                                     
                                     <div className="amount">
-                                        {listeTransaktionenGirokonto}
+                                        {listeTransaktionenGirokonto.betrag}
                                         {wert.toFixed(2)}
                                         {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
