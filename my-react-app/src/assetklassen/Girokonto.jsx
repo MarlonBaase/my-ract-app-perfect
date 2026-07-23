@@ -57,7 +57,7 @@ export default function Girokonto() {
 
             await supabase 
             .from("transaktionsprotokoll")
-            .select("*")
+            .select("betrag")
             .eq("asset_id", assetId)
             .order('datum', { ascending: false });
 
