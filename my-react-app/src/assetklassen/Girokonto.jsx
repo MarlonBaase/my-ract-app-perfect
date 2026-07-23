@@ -30,6 +30,7 @@ export default function Girokonto() {
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
     const [transaktionsTyp, setTransaktionsTyp] = useState("");
+    const [listeTransaktionsWerte , setListeTransaktionsWerte] = useState([]);
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
@@ -81,7 +82,7 @@ export default function Girokonto() {
             .eq("asset_id", assetId);
 
     if (handleApiError(error, "Transaktionen öffnen")) return;
-    if (data) setListeTransaktionenGirokonto(data)
+    if (data) setListeTransaktionsWerte(data)
 }
 
 const girokontoHinzufuegen = async () => {
@@ -325,7 +326,7 @@ return (
                             <div className="card-body">
 
                                 <div className="amount">
-                                    {transaktionsWerte} 
+                                    {listeTransaktionsWerte} 
                                     {wert.toFixed(2)}
                                     {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                 </div>
