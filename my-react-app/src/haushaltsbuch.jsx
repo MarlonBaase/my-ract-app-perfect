@@ -373,21 +373,24 @@ export default function Haushaltsbuch() {
       }
     };
 
+    // Ausgaben pro Assetklasse (asset_typ)
     const gefilterteAusgaben = eintraege.filter(e => e.typ === "ausgabe" && zeitraumFilter(e));
     const ausgabenProAsset = gefilterteAusgaben.reduce((acc, e) => {
-      const astName = e.asset?.assetklasse || "Keine Angaben";
-      acc[astName] = (acc[astName] ?? 0) + e.betrag;
+      // Greift auf den Typen des Assets zu (z. B. "Girokonto", "Depot", etc.)
+      const assetKlasse = e.asset?.asset_typ || "Keine Assetklasse";
+      acc[assetKlasse] = (acc[assetKlasse] ?? 0) + e.betrag;
       return acc;
     }, {});
     setKreisDatenAusgaben(Object.entries(ausgabenProAsset).map(([name, value]) => ({ name, value })));
 
+    // Einnahmen pro Assetklasse (asset_typ)
     const gefilterteEinnahmen = eintraege.filter(e => e.typ === "einnahme" && zeitraumFilter(e));
-    const einnahmenProKategorie = gefilterteEinnahmen.reduce((acc, e) => {
-      const astName = e.asset?.assetklasse || "Keine Angaben";
-      acc[astName] = (acc[astName] ?? 0) + e.betrag;
+    const einnahmenProAsset = gefilterteEinnahmen.reduce((acc, e) => {
+      const assetKlasse = e.asset?.asset_typ || "Keine Assetklasse";
+      acc[assetKlasse] = (acc[assetKlasse] ?? 0) + e.betrag;
       return acc;
     }, {});
-    setKreisDatenEinnahmen(Object.entries(einnahmenProKategorie).map(([name, value]) => ({ name, value })));
+    setKreisDatenEinnahmen(Object.entries(einnahmenProAsset).map(([name, value]) => ({ name, value })));
   };
 
   return (
@@ -395,7 +398,7 @@ export default function Haushaltsbuch() {
       <h1 className="Haushaltsbuch-title">Haushaltsbuch</h1>
 
       <div className="uebersicht">
-        
+
         {/* --- 1. KARTEN-GRID (ZAHLEN) --- */}
         <div className="zahlen">
           <div className="zahl">
@@ -427,7 +430,7 @@ export default function Haushaltsbuch() {
               <Line type="monotone" dataKey="einnahmen" stroke="#10b981" strokeWidth={2} />
               <Line type="monotone" dataKey="ausgaben" stroke="#ef4444" strokeWidth={2} />
             </LineChart>
-            
+
             <div className="zeitraum">
               <button className={zeitraum === "heute" ? "active" : ""} onClick={() => setZeitraum("heute")}>Heute</button>
               <button className={zeitraum === "woche" ? "active" : ""} onClick={() => setZeitraum("woche")}>Woche</button>
@@ -438,7 +441,7 @@ export default function Haushaltsbuch() {
 
           {/* Einnahmen-Kuchen */}
           <div className="diagramm">
-            <h4>Einnahmen pro Kategorie</h4>
+            <h4>Einnahmen pro Assetklasse</h4>
             {kreisDatenEinnahmen.length > 0 ? (
               <PieChart width={250} height={220}>
                 <Pie data={kreisDatenEinnahmen} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
@@ -456,7 +459,7 @@ export default function Haushaltsbuch() {
 
           {/* Ausgaben-Kuchen */}
           <div className="diagramm">
-            <h4>Ausgaben pro Kategorie</h4>
+            <h4>Ausgaben pro Assetklasse</h4>
             {kreisDatenAusgaben.length > 0 ? (
               <PieChart width={250} height={220}>
                 <Pie data={kreisDatenAusgaben} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70}>
@@ -560,10 +563,10 @@ export default function Haushaltsbuch() {
                 <tr key={e.id + e.typ}>
                   <td>{e.notizen}</td>
                   <td>{e.transaktionskategorie?.name || "Keine Kategorie"}</td>
-                  <td style={{ 
-                    textAlign: 'right', 
-                    fontWeight: '600', 
-                    color: e.typ === "ausgabe" ? "#ef4444" : "#10b981" 
+                  <td style={{
+                    textAlign: 'right',
+                    fontWeight: '600',
+                    color: e.typ === "ausgabe" ? "#ef4444" : "#10b981"
                   }}>
                     {e.typ === "ausgabe" ? "-" : "+"}{e.betrag.toFixed(2)} €
                   </td>
@@ -623,8 +626,8 @@ export default function Haushaltsbuch() {
                 <option key={k.id} value={k.id}>{k.name}</option>
               ))}
             </select>
-            <select 
-              value={transaktionsTyp} 
+            <select
+              value={transaktionsTyp}
               onChange={(e) => setTransaktionsTyp(e.target.value)}
               style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
             >
@@ -644,7 +647,7 @@ export default function Haushaltsbuch() {
                 </option>
               ))}
             </select>
-            
+
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <input
                 type="checkbox"
@@ -670,13 +673,13 @@ export default function Haushaltsbuch() {
             )}
 
             <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-              <button 
+              <button
                 onClick={transaktionHinzufuegen}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 Hinzufügen
               </button>
-              <button 
+              <button
                 onClick={transaktionSchließen}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
@@ -731,15 +734,15 @@ export default function Haushaltsbuch() {
                 <option key={k.id} value={k.id}>{k.name}</option>
               ))}
             </select>
-            
+
             <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-              <button 
+              <button
                 onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 Speichern
               </button>
-              <button 
+              <button
                 onClick={bearbeitenSchliessen}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
