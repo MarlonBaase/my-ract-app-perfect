@@ -136,7 +136,7 @@ export default function Girokonto() {
                     kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
                     asset_id: asset_id,
                     assetklasse: "girokonto",
-                    typ: "Einnahme"
+                    typ: "einnahme"
                 })
 
             if (transError) {
