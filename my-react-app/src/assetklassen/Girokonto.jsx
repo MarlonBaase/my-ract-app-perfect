@@ -271,6 +271,7 @@ export default function Girokonto() {
                 await ladeGirokonto()
                 await ladeKategorien();
                 await ladeElternkontoListe();
+                await listeTransaktionenGirokonto
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
