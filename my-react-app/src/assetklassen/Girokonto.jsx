@@ -81,7 +81,7 @@ export default function Girokonto() {
             .select("betrag")
             .eq("asset_id", assetId);
 
-    if (handleApiError(error, "Transaktionen öffnen")) return;
+    if (handleApiError(error, "TransaktionensWerte öffnen")) return;
     if (data) setListeTransaktionsWerte(data)
 }
 
