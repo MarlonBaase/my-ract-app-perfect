@@ -304,10 +304,15 @@ export default function Girokonto() {
                     {listeGirokonto.map((e) => {
                         const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
-                        console.log("Erste Transaktion:", listeTransaktionenGirokonto[0]);
 
-                        const summe = listeTransaktionenGirokonto.reduce((summe, transaktion) => { return summe + Number(transaktion.betrag || 0);}, 0);
-                        const wert =  einzahlung_bei_eroeffnung - summe;
+                        const transaktionen = e.asset?.transaktionsprotokoll || [];
+
+                        const summe = transaktionen.reduce((acc, t) => {
+                            const betrag = Number(t.betrag || 0);
+                            return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
+                        }, 0);
+
+                        const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                         return (
                             <div className="account-card" key={e.id}>
@@ -320,13 +325,13 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="card-body">
-                                    
 
-                                    {summe.toFixed(2)}
-                                    
+
+                                    {aktuellerKontostand.toFixed(2)}
+
 
                                     <div className="amount">
-                                        
+
                                         {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
@@ -473,7 +478,7 @@ export default function Girokonto() {
                                     <label>Notizen</label>
                                     <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
                                 </div>
-                                
+
                                 <div className="form-group checkbox-group col-span-2">
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
