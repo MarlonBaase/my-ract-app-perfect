@@ -133,7 +133,7 @@ export default function Girokonto() {
                     benutzer_id: user.id,
                     notizen: "Einzahlung bei Eröffnung",
                     betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    kategorie_id: "d5473c35-2e52-41ef-82a2-3eef5aff038f",
+                    kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
                     asset_id: asset_id,
                     assetklasse: "girokonto",
                     typ: "Einnahme"
