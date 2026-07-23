@@ -310,7 +310,7 @@ return (
                 {listeGirokonto.map((e) => {
                     const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                     const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
-                    const summe = listeTransaktionenGirokonto.reduce((akkumulator, aktuellerWert) => { return akkumulator + Number(aktuellerWert.betrag || 0); }, 0);
+                    const summe = listeTransaktionsWerte.reduce((akkumulator, aktuellerWert) => { return akkumulator + Number(aktuellerWert.betrag || 0); }, 0);
                     const wert = einzahlung_bei_eroeffnung - summe;
 
                     return (
