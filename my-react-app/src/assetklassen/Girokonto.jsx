@@ -327,12 +327,11 @@ export default function Girokonto() {
 
                         const transaktionen = e.asset?.transaktionsprotokoll || [];
 
-                        const summe = transaktionen.reduce((acc, t) => {
+                        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                         }, 0);
 
-                        const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                         return (
                             <div className="account-card" key={e.id}>
