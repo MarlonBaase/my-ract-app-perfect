@@ -54,6 +54,8 @@ export default function Girokonto() {
         if (handleApiError(error, "Girokonto laden")) return;
         if (data) setListeGirokonto(data)
 
+
+            await supabase 
             .from("transaktionsprotokoll")
             .select("*")
             .eq("asset_id", assetId)
