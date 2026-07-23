@@ -66,7 +66,7 @@ export default function Haushaltsbuch() {
         *,
         asset!asset_id (asset_name, asset_typ),
         transaktionskategorie!kategorie_id (name),
-        transaktionskategorie.sichtbar
+        transaktionskategorie (sichtbar)
       `)
       .eq("benutzer_id", user.id)
       .eq("typ", "ausgabe")
@@ -84,7 +84,7 @@ export default function Haushaltsbuch() {
         *,
         asset!asset_id (asset_name, asset_typ),
         transaktionskategorie!kategorie_id (name),
-        transaktionskategorie.sichtbar
+        transaktionskategorie(sichtbar)
       `)
       .eq("benutzer_id", user.id)
       .eq("typ", "einnahme")
