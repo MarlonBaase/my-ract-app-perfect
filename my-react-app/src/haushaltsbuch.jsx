@@ -374,17 +374,17 @@ export default function Haushaltsbuch() {
     };
 
     const gefilterteAusgaben = eintraege.filter(e => e.typ === "ausgabe" && zeitraumFilter(e));
-    const ausgabenProKategorie = gefilterteAusgaben.reduce((acc, e) => {
-      const katName = e.transaktionskategorie?.name || "Keine Kategorie";
-      acc[katName] = (acc[katName] ?? 0) + e.betrag;
+    const ausgabenProAsset = gefilterteAusgaben.reduce((acc, e) => {
+      const astName = e.asset?.assetklasse || "Keine Angaben";
+      acc[astName] = (acc[astName] ?? 0) + e.betrag;
       return acc;
     }, {});
-    setKreisDatenAusgaben(Object.entries(ausgabenProKategorie).map(([name, value]) => ({ name, value })));
+    setKreisDatenAusgaben(Object.entries(ausgabenProAsset).map(([name, value]) => ({ name, value })));
 
     const gefilterteEinnahmen = eintraege.filter(e => e.typ === "einnahme" && zeitraumFilter(e));
     const einnahmenProKategorie = gefilterteEinnahmen.reduce((acc, e) => {
-      const katName = e.transaktionskategorie?.name || "Keine Kategorie";
-      acc[katName] = (acc[katName] ?? 0) + e.betrag;
+      const astName = e.asset?.assetklasse || "Keine Angaben";
+      acc[astName] = (acc[astName] ?? 0) + e.betrag;
       return acc;
     }, {});
     setKreisDatenEinnahmen(Object.entries(einnahmenProKategorie).map(([name, value]) => ({ name, value })));
