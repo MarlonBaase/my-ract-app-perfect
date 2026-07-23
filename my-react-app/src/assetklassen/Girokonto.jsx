@@ -46,7 +46,7 @@ export default function Girokonto() {
                     benutzer_id,
                     asset_name,
                     asset_id,
-                    transaktionsprotokoll(betrag)
+                    transaktionsprotokoll(betrag, typ)
                 )
             `)
             .eq("asset.benutzer_id", user.id)
@@ -327,7 +327,9 @@ export default function Girokonto() {
                                 <div className="card-body">
 
 
-                                    {aktuellerKontostand.toFixed(2)}
+                                    <div className="amount">
+                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
+                                    </div>
 
 
                                     <div className="amount">
