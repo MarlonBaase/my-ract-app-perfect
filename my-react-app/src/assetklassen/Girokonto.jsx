@@ -300,7 +300,7 @@ export default function Girokonto() {
                         const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
                         const summe = listeTransaktionenGirokonto.reduce((akkumulator, aktuellerWert) => akkumulator + aktuellerWert.betrag, 0);
-                        const wert =  einzahlung_bei_eroeffnung - summe
+                        const wert =  einzahlung_bei_eroeffnung - summe;
 
                         return (
                             <div className="account-card" key={e.id}>
@@ -315,7 +315,7 @@ export default function Girokonto() {
                                 <div className="card-body">
                                     
                                     <div className="amount">
-                                        {wert}
+                                        {wert.toFixed(2)}
                                         {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
