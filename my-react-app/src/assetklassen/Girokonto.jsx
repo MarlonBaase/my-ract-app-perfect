@@ -37,7 +37,7 @@ export default function Girokonto() {
 
     const { ansicht } = useContext(SettingsContext);
 
-    const ladeGirokonto = async (assetId) => {
+    const ladeGirokonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
             .from("girokonto")
@@ -45,7 +45,8 @@ export default function Girokonto() {
                 asset!inner(
                     benutzer_id,
                     asset_name,
-                    asset_id
+                    asset_id,
+                    transaktionsprotokoll(*)
                 )
             `)
             .eq("asset.benutzer_id", user.id)
@@ -54,12 +55,6 @@ export default function Girokonto() {
         if (handleApiError(error, "Girokonto laden")) return;
         if (data) setListeGirokonto(data)
 
-
-            await supabase 
-            .from("transaktionsprotokoll")
-            .select("betrag")
-            .eq("asset_id", assetId)
-            .order('datum', { ascending: false });
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenGirokonto(data)
