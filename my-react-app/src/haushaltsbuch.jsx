@@ -125,6 +125,7 @@ export default function Haushaltsbuch() {
     const { data } = await supabase
       .from("transaktionskategorie")
       .select("*")
+      .eq("sichtbar", true)
       .order("name", { ascending: true });
 
     if (data) setKategorien(data);
