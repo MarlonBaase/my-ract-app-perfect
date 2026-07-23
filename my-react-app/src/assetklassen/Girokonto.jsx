@@ -24,7 +24,7 @@ export default function Girokonto() {
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
-    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
+    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([] , "keine Werte vorhanden")
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
