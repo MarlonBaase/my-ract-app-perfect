@@ -315,7 +315,7 @@ export default function Girokonto() {
                                 <div className="card-body">
                                     
 
-                                    {listeTransaktionenGirokonto.betrag}
+                                    {listeTransaktionenGirokonto}
 
 
                                     <div className="amount">
