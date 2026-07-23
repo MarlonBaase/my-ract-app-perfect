@@ -127,6 +127,24 @@ export default function Girokonto() {
                 return
             }
 
+            const { error: transError } = await supabase
+                .from("transaktionsprotokoll")
+                .insert({
+                    benutzer_id: user.id,
+                    notizen: "Einzahlung bei Eröffnung",
+                    betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                    kategorie_id: transaktionsKategorie,
+                    asset_id: asset_id,
+                    assetklasse: "girokonto",
+                    typ: "Einnahme"
+                })
+
+            if (transError) {
+                console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError)
+                alert("Fehler beim Girokonto-Insert.")
+                return
+            }
+
             setName("")
             setBank("")
             setIban("")
@@ -254,7 +272,9 @@ export default function Girokonto() {
         const { data, error } = await supabase
             .from("transaktionskategorie")
             .select("*")
+            .eq("sichtbar", true)
             .order("name", { ascending: true });
+            
 
         if (data) setKategorien(data);
         if (handleApiError(error, "Kategorie laden")) return;
