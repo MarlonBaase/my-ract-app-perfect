@@ -325,9 +325,11 @@ return (
 
                             <div className="card-body">
 
+                                {listeTransaktionsWerte} 
+                                
                                 <div className="amount">
-                                    {listeTransaktionsWerte} 
-                                    {wert.toFixed(2)}
+                                    
+                                    
                                     {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                 </div>
                                 <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
