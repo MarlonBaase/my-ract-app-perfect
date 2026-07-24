@@ -18,6 +18,7 @@ import Konfiguration from './profil/konfiguration'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
+import Zeiterfassung from './Zeiterfassung'
 import AssetSidebar from './AssetSidebar'
 import './index.css'
 
@@ -77,6 +78,7 @@ function App() {
               <Route path='wd' element={<Wd darkMode={darkMode} />} />
             </Route>
             <Route path="/haushaltsbuch" element={<Haushaltsbuch darkMode={darkMode} />} />
+            <Route path="/zeiterfassung" element={<Zeiterfassung />} />
             <Route path="/profil" element={<Profil darkMode={darkMode} />}>
               <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode} />} />
             </Route>
