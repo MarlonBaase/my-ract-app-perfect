@@ -111,9 +111,6 @@ export default function Navbar({ darkMode }) {
             }}
           >
             {item.label}
-            {item.unterseiten.length > 0 && (
-              <span style={{ marginLeft: '4px', fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
-            )}
           </Link>
         </div>
       ))}
