@@ -52,8 +52,11 @@ const navStruktur = [
     unterseiten: [
       { label: 'Einstellungen', path: '/profil/einstellungen' },
       { label: 'Konfiguration', path: '/profil/konfiguration' },
+      { label: 'Zeiterfassung', path: '/profil/zeiterfassung'}
     ]
   },
+
+
 ]
 
 export default function Navbar({ darkMode }) {
