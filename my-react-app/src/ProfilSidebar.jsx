@@ -25,6 +25,18 @@ const struktur = [
         ]
       },
     ]
+  },
+  {
+    block: "Zeiterfassung",
+    farbe: "#2b2a6f",
+    bereiche: [
+      {
+        label: "Zeiterfassung",
+        path: "/profil/zeiterfassung",
+        unterseiten: [
+        ]
+      },
+    ]
   }
 ]
  
