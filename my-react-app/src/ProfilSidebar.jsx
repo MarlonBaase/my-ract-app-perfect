@@ -28,7 +28,7 @@ const struktur = [
   },
   {
     block: "Zeiterfassung",
-    farbe: "#2b2a6f",
+    farbe: "#2e2bc0",
     bereiche: [
       {
         label: "Zeiterfassung",
