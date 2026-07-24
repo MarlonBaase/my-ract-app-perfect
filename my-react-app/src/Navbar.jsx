@@ -115,47 +115,6 @@ export default function Navbar({ darkMode }) {
               <span style={{ marginLeft: '4px', fontSize: '0.6rem', opacity: 0.6 }}>▼</span>
             )}
           </Link>
-            
-
-          {/* Dropdown */}
-          {item.unterseiten.length > 0 && offenIndex === index && (
-            <div style={{
-              position: 'absolute',
-              top: '56px',
-              left: 0,
-              backgroundColor: darkMode ? '#2a2a3e' : '#ffffff',
-              border: darkMode ? '1px solid #444' : '1px solid #e0e0e0',
-              borderRadius: '8px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              minWidth: '220px',
-              zIndex: 1001,
-              overflow: 'hidden',
-            }}>
-              {item.unterseiten.map((unter, uIndex) => (
-                <Link
-                  key={uIndex}
-                  to={unter.path}
-                  style={{
-                    display: 'block',
-                    padding: '0.6rem 1rem',
-                    textDecoration: 'none',
-                    fontSize: '0.85rem',
-                    color: istAktiv(unter.path)
-                      ? '#4f8ef7'
-                      : darkMode ? '#c9d1e0' : '#374151',
-                    backgroundColor: istAktiv(unter.path)
-                      ? darkMode ? '#1a1a2e' : '#f0f5ff'
-                      : 'transparent',
-                    fontWeight: istAktiv(unter.path) ? '600' : '400',
-                    borderLeft: istAktiv(unter.path) ? '3px solid #4f8ef7' : '3px solid transparent',
-                    transition: 'background 0.1s',
-                  }}
-                >
-                  {unter.label}
-                </Link>
-              ))}
-            </div>
-          )}
         </div>
       ))}
     </nav>
