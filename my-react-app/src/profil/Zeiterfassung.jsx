@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabase";
+import { supabase } from "./supabase";
 
 export default function Zeiterfassung() {
   const [eintraege, setEintraege] = useState([]);
@@ -18,6 +18,9 @@ export default function Zeiterfassung() {
   const [filterBereich, setFilterBereich] = useState("alle");
   const [filterPrio, setFilterPrio] = useState("alle");
   const [filterStatus, setFilterStatus] = useState("alle");
+
+  // Neu: Kanban Gruppierungs-Modus ('bereich', 'status' oder 'prio')
+  const [kanbanGruppierung, setKanbanGruppierung] = useState("bereich");
 
   // Modal für Bearbeiten
   const [bearbeitenEintrag, setBearbeitenEintrag] = useState(null);
@@ -188,6 +191,29 @@ export default function Zeiterfassung() {
     return bereichMatch && prioMatch && statusMatch;
   });
 
+  // Dynamische Generierung der Kanban-Spalten je nach Gruppierung
+  const getKanbanSpalten = () => {
+    if (kanbanGruppierung === "status") {
+      return [
+        { key: "offen", label: "📋 Offen" },
+        { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
+        { key: "abgeschlossen", label: "✅ Abgeschlossen" }
+      ];
+    }
+    if (kanbanGruppierung === "prio") {
+      return [
+        { key: "dringend", label: "🔴 Dringend" },
+        { key: "hoch", label: "🟠 Hoch" },
+        { key: "mittel", label: "🟡 Mittel" },
+        { key: "niedrig", label: "🟢 Niedrig" }
+      ];
+    }
+    // Standard: Nach Bereichen
+    return verfuegbareBereiche
+      .filter(b => filterBereich === "alle" || filterBereich.toLowerCase() === b.toLowerCase())
+      .map(b => ({ key: b, label: `📁 ${b}` }));
+  };
+
   return (
     <div style={{ padding: "32px 24px", maxWidth: "1600px", margin: "0 auto", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a", backgroundColor: "#f8fafc", minHeight: "100vh" }}>
       
@@ -286,35 +312,76 @@ export default function Zeiterfassung() {
       </form>
 
       {/* FILTERLEISTE */}
-      <div style={{ display: "flex", gap: "16px", marginBottom: "24px", background: "#ffffff", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Bereich:</span>
-          <select value={filterBereich} onChange={(e) => setFilterBereich(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-            <option value="alle">Alle Bereiche</option>
-            {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", background: "#ffffff", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", flexWrap: "wrap", gap: "12px" }}>
+        
+        {/* Daten-Filter */}
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Bereich:</span>
+            <select value={filterBereich} onChange={(e) => setFilterBereich(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
+              <option value="alle">Alle Bereiche</option>
+              {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Priorität:</span>
+            <select value={filterPrio} onChange={(e) => setFilterPrio(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
+              <option value="alle">Alle Prioritäten</option>
+              <option value="dringend">🔴 Dringend</option>
+              <option value="hoch">🟠 Hoch</option>
+              <option value="mittel">🟡 Mittel</option>
+              <option value="niedrig">🟢 Niedrig</option>
+            </select>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
+              <option value="alle">Alle Status</option>
+              <option value="offen">Offen</option>
+              <option value="in_bearbeitung">In Bearbeitung</option>
+              <option value="abgeschlossen">Abgeschlossen</option>
+            </select>
+          </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Priorität:</span>
-          <select value={filterPrio} onChange={(e) => setFilterPrio(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-            <option value="alle">Alle Prioritäten</option>
-            <option value="dringend">🔴 Dringend</option>
-            <option value="hoch">🟠 Hoch</option>
-            <option value="mittel">🟡 Mittel</option>
-            <option value="niedrig">🟢 Niedrig</option>
-          </select>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
-            <option value="alle">Alle Status</option>
-            <option value="offen">Offen</option>
-            <option value="in_bearbeitung">In Bearbeitung</option>
-            <option value="abgeschlossen">Abgeschlossen</option>
-          </select>
-        </div>
+        {/* Umschaltung für Kanban-Gruppierung (nur sichtbar in Cards-Ansicht) */}
+        {ansicht === "cards" && (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Spalten Gruppieren nach:</span>
+            <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
+              <input 
+                type="radio" 
+                name="gruppierung" 
+                value="bereich" 
+                checked={kanbanGruppierung === "bereich"} 
+                onChange={() => setKanbanGruppierung("bereich")} 
+              />
+              Bereich
+            </label>
+            <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
+              <input 
+                type="radio" 
+                name="gruppierung" 
+                value="status" 
+                checked={kanbanGruppierung === "status"} 
+                onChange={() => setKanbanGruppierung("status")} 
+              />
+              Status
+            </label>
+            <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
+              <input 
+                type="radio" 
+                name="gruppierung" 
+                value="prio" 
+                checked={kanbanGruppierung === "prio"} 
+                onChange={() => setKanbanGruppierung("prio")} 
+              />
+              Priorität
+            </label>
+          </div>
+        )}
       </div>
 
       {/* ANSICHT 1: TABELLE */}
@@ -377,109 +444,115 @@ export default function Zeiterfassung() {
       {/* ANSICHT 2: KANBAN-BOARD */}
       {ansicht === "cards" && (
         <div style={{ display: "flex", gap: "20px", overflowX: "auto", paddingBottom: "16px", alignItems: "flex-start" }}>
-          {verfuegbareBereiche
-            .filter(b => filterBereich === "alle" || filterBereich.toLowerCase() === b.toLowerCase())
-            .map((bereichsName) => {
-              const bereichEintraege = gefilterteEintraege.filter(
-                e => String(e.bereich || "").toLowerCase() === bereichsName.toLowerCase()
-              );
+          {getKanbanSpalten().map((spalte) => {
+            // Flexible Filterung je nach Gruppierungs-Modus
+            const spaltenEintraege = gefilterteEintraege.filter((e) => {
+              if (kanbanGruppierung === "status") {
+                return String(e.status || "").toLowerCase() === spalte.key.toLowerCase();
+              }
+              if (kanbanGruppierung === "prio") {
+                return String(e.prioritaet || "").toLowerCase() === spalte.key.toLowerCase();
+              }
+              // Standard: Nach Bereichen
+              return String(e.bereich || "").toLowerCase() === spalte.key.toLowerCase();
+            });
 
-              return (
-                <div 
-                  key={bereichsName} 
-                  style={{ 
-                    flex: "0 0 320px", 
-                    background: "#f1f5f9", 
-                    borderRadius: "14px", 
-                    padding: "16px",
-                    boxSizing: "border-box"
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-                    <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#334155" }}>
-                      📁 {bereichsName}
-                    </h3>
-                    <span style={{ background: "#e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "700", padding: "2px 8px", borderRadius: "12px" }}>
-                      {bereichEintraege.length}
-                    </span>
-                  </div>
+            return (
+              <div 
+                key={spalte.key} 
+                style={{ 
+                  flex: "0 0 320px", 
+                  background: "#f1f5f9", 
+                  borderRadius: "14px", 
+                  padding: "16px",
+                  boxSizing: "border-box"
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#334155" }}>
+                    {spalte.label}
+                  </h3>
+                  <span style={{ background: "#e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "700", padding: "2px 8px", borderRadius: "12px" }}>
+                    {spaltenEintraege.length}
+                  </span>
+                </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {bereichEintraege.map((item) => {
-                      const aktuelleZeit = item.is_running ? item.tempDauer || item.dauer_sekunden : item.dauer_sekunden;
-                      const prio = getPrioMeta(item.prioritaet);
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {spaltenEintraege.map((item) => {
+                    const aktuelleZeit = item.is_running ? item.tempDauer || item.dauer_sekunden : item.dauer_sekunden;
+                    const prio = getPrioMeta(item.prioritaet);
 
-                      return (
-                        <div 
-                          key={item.id} 
-                          style={{ 
-                            background: "#ffffff", 
-                            borderRadius: "12px", 
-                            padding: "16px", 
-                            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-                            borderLeft: `4px solid ${prio.farbe}`,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px"
-                          }}
-                        >
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: "11px", fontWeight: "700", color: prio.farbe, background: prio.bg, padding: "2px 8px", borderRadius: "6px" }}>
-                              {prio.label}
-                            </span>
-                            <span style={{ fontSize: "11px", color: "#64748b", background: "#f8fafc", padding: "2px 6px", borderRadius: "4px", border: "1px solid #e2e8f0" }}>
-                              {item.status}
-                            </span>
+                    return (
+                      <div 
+                        key={item.id} 
+                        style={{ 
+                          background: "#ffffff", 
+                          borderRadius: "12px", 
+                          padding: "16px", 
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                          borderLeft: `4px solid ${prio.farbe}`,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px"
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: prio.farbe, background: prio.bg, padding: "2px 8px", borderRadius: "6px" }}>
+                            {prio.label}
+                          </span>
+                          <span style={{ fontSize: "11px", color: "#64748b", background: "#f8fafc", padding: "2px 6px", borderRadius: "4px", border: "1px solid #e2e8f0" }}>
+                            📁 {item.bereich} | {item.status}
+                          </span>
+                        </div>
+
+                        <div>
+                          <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700" }}>{item.ticket_nummer}</div>
+                          <h4 style={{ margin: "2px 0 0 0", fontSize: "14px", fontWeight: "600", color: "#0f172a" }}>{item.prozess_name}</h4>
+                        </div>
+
+                        {item.beschreibung && (
+                          <p style={{ fontSize: "12px", color: "#64748b", margin: 0, whiteSpace: "pre-wrap", lineHeight: "1.4" }}>
+                            {item.beschreibung}
+                          </p>
+                        )}
+
+                        {item.fortlaufende_notizen && (
+                          <div style={{ background: "#f8fafc", padding: "8px 10px", borderRadius: "6px", fontSize: "12px", border: "1px solid #f1f5f9", color: "#334155", whiteSpace: "pre-wrap" }}>
+                            📌 <strong>Stand:</strong>{"\n"}{item.fortlaufende_notizen}
                           </div>
+                        )}
 
-                          <div>
-                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700" }}>{item.ticket_nummer}</div>
-                            <h4 style={{ margin: "2px 0 0 0", fontSize: "14px", fontWeight: "600", color: "#0f172a" }}>{item.prozess_name}</h4>
+                        {item.deadline && (
+                          <div style={{ fontSize: "11px", color: "#dc2626", fontWeight: "500" }}>
+                            📅 Deadline: {item.deadline}
                           </div>
+                        )}
 
-                          {item.beschreibung && (
-                            <p style={{ fontSize: "12px", color: "#64748b", margin: 0, whiteSpace: "pre-wrap", lineHeight: "1.4" }}>
-                              {item.beschreibung}
-                            </p>
-                          )}
-
-                          {item.fortlaufende_notizen && (
-                            <div style={{ background: "#f8fafc", padding: "8px 10px", borderRadius: "6px", fontSize: "12px", border: "1px solid #f1f5f9", color: "#334155", whiteSpace: "pre-wrap" }}>
-                              📌 <strong>Stand:</strong>{"\n"}{item.fortlaufende_notizen}
-                            </div>
-                          )}
-
-                          {item.deadline && (
-                            <div style={{ fontSize: "11px", color: "#dc2626", fontWeight: "500" }}>
-                              📅 Deadline: {item.deadline}
-                            </div>
-                          )}
-
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: "10px", marginTop: "4px" }}>
-                            <span style={{ fontFamily: "monospace", fontWeight: "700", fontSize: "14px", color: item.is_running ? "#16a34a" : "#0f172a" }}>
-                              {formatierteZeit(aktuelleZeit)}
-                            </span>
-                            <div style={{ display: "flex", gap: "4px" }}>
-                              <button onClick={() => toggleTimer(item)} style={{ padding: "4px 10px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", fontWeight: "600", fontSize: "12px", cursor: "pointer" }}>
-                                {item.is_running ? "⏹" : "▶"}
-                              </button>
-                              <button onClick={() => setBearbeitenEintrag(item)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>✏️</button>
-                              <button onClick={() => eintragLoeschen(item.id)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>🗑️</button>
-                            </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: "10px", marginTop: "4px" }}>
+                          <span style={{ fontFamily: "monospace", fontWeight: "700", fontSize: "14px", color: item.is_running ? "#16a34a" : "#0f172a" }}>
+                            {formatierteZeit(aktuelleZeit)}
+                          </span>
+                          <div style={{ display: "flex", gap: "4px" }}>
+                            <button onClick={() => toggleTimer(item)} style={{ padding: "4px 10px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", fontWeight: "600", fontSize: "12px", cursor: "pointer" }}>
+                              {item.is_running ? "⏹" : "▶"}
+                            </button>
+                            <button onClick={() => setBearbeitenEintrag(item)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>✏️</button>
+                            <button onClick={() => eintragLoeschen(item.id)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>🗑️</button>
                           </div>
                         </div>
-                      );
-                    })}
-
-                    {bereichEintraege.length === 0 && (
-                      <div style={{ textAlign: "center", color: "#94a3b8", fontSize: "13px", padding: "24px 12px", background: "#ffffff", borderRadius: "10px", border: "1px dashed #cbd5e1" }}>
-                        Keine Aufgaben
                       </div>
-                    )}
-                  </div>
+                    );
+                  })}
+
+                  {spaltenEintraege.length === 0 && (
+                    <div style={{ textAlign: "center", color: "#94a3b8", fontSize: "13px", padding: "24px 12px", background: "#ffffff", borderRadius: "10px", border: "1px dashed #cbd5e1" }}>
+                      Keine Aufgaben
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
         </div>
       )}
 
