@@ -26,7 +26,7 @@ export default function Zeiterfassung() {
   const [bearbeitenEintrag, setBearbeitenEintrag] = useState(null);
 
   // Standard-Bereiche + dynamisch erfasste aus den Einträgen
-  const vordefinierteBereiche = ["Allgemein", "Entwicklung", "Admin", "Finanzen", "Privat"];
+  const vordefinierteBereiche = ["Aktiva_Liquidität&Geldmarkt", "Aktiva_Wertpapiere&Derivate", "Aktiva_Immobilien&Sachwerte", "Aktiva_Web3&Krypto", "Aktiva_Buisness&forderungen", "Aktiva_Vorsorge&Verträge" , "Passiva_Kredite&Schulden", "Hauptbereiche"];
   const verfuegbareBereiche = Array.from(
     new Set([
       ...vordefinierteBereiche,
@@ -195,7 +195,8 @@ export default function Zeiterfassung() {
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
-        { key: "offen", label: "📋 Offen" },
+        { key: "plannung", label: "📋 Plannung"},
+        { key: "offen", label: "🔓 Offen" },
         { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
         { key: "abgeschlossen", label: "✅ Abgeschlossen" }
       ];
@@ -339,6 +340,7 @@ export default function Zeiterfassung() {
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
               <option value="alle">Alle Status</option>
+              <option value="plannung">Plannung</option>
               <option value="offen">Offen</option>
               <option value="in_bearbeitung">In Bearbeitung</option>
               <option value="abgeschlossen">Abgeschlossen</option>
@@ -581,6 +583,7 @@ export default function Zeiterfassung() {
               <div>
                 <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Status:</label>
                 <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                  <option value="plannung">Plannung</option>
                   <option value="offen">Offen</option>
                   <option value="in_bearbeitung">In Bearbeitung</option>
                   <option value="abgeschlossen">Abgeschlossen</option>
