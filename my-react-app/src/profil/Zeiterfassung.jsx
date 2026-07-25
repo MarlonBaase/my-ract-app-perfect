@@ -26,7 +26,7 @@ export default function Zeiterfassung() {
   const [bearbeitenEintrag, setBearbeitenEintrag] = useState(null);
 
   // Standard-Bereiche + dynamisch erfasste aus den Einträgen
-  const vordefinierteBereiche = ["Aktiva_Liquidität&Geldmarkt", "Aktiva_Wertpapiere&Derivate", "Aktiva_Immobilien&Sachwerte", "Aktiva_Web3&Krypto", "Aktiva_Buisness&forderungen", "Aktiva_Vorsorge&Verträge" , "Passiva_Kredite&Schulden", "Hauptbereiche"];
+  const vordefinierteBereiche = ["Aktiva_Liquidität&Geldmarkt", "Aktiva_Wertpapiere&Derivate", "Aktiva_Immobilien&Sachwerte", "Aktiva_Web3&Krypto", "Aktiva_Buisness&forderungen", "Aktiva_Vorsorge&Verträge" , "Passiva_Kredite&Schulden", "Hauptbereiche", "Begleitende Seite"];
   const verfuegbareBereiche = Array.from(
     new Set([
       ...vordefinierteBereiche,
