@@ -129,7 +129,7 @@ export default function Zeiterfassung() {
       setTicketNummer(data.ticket_nummer + 1)
     }
     else{
-      setTicketNummer("0001")
+      setTicketNummer(1)
     }
   }
 
