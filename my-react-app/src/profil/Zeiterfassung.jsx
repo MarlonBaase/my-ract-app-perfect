@@ -109,16 +109,17 @@ export default function Zeiterfassung() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // KORREKTUR: "offen" als Standardwert für status verwenden, um Constraint-Fehler zu vermeiden
     const { error } = await supabase.from("zeiterfassung").insert({
       benutzer_id: user.id,
-      ticket_nummer: Number(ticketNummer), // Als reine Zahl senden
+      ticket_nummer: Number(ticketNummer),
       prozess_name: prozessName,
-      beschreibung,
-      prioritaet,
+      beschreibung: beschreibung || "",
+      prioritaet: prioritaet || "mittel",
       deadline: deadline || null,
-      bereich,
-      fortlaufende_notizen: notizen,
-      status: "planung"
+      bereich: bereich || "Hauptbereiche",
+      fortlaufende_notizen: notizen || "",
+      status: "offen" // Stelle sicher, dass 'offen' in der DB erlaubt ist (oder 'planung', falls in Supabase hinterlegt)
     });
 
     if (error) {
@@ -149,7 +150,7 @@ export default function Zeiterfassung() {
           dauer_sekunden: neueDauer,
           gestartet_am: null,
           end_zeit: jetzt,
-          status: "in_bearbeitung"
+          status: eintrag.status || "in_bearbeitung"
         })
         .eq("id", eintrag.id);
     } else {
@@ -159,7 +160,7 @@ export default function Zeiterfassung() {
           is_running: true,
           gestartet_am: jetzt,
           start_zeit: eintrag.start_zeit || jetzt,
-          status: "in_bearbeitung"
+          status: eintrag.status || "in_bearbeitung"
         })
         .eq("id", eintrag.id);
     }
@@ -172,13 +173,13 @@ export default function Zeiterfassung() {
     const { error } = await supabase
       .from("zeiterfassung")
       .update({
-        ticket_nummer: Number(bearbeitenEintrag.ticket_nummer), // Als reine Zahl senden
+        ticket_nummer: Number(bearbeitenEintrag.ticket_nummer),
         prozess_name: bearbeitenEintrag.prozess_name,
         beschreibung: bearbeitenEintrag.beschreibung,
         prioritaet: bearbeitenEintrag.prioritaet,
         bereich: bearbeitenEintrag.bereich,
         deadline: bearbeitenEintrag.deadline || null,
-        status: bearbeitenEintrag.status,
+        status: bearbeitenEintrag.status || "offen",
         fortlaufende_notizen: bearbeitenEintrag.fortlaufende_notizen
       })
       .eq("id", bearbeitenEintrag.id);
@@ -268,7 +269,6 @@ export default function Zeiterfassung() {
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
-        { key: "planung", label: "📋 Planung" },
         { key: "offen", label: "🔓 Offen" },
         { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
         { key: "abgeschlossen", label: "✅ Abgeschlossen" }
@@ -306,7 +306,6 @@ export default function Zeiterfassung() {
               cursor: "pointer",
               fontSize: "13px",
               fontWeight: "600",
-              transition: "all 0.2s",
               background: ansicht === "cards" ? "#ffffff" : "transparent",
               color: ansicht === "cards" ? "#0f172a" : "#64748b",
               boxShadow: ansicht === "cards" ? "0 1px 3px rgba(0,0,0,0.1)" : "none"
@@ -323,7 +322,6 @@ export default function Zeiterfassung() {
               cursor: "pointer",
               fontSize: "13px",
               fontWeight: "600",
-              transition: "all 0.2s",
               background: ansicht === "tabelle" ? "#ffffff" : "transparent",
               color: ansicht === "tabelle" ? "#0f172a" : "#64748b",
               boxShadow: ansicht === "tabelle" ? "0 1px 3px rgba(0,0,0,0.1)" : "none"
@@ -342,7 +340,7 @@ export default function Zeiterfassung() {
             <input 
               type="number" 
               value={ticketNummer} 
-              onChange={(e) => setTicketNummer(e.target.value)} 
+              onChange={(e) => setTicketNummer(Number(e.target.value))} 
               placeholder="1" 
               required 
               style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }} 
@@ -385,7 +383,7 @@ export default function Zeiterfassung() {
             <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Deadline:</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }} />
           </div>
-          <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "14px", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)" }}>
+          <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "14px" }}>
             + Prozess anlegen
           </button>
         </div>
@@ -393,8 +391,6 @@ export default function Zeiterfassung() {
 
       {/* FILTERLEISTE */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", background: "#ffffff", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0", flexWrap: "wrap", gap: "12px" }}>
-        
-        {/* Daten-Filter */}
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Bereich:</span>
@@ -419,7 +415,6 @@ export default function Zeiterfassung() {
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
               <option value="alle">Alle Status</option>
-              <option value="planung">📋 Planung</option>
               <option value="offen">🔓 Offen</option>
               <option value="in_bearbeitung">⚡ In Bearbeitung</option>
               <option value="abgeschlossen">✅ Abgeschlossen</option>
@@ -427,54 +422,35 @@ export default function Zeiterfassung() {
           </div>
         </div>
 
-        {/* Umschaltung für Kanban-Gruppierung */}
         {ansicht === "cards" && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
             <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Spalten Gruppieren nach:</span>
             <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
-              <input 
-                type="radio" 
-                name="gruppierung" 
-                value="bereich" 
-                checked={kanbanGruppierung === "bereich"} 
-                onChange={() => setKanbanGruppierung("bereich")} 
-              />
+              <input type="radio" name="gruppierung" value="bereich" checked={kanbanGruppierung === "bereich"} onChange={() => setKanbanGruppierung("bereich")} />
               Bereich
             </label>
             <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
-              <input 
-                type="radio" 
-                name="gruppierung" 
-                value="status" 
-                checked={kanbanGruppierung === "status"} 
-                onChange={() => setKanbanGruppierung("status")} 
-              />
+              <input type="radio" name="gruppierung" value="status" checked={kanbanGruppierung === "status"} onChange={() => setKanbanGruppierung("status")} />
               Status
             </label>
             <label style={{ fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>
-              <input 
-                type="radio" 
-                name="gruppierung" 
-                value="prio" 
-                checked={kanbanGruppierung === "prio"} 
-                onChange={() => setKanbanGruppierung("prio")} 
-              />
+              <input type="radio" name="gruppierung" value="prio" checked={kanbanGruppierung === "prio"} onChange={() => setKanbanGruppierung("prio")} />
               Priorität
             </label>
           </div>
         )}
       </div>
 
-      {/* ANSICHT 1: TABELLE */}
+      {/* TABELLE */}
       {ansicht === "tabelle" && (
-        <div style={{ overflowX: "auto", background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+        <div style={{ overflowX: "auto", background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
             <thead>
-              <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase" }}>
                 <th style={{ padding: "12px 16px" }}>Prio</th>
                 <th style={{ padding: "12px 16px" }}>Ticket-Nr. & Bereich</th>
                 <th style={{ padding: "12px 16px" }}>Prozess</th>
-                <th style={{ padding: "12px 16px" }}>Notizen / Wo stehe ich?</th>
+                <th style={{ padding: "12px 16px" }}>Notizen</th>
                 <th style={{ padding: "12px 16px" }}>Deadline</th>
                 <th style={{ padding: "12px 16px" }}>Zeit</th>
                 <th style={{ padding: "12px 16px", textAlign: "right" }}>Aktionen</th>
@@ -486,7 +462,7 @@ export default function Zeiterfassung() {
                 const prio = getPrioMeta(item.prioritaet);
 
                 return (
-                  <tr key={item.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s" }}>
+                  <tr key={item.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
                     <td style={{ padding: "14px 16px" }}>
                       <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: prio.farbe }}></span>
                     </td>
@@ -496,19 +472,19 @@ export default function Zeiterfassung() {
                     </td>
                     <td style={{ padding: "14px 16px" }}>
                       <div style={{ fontWeight: "600" }}>{item.prozess_name}</div>
-                      <div style={{ whiteSpace: "pre-wrap", color: "#64748b", fontSize: "13px", marginTop: "2px" }}>{item.beschreibung}</div>
+                      <div style={{ whiteSpace: "pre-wrap", color: "#64748b", fontSize: "13px" }}>{item.beschreibung}</div>
                     </td>
-                    <td style={{ padding: "14px 16px", maxWidth: "250px", fontSize: "13px", color: "#334155", whiteSpace: "pre-wrap" }}>
+                    <td style={{ padding: "14px 16px", fontSize: "13px", color: "#334155", whiteSpace: "pre-wrap" }}>
                       {item.fortlaufende_notizen || "—"}
                     </td>
-                    <td style={{ padding: "14px 16px", fontSize: "13px", color: item.deadline ? "#0f172a" : "#94a3b8" }}>
+                    <td style={{ padding: "14px 16px", fontSize: "13px" }}>
                       {item.deadline || "—"}
                     </td>
-                    <td style={{ padding: "14px 16px", fontFamily: "monospace", fontWeight: "700", fontSize: "15px", color: item.is_running ? "#16a34a" : "#0f172a" }}>
+                    <td style={{ padding: "14px 16px", fontFamily: "monospace", fontWeight: "700" }}>
                       {formatierteZeit(aktuelleZeit)}
                     </td>
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
-                      <button onClick={() => toggleTimer(item)} style={{ padding: "6px 12px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", fontWeight: "600", cursor: "pointer", marginRight: "8px" }}>
+                      <button onClick={() => toggleTimer(item)} style={{ padding: "6px 12px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", cursor: "pointer", marginRight: "8px" }}>
                         {item.is_running ? "⏹ Stopp" : "▶ Start"}
                       </button>
                       <button onClick={() => setBearbeitenEintrag(item)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", marginRight: "4px" }}>✏️</button>
@@ -522,7 +498,7 @@ export default function Zeiterfassung() {
         </div>
       )}
 
-      {/* ANSICHT 2: KANBAN-BOARD */}
+      {/* KANBAN BOARD */}
       {ansicht === "cards" && (
         <div style={{ display: "flex", gap: "20px", overflowX: "auto", paddingBottom: "16px", alignItems: "flex-start" }}>
           {getKanbanSpalten().map((spalte) => {
@@ -541,14 +517,7 @@ export default function Zeiterfassung() {
                 key={spalte.key}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, spalte.key)}
-                style={{ 
-                  flex: "0 0 320px", 
-                  background: "#f1f5f9", 
-                  borderRadius: "14px", 
-                  padding: "16px",
-                  boxSizing: "border-box",
-                  minHeight: "200px"
-                }}
+                style={{ flex: "0 0 320px", background: "#f1f5f9", borderRadius: "14px", padding: "16px", minHeight: "200px" }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
                   <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#334155" }}>
@@ -652,55 +621,14 @@ export default function Zeiterfassung() {
               <input 
                 type="number"
                 value={bearbeitenEintrag.ticket_nummer || ""} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: Number(e.target.value)})} 
                 placeholder="Ticket Nr." 
                 style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
               />
               <input 
                 value={bearbeitenEintrag.prozess_name || ""} 
                 onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} 
-                placeholder="Name" 
-                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
-              <select 
-                value={bearbeitenEintrag.bereich || ""} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, bereich: e.target.value})}
-                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              >
-                {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
-              </select>
-
-              <select 
-                value={bearbeitenEintrag.status || "planung"} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})}
-                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              >
-                <option value="planung">📋 Planung</option>
-                <option value="offen">🔓 Offen</option>
-                <option value="in_bearbeitung">⚡ In Bearbeitung</option>
-                <option value="abgeschlossen">✅ Abgeschlossen</option>
-              </select>
-            </div>
-
-            <div style={{ display: "flex", gap: "10px" }}>
-              <select 
-                value={bearbeitenEintrag.prioritaet || "mittel"} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})}
-                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              >
-                <option value="niedrig">🟢 Niedrig</option>
-                <option value="mittel">🟡 Mittel</option>
-                <option value="hoch">🟠 Hoch</option>
-                <option value="dringend">🔴 Dringend</option>
-              </select>
-
-              <input 
-                type="date" 
-                value={bearbeitenEintrag.deadline || ""} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})}
+                placeholder="Name"
                 style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
               />
             </div>
@@ -708,18 +636,41 @@ export default function Zeiterfassung() {
             <textarea 
               value={bearbeitenEintrag.beschreibung || ""} 
               onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} 
-              placeholder="Beschreibung" 
-              style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} 
+              placeholder="Beschreibung"
+              style={{ width: "100%", height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", boxSizing: "border-box" }}
             />
 
             <textarea 
               value={bearbeitenEintrag.fortlaufende_notizen || ""} 
               onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} 
-              placeholder="Fortschritts-Notizen" 
-              style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} 
+              placeholder="Notizen"
+              style={{ width: "100%", height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", boxSizing: "border-box" }}
             />
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select 
+                value={bearbeitenEintrag.status || "offen"} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              >
+                <option value="offen">Offen</option>
+                <option value="in_bearbeitung">In Bearbeitung</option>
+                <option value="abgeschlossen">Abgeschlossen</option>
+              </select>
+
+              <select 
+                value={bearbeitenEintrag.prioritaet || "mittel"} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              >
+                <option value="niedrig">Niedrig</option>
+                <option value="mittel">Mittel</option>
+                <option value="hoch">Hoch</option>
+                <option value="dringend">Dringend</option>
+              </select>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "8px" }}>
               <button 
                 onClick={() => setBearbeitenEintrag(null)} 
                 style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}
@@ -736,7 +687,6 @@ export default function Zeiterfassung() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
