@@ -8,9 +8,7 @@ export default function Zeiterfassung() {
   const [beschreibung, setBeschreibung] = useState("");
   const [aktiverTimerId, setAktiverTimerId] = useState(null);
 
-  useEffect(() => {
-    ladeZeiterfassungen();
-  }, []);
+  
 
   // Live-Timer Ticker für aktive Messung
   useEffect(() => {
@@ -117,6 +115,30 @@ export default function Zeiterfassung() {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const neueNummer = async () => {
+    const { data, error } = await supabase
+      .from("zeierfassung")
+      .select("ticket_nummer")
+      .order("erstellt_am", { ascending: false })
+      .limit(1)
+      .single();
+    
+    if (error) {
+      console.error("Fehler beim Abrufen:", error);
+    
+    } else {
+      console.log("Neueste Ticketnummer:", data.ticket_nummer);
+    }
+  };
+
+  const aktuelleNummer = async () => {
+    neueNummer + 1
+  }
+
+  useEffect(() => {
+    ladeZeiterfassungen();
+  }, []);
+
   return (
     <div style={{ padding: "24px", maxWidth: "1000px", margin: "0 auto" }}>
       <h2>Zeiterfassung & Prozess-Tracking</h2>
@@ -125,7 +147,7 @@ export default function Zeiterfassung() {
       <form onSubmit={prozessErstellen} style={{ display: "grid", gap: "12px", marginBottom: "32px", background: "#f8fafc", padding: "16px", borderRadius: "8px" }}>
         <div style={{ display: "flex", gap: "12px" }}>
           <input
-            placeholder="Ticketnummer (z. B. PROJ-123)"
+            defaultValue={aktuelleNummer}
             value={ticketNummer}
             onChange={(e) => setTicketNummer(e.target.value)}
             style={{ flex: 1, padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
