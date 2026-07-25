@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabase";
+import { supabase } from "./supabase";
 
 export default function Zeiterfassung() {
   const [eintraege, setEintraege] = useState([]);
@@ -22,7 +22,14 @@ export default function Zeiterfassung() {
   // Modal für Bearbeiten
   const [bearbeitenEintrag, setBearbeitenEintrag] = useState(null);
 
-  const verfuegbareBereiche = ["Entwicklung", "Admin", "Finanzen", "Privat"];
+  // Standard-Bereiche + dynamisch erfasste aus den Einträgen
+  const vordefinierteBereiche = ["Allgemein", "Entwicklung", "Admin", "Finanzen", "Privat"];
+  const verfuegbareBereiche = Array.from(
+    new Set([
+      ...vordefinierteBereiche,
+      ...eintraege.map((e) => e.bereich).filter(Boolean)
+    ])
+  );
 
   useEffect(() => {
     ladeZeiterfassungen();
@@ -67,7 +74,6 @@ export default function Zeiterfassung() {
       .maybeSingle();
 
     if (data && data.ticket_nummer !== undefined && data.ticket_nummer !== null) {
-      // Absicherung mit String(), damit replace() bei Zahlen nicht mehr abstürzt
       const ticketStr = String(data.ticket_nummer);
       const nummer = parseInt(ticketStr.replace(/\D/g, ""), 10);
       setTicketNummer(`TICK-${isNaN(nummer) ? 1 : nummer + 1}`);
@@ -94,7 +100,6 @@ export default function Zeiterfassung() {
       status: "offen"
     });
 
-    // Reset & Nächste Nummer laden
     setProzessName("");
     setBeschreibung("");
     setDeadline("");
@@ -167,87 +172,132 @@ export default function Zeiterfassung() {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const getPrioFarbe = (prio) => {
+  const getPrioMeta = (prio) => {
     switch (prio) {
-      case "dringend": return "#ef4444";
-      case "hoch": return "#f97316";
-      case "mittel": return "#eab308";
-      default: return "#10b981";
+      case "dringend": return { farbe: "#ef4444", bg: "#fef2f2", label: "Dringend" };
+      case "hoch": return { farbe: "#f97316", bg: "#fff7ed", label: "Hoch" };
+      case "mittel": return { farbe: "#eab308", bg: "#fefce8", label: "Mittel" };
+      default: return { farbe: "#10b981", bg: "#ecfdf5", label: "Niedrig" };
     }
   };
 
-  // Gefilterte Liste (sicher gegen falsche Typen & Groß/Kleinschreibung)
   const gefilterteEintraege = eintraege.filter((e) => {
-    const bereichMatch = filterBereich === "alle" || String(e.bereich).toLowerCase() === filterBereich.toLowerCase();
-    const prioMatch = filterPrio === "alle" || String(e.prioritaet).toLowerCase() === filterPrio.toLowerCase();
-    const statusMatch = filterStatus === "alle" || String(e.status).toLowerCase() === filterStatus.toLowerCase();
+    const bereichMatch = filterBereich === "alle" || String(e.bereich || "").toLowerCase() === filterBereich.toLowerCase();
+    const prioMatch = filterPrio === "alle" || String(e.prioritaet || "").toLowerCase() === filterPrio.toLowerCase();
+    const statusMatch = filterStatus === "alle" || String(e.status || "").toLowerCase() === filterStatus.toLowerCase();
     return bereichMatch && prioMatch && statusMatch;
   });
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
-      {/* HEADER & ANSICHTS-TOGGLE */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2>⏱️ Zeiterfassung & Prozess-Tracking</h2>
+    <div style={{ padding: "32px 24px", maxWidth: "1600px", margin: "0 auto", fontFamily: "system-ui, -apple-system, sans-serif", color: "#0f172a", backgroundColor: "#f8fafc", minHeight: "100vh" }}>
+      
+      {/* HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" }}>
         <div>
+          <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "700", letterSpacing: "-0.02em" }}>⏱️ Zeiterfassung & Tracking</h1>
+          <p style={{ margin: "4px 0 0 0", color: "#64748b", fontSize: "14px" }}>Verwalte deine Aufgaben, Zeiten und Fortschritte an einem Ort.</p>
+        </div>
+        <div style={{ display: "flex", gap: "6px", background: "#e2e8f0", padding: "4px", borderRadius: "10px" }}>
           <button 
             onClick={() => setAnsicht("cards")} 
-            style={{ padding: "8px 12px", marginRight: "8px", fontWeight: ansicht === "cards" ? "bold" : "normal" }}
+            style={{ 
+              padding: "8px 16px", 
+              borderRadius: "8px", 
+              border: "none", 
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: "600",
+              transition: "all 0.2s",
+              background: ansicht === "cards" ? "#ffffff" : "transparent",
+              color: ansicht === "cards" ? "#0f172a" : "#64748b",
+              boxShadow: ansicht === "cards" ? "0 1px 3px rgba(0,0,0,0.1)" : "none"
+            }}
           >
-            🎴 Kanban (Bereiche)
+            🎴 Kanban Board
           </button>
           <button 
             onClick={() => setAnsicht("tabelle")} 
-            style={{ padding: "8px 12px", fontWeight: ansicht === "tabelle" ? "bold" : "normal" }}
+            style={{ 
+              padding: "8px 16px", 
+              borderRadius: "8px", 
+              border: "none", 
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: "600",
+              transition: "all 0.2s",
+              background: ansicht === "tabelle" ? "#ffffff" : "transparent",
+              color: ansicht === "tabelle" ? "#0f172a" : "#64748b",
+              boxShadow: ansicht === "tabelle" ? "0 1px 3px rgba(0,0,0,0.1)" : "none"
+            }}
           >
             📋 Tabelle
           </button>
         </div>
       </div>
 
-      {/* NEUEN PROZESS ANLEGEN */}
-      <form onSubmit={prozessErstellen} style={{ display: "grid", gap: "12px", marginBottom: "24px", background: "#f8fafc", padding: "16px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr 1fr", gap: "12px" }}>
-          <input value={ticketNummer} onChange={(e) => setTicketNummer(e.target.value)} placeholder="Ticket" required style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
-          <input value={prozessName} onChange={(e) => setProzessName(e.target.value)} placeholder="Prozess / Aufgabe Name" required style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
-          <select value={bereich} onChange={(e) => setBereich(e.target.value)} style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}>
-            {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <select value={prioritaet} onChange={(e) => setPrioritaet(e.target.value)} style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}>
-            <option value="niedrig">🟢 Niedrig</option>
-            <option value="mittel">🟡 Mittel</option>
-            <option value="hoch">🟠 Hoch</option>
-            <option value="dringend">🔴 Dringend</option>
-          </select>
+      {/* FORMULAR: NEUEN PROZESS ANLEGEN */}
+      <form onSubmit={prozessErstellen} style={{ background: "#ffffff", padding: "20px", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", marginBottom: "24px", display: "grid", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2.5fr 1fr 1fr", gap: "12px" }}>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Ticket ID</label>
+            <input value={ticketNummer} onChange={(e) => setTicketNummer(e.target.value)} placeholder="TICK-1" required style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }} />
+          </div>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Prozess / Aufgaben Name</label>
+            <input value={prozessName} onChange={(e) => setProzessName(e.target.value)} placeholder="Was möchtest du erledigen?" required style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }} />
+          </div>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Bereich</label>
+            <select value={bereich} onChange={(e) => setBereich(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", backgroundColor: "#fff" }}>
+              {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Priorität</label>
+            <select value={prioritaet} onChange={(e) => setPrioritaet(e.target.value)} style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", backgroundColor: "#fff" }}>
+              <option value="niedrig">🟢 Niedrig</option>
+              <option value="mittel">🟡 Mittel</option>
+              <option value="hoch">🟠 Hoch</option>
+              <option value="dringend">🔴 Dringend</option>
+            </select>
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-          <textarea value={beschreibung} onChange={(e) => setBeschreibung(e.target.value)} placeholder="To-Do Details (Absätze möglich)..." style={{ height: "70px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
-          <textarea value={notizen} onChange={(e) => setNotizen(e.target.value)} placeholder="Notizen / Wo stehe ich gerade?" style={{ height: "70px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Details & To-Dos</label>
+            <textarea value={beschreibung} onChange={(e) => setBeschreibung(e.target.value)} placeholder="• Schritt 1&#10;• Schritt 2" style={{ width: "100%", height: "64px", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box", fontFamily: "inherit" }} />
+          </div>
+          <div>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Fortschritts-Notizen</label>
+            <textarea value={notizen} onChange={(e) => setNotizen(e.target.value)} placeholder="Aktueller Stand / Wo hänge ich gerade?" style={{ width: "100%", height: "64px", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "13px", boxSizing: "border-box", fontFamily: "inherit" }} />
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <label style={{ fontSize: "14px" }}>Deadline:</label>
-          <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} style={{ padding: "6px", borderRadius: "4px", border: "1px solid #ccc" }} />
-          <button type="submit" style={{ marginLeft: "auto", padding: "8px 24px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
-            Prozess anlegen
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Deadline:</label>
+            <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }} />
+          </div>
+          <button type="submit" style={{ padding: "10px 20px", backgroundColor: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "14px", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)" }}>
+            + Prozess anlegen
           </button>
         </div>
       </form>
 
       {/* FILTERLEISTE */}
-      <div style={{ display: "flex", gap: "16px", marginBottom: "20px", background: "#fff", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-        <div>
-          <label style={{ fontSize: "12px", display: "block", color: "#64748b" }}>Bereich:</label>
-          <select value={filterBereich} onChange={(e) => setFilterBereich(e.target.value)} style={{ padding: "6px", borderRadius: "4px" }}>
+      <div style={{ display: "flex", gap: "16px", marginBottom: "24px", background: "#ffffff", padding: "12px 16px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Bereich:</span>
+          <select value={filterBereich} onChange={(e) => setFilterBereich(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
             <option value="alle">Alle Bereiche</option>
             {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>
 
-        <div>
-          <label style={{ fontSize: "12px", display: "block", color: "#64748b" }}>Priorität:</label>
-          <select value={filterPrio} onChange={(e) => setFilterPrio(e.target.value)} style={{ padding: "6px", borderRadius: "4px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Priorität:</span>
+          <select value={filterPrio} onChange={(e) => setFilterPrio(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
             <option value="alle">Alle Prioritäten</option>
             <option value="dringend">🔴 Dringend</option>
             <option value="hoch">🟠 Hoch</option>
@@ -256,9 +306,9 @@ export default function Zeiterfassung() {
           </select>
         </div>
 
-        <div>
-          <label style={{ fontSize: "12px", display: "block", color: "#64748b" }}>Status:</label>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px", borderRadius: "4px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
             <option value="alle">Alle Status</option>
             <option value="offen">Offen</option>
             <option value="in_bearbeitung">In Bearbeitung</option>
@@ -269,42 +319,52 @@ export default function Zeiterfassung() {
 
       {/* ANSICHT 1: TABELLE */}
       {ansicht === "tabelle" && (
-        <div style={{ overflowX: "auto", background: "#fff", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div style={{ overflowX: "auto", background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "14px" }}>
             <thead>
-              <tr style={{ textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>
-                <th style={{ padding: "8px" }}>Prio</th>
-                <th style={{ padding: "8px" }}>Ticket & Bereich</th>
-                <th style={{ padding: "8px" }}>Prozess</th>
-                <th style={{ padding: "8px" }}>Notizen / Wo stehe ich?</th>
-                <th style={{ padding: "8px" }}>Deadline</th>
-                <th style={{ padding: "8px" }}>Zeit</th>
-                <th style={{ padding: "8px", textAlign: "center" }}>Aktionen</th>
+              <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <th style={{ padding: "12px 16px" }}>Prio</th>
+                <th style={{ padding: "12px 16px" }}>Ticket & Bereich</th>
+                <th style={{ padding: "12px 16px" }}>Prozess</th>
+                <th style={{ padding: "12px 16px" }}>Notizen / Wo stehe ich?</th>
+                <th style={{ padding: "12px 16px" }}>Deadline</th>
+                <th style={{ padding: "12px 16px" }}>Zeit</th>
+                <th style={{ padding: "12px 16px", textAlign: "right" }}>Aktionen</th>
               </tr>
             </thead>
             <tbody>
               {gefilterteEintraege.map((item) => {
                 const aktuelleZeit = item.is_running ? item.tempDauer || item.dauer_sekunden : item.dauer_sekunden;
+                const prio = getPrioMeta(item.prioritaet);
+
                 return (
-                  <tr key={item.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                    <td style={{ padding: "8px" }}><span style={{ color: getPrioFarbe(item.prioritaet) }}>●</span></td>
-                    <td style={{ padding: "8px" }}>
-                      <strong>{item.ticket_nummer}</strong>
-                      <br /><small style={{ color: "#64748b" }}>{item.bereich}</small>
+                  <tr key={item.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s" }}>
+                    <td style={{ padding: "14px 16px" }}>
+                      <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: prio.farbe }}></span>
                     </td>
-                    <td style={{ padding: "8px" }}>
-                      <strong>{item.prozess_name}</strong>
-                      <br /><small style={{ whiteSpace: "pre-wrap", color: "#475569" }}>{item.beschreibung}</small>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontWeight: "700" }}>{item.ticket_nummer}</div>
+                      <div style={{ fontSize: "12px", color: "#64748b" }}>{item.bereich}</div>
                     </td>
-                    <td style={{ padding: "8px", maxWidth: "250px", fontSize: "12px", color: "#334155", whiteSpace: "pre-wrap" }}>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div style={{ fontWeight: "600" }}>{item.prozess_name}</div>
+                      <div style={{ whiteSpace: "pre-wrap", color: "#64748b", fontSize: "13px", marginTop: "2px" }}>{item.beschreibung}</div>
+                    </td>
+                    <td style={{ padding: "14px 16px", maxWidth: "250px", fontSize: "13px", color: "#334155", whiteSpace: "pre-wrap" }}>
                       {item.fortlaufende_notizen || "—"}
                     </td>
-                    <td style={{ padding: "8px", fontSize: "13px" }}>{item.deadline || "—"}</td>
-                    <td style={{ padding: "8px", fontFamily: "monospace", fontWeight: "bold" }}>{formatierteZeit(aktuelleZeit)}</td>
-                    <td style={{ padding: "8px", textAlign: "center" }}>
-                      <button onClick={() => toggleTimer(item)} style={{ marginRight: "6px", cursor: "pointer" }}>{item.is_running ? "⏹ Stop" : "▶ Start"}</button>
-                      <button onClick={() => setBearbeitenEintrag(item)} style={{ marginRight: "6px", cursor: "pointer" }}>✏️</button>
-                      <button onClick={() => eintragLoeschen(item.id)} style={{ cursor: "pointer" }}>🗑️</button>
+                    <td style={{ padding: "14px 16px", fontSize: "13px", color: item.deadline ? "#0f172a" : "#94a3b8" }}>
+                      {item.deadline || "—"}
+                    </td>
+                    <td style={{ padding: "14px 16px", fontFamily: "monospace", fontWeight: "700", fontSize: "15px", color: item.is_running ? "#16a34a" : "#0f172a" }}>
+                      {formatierteZeit(aktuelleZeit)}
+                    </td>
+                    <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                      <button onClick={() => toggleTimer(item)} style={{ padding: "6px 12px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", fontWeight: "600", cursor: "pointer", marginRight: "8px" }}>
+                        {item.is_running ? "⏹ Stopp" : "▶ Start"}
+                      </button>
+                      <button onClick={() => setBearbeitenEintrag(item)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", marginRight: "4px" }}>✏️</button>
+                      <button onClick={() => eintragLoeschen(item.id)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}>🗑️</button>
                     </td>
                   </tr>
                 );
@@ -314,13 +374,12 @@ export default function Zeiterfassung() {
         </div>
       )}
 
-      {/* ANSICHT 2: KANBAN-BOARD (KARTEN PRO BEREICH NEBENEINANDER) */}
+      {/* ANSICHT 2: KANBAN-BOARD */}
       {ansicht === "cards" && (
-        <div style={{ display: "flex", gap: "16px", overflowX: "auto", paddingBottom: "16px" }}>
+        <div style={{ display: "flex", gap: "20px", overflowX: "auto", paddingBottom: "16px", alignItems: "flex-start" }}>
           {verfuegbareBereiche
             .filter(b => filterBereich === "alle" || filterBereich.toLowerCase() === b.toLowerCase())
             .map((bereichsName) => {
-              // Toleranter Vergleich für Bereiche (behebt das Problem fehlender Karten)
               const bereichEintraege = gefilterteEintraege.filter(
                 e => String(e.bereich || "").toLowerCase() === bereichsName.toLowerCase()
               );
@@ -329,60 +388,83 @@ export default function Zeiterfassung() {
                 <div 
                   key={bereichsName} 
                   style={{ 
-                    flex: "1", 
-                    minWidth: "300px", 
-                    background: "#f8fafc", 
-                    borderRadius: "8px", 
-                    padding: "12px",
-                    border: "1px solid #e2e8f0"
+                    flex: "0 0 320px", 
+                    background: "#f1f5f9", 
+                    borderRadius: "14px", 
+                    padding: "16px",
+                    boxSizing: "border-box"
                   }}
                 >
-                  <h3 style={{ margin: "0 0 12px 0", fontSize: "15px", borderBottom: "2px solid #cbd5e1", paddingBottom: "6px" }}>
-                    📁 {bereichsName} ({bereichEintraege.length})
-                  </h3>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                    <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#334155" }}>
+                      📁 {bereichsName}
+                    </h3>
+                    <span style={{ background: "#e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "700", padding: "2px 8px", borderRadius: "12px" }}>
+                      {bereichEintraege.length}
+                    </span>
+                  </div>
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     {bereichEintraege.map((item) => {
                       const aktuelleZeit = item.is_running ? item.tempDauer || item.dauer_sekunden : item.dauer_sekunden;
+                      const prio = getPrioMeta(item.prioritaet);
+
                       return (
-                        <div key={item.id} style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                            <span style={{ fontSize: "11px", fontWeight: "bold", color: getPrioFarbe(item.prioritaet) }}>
-                              ● {String(item.prioritaet || "").toUpperCase()}
+                        <div 
+                          key={item.id} 
+                          style={{ 
+                            background: "#ffffff", 
+                            borderRadius: "12px", 
+                            padding: "16px", 
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                            borderLeft: `4px solid ${prio.farbe}`,
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "8px"
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: prio.farbe, background: prio.bg, padding: "2px 8px", borderRadius: "6px" }}>
+                              {prio.label}
                             </span>
-                            <span style={{ fontSize: "11px", color: "#64748b", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>
+                            <span style={{ fontSize: "11px", color: "#64748b", background: "#f8fafc", padding: "2px 6px", borderRadius: "4px", border: "1px solid #e2e8f0" }}>
                               {item.status}
                             </span>
                           </div>
 
-                          <h4 style={{ margin: "0 0 6px 0", fontSize: "14px" }}>{item.ticket_nummer}: {item.prozess_name}</h4>
-                          
+                          <div>
+                            <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700" }}>{item.ticket_nummer}</div>
+                            <h4 style={{ margin: "2px 0 0 0", fontSize: "14px", fontWeight: "600", color: "#0f172a" }}>{item.prozess_name}</h4>
+                          </div>
+
                           {item.beschreibung && (
-                            <p style={{ fontSize: "12px", color: "#64748b", margin: "0 0 8px 0", whiteSpace: "pre-wrap" }}>
+                            <p style={{ fontSize: "12px", color: "#64748b", margin: 0, whiteSpace: "pre-wrap", lineHeight: "1.4" }}>
                               {item.beschreibung}
                             </p>
                           )}
 
                           {item.fortlaufende_notizen && (
-                            <div style={{ background: "#f1f5f9", padding: "8px", borderRadius: "4px", fontSize: "12px", marginBottom: "8px", whiteSpace: "pre-wrap", color: "#334155" }}>
+                            <div style={{ background: "#f8fafc", padding: "8px 10px", borderRadius: "6px", fontSize: "12px", border: "1px solid #f1f5f9", color: "#334155", whiteSpace: "pre-wrap" }}>
                               📌 <strong>Stand:</strong>{"\n"}{item.fortlaufende_notizen}
                             </div>
                           )}
 
-                          <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "10px" }}>
-                            📅 Deadline: {item.deadline || "Keine"}
-                          </div>
+                          {item.deadline && (
+                            <div style={{ fontSize: "11px", color: "#dc2626", fontWeight: "500" }}>
+                              📅 Deadline: {item.deadline}
+                            </div>
+                          )}
 
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: "8px" }}>
-                            <span style={{ fontFamily: "monospace", fontWeight: "bold", fontSize: "14px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: "10px", marginTop: "4px" }}>
+                            <span style={{ fontFamily: "monospace", fontWeight: "700", fontSize: "14px", color: item.is_running ? "#16a34a" : "#0f172a" }}>
                               {formatierteZeit(aktuelleZeit)}
                             </span>
-                            <div>
-                              <button onClick={() => toggleTimer(item)} style={{ marginRight: "4px", padding: "4px 8px", cursor: "pointer" }}>
-                                {item.is_running ? "⏹ Stop" : "▶ Start"}
+                            <div style={{ display: "flex", gap: "4px" }}>
+                              <button onClick={() => toggleTimer(item)} style={{ padding: "4px 10px", borderRadius: "6px", border: "none", backgroundColor: item.is_running ? "#fef2f2" : "#f0fdf4", color: item.is_running ? "#dc2626" : "#16a34a", fontWeight: "600", fontSize: "12px", cursor: "pointer" }}>
+                                {item.is_running ? "⏹" : "▶"}
                               </button>
-                              <button onClick={() => setBearbeitenEintrag(item)} style={{ marginRight: "4px", padding: "4px 8px", cursor: "pointer" }}>✏️</button>
-                              <button onClick={() => eintragLoeschen(item.id)} style={{ padding: "4px 8px", cursor: "pointer" }}>🗑️</button>
+                              <button onClick={() => setBearbeitenEintrag(item)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>✏️</button>
+                              <button onClick={() => eintragLoeschen(item.id)} style={{ padding: "4px 8px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer", fontSize: "12px" }}>🗑️</button>
                             </div>
                           </div>
                         </div>
@@ -390,7 +472,7 @@ export default function Zeiterfassung() {
                     })}
 
                     {bereichEintraege.length === 0 && (
-                      <div style={{ textAlign: "center", color: "#94a3b8", fontSize: "12px", padding: "16px" }}>
+                      <div style={{ textAlign: "center", color: "#94a3b8", fontSize: "13px", padding: "24px 12px", background: "#ffffff", borderRadius: "10px", border: "1px dashed #cbd5e1" }}>
                         Keine Aufgaben
                       </div>
                     )}
@@ -403,29 +485,29 @@ export default function Zeiterfassung() {
 
       {/* MODAL: EINTRAG BEARBEITEN */}
       {bearbeitenEintrag && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
-          <div style={{ background: "#fff", padding: "24px", borderRadius: "8px", width: "450px", display: "flex", flexDirection: "column", gap: "12px", boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}>
-            <h3>Eintrag bearbeiten</h3>
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
+          <div style={{ background: "#ffffff", padding: "28px", borderRadius: "16px", width: "480px", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
+            <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700" }}>Eintrag bearbeiten</h3>
             
-            <div style={{ display: "flex", gap: "8px" }}>
-              <input value={bearbeitenEintrag.ticket_nummer} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} placeholder="Ticket" style={{ width: "100px", padding: "6px" }} />
-              <input value={bearbeitenEintrag.prozess_name} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} placeholder="Name" style={{ flex: 1, padding: "6px" }} />
+            <div style={{ display: "flex", gap: "10px" }}>
+              <input value={bearbeitenEintrag.ticket_nummer} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} placeholder="Ticket" style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+              <input value={bearbeitenEintrag.prozess_name} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} placeholder="Name" style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
             </div>
 
-            <textarea value={bearbeitenEintrag.beschreibung || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} placeholder="Beschreibung" style={{ height: "60px", padding: "6px" }} />
-            <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} placeholder="Notizen / Wo stehe ich?" style={{ height: "60px", padding: "6px" }} />
+            <textarea value={bearbeitenEintrag.beschreibung || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} placeholder="Beschreibung" style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} />
+            <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} placeholder="Notizen / Wo stehe ich?" style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} />
             
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               <div>
-                <label style={{ fontSize: "11px", color: "#64748b" }}>Bereich:</label>
-                <select value={bearbeitenEintrag.bereich} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, bereich: e.target.value})} style={{ width: "100%", padding: "6px" }}>
+                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Bereich:</label>
+                <select value={bearbeitenEintrag.bereich} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, bereich: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
                   {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
 
               <div>
-                <label style={{ fontSize: "11px", color: "#64748b" }}>Status:</label>
-                <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "6px" }}>
+                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Status:</label>
+                <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
                   <option value="offen">Offen</option>
                   <option value="in_bearbeitung">In Bearbeitung</option>
                   <option value="abgeschlossen">Abgeschlossen</option>
@@ -433,8 +515,8 @@ export default function Zeiterfassung() {
               </div>
 
               <div>
-                <label style={{ fontSize: "11px", color: "#64748b" }}>Priorität:</label>
-                <select value={bearbeitenEintrag.prioritaet} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})} style={{ width: "100%", padding: "6px" }}>
+                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Priorität:</label>
+                <select value={bearbeitenEintrag.prioritaet} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
                   <option value="niedrig">Niedrig</option>
                   <option value="mittel">Mittel</option>
                   <option value="hoch">Hoch</option>
@@ -443,14 +525,14 @@ export default function Zeiterfassung() {
               </div>
 
               <div>
-                <label style={{ fontSize: "11px", color: "#64748b" }}>Deadline:</label>
-                <input type="date" value={bearbeitenEintrag.deadline || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})} style={{ width: "100%", padding: "6px" }} />
+                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Deadline:</label>
+                <input type="date" value={bearbeitenEintrag.deadline || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})} style={{ width: "100%", padding: "7px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
-              <button onClick={eintragSpeichern} style={{ flex: 1, padding: "8px", background: "#3b82f6", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>Speichern</button>
-              <button onClick={() => setBearbeitenEintrag(null)} style={{ flex: 1, padding: "8px", background: "#cbd5e1", border: "none", borderRadius: "4px", cursor: "pointer" }}>Abbrechen</button>
+            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+              <button onClick={eintragSpeichern} style={{ flex: 1, padding: "10px", background: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>Speichern</button>
+              <button onClick={() => setBearbeitenEintrag(null)} style={{ flex: 1, padding: "10px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>Abbrechen</button>
             </div>
           </div>
         </div>
