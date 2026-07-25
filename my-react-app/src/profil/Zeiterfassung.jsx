@@ -123,7 +123,7 @@ export default function Zeiterfassung() {
       .select("ticket_nummer")
       .order("erstellt_am", {ascending: false})
       .limit(1)
-      .single
+      .single()
 
       console.log(data)
 
