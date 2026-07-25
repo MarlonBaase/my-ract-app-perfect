@@ -62,6 +62,8 @@ export default function Zeiterfassung() {
       await naechsteNummer();
       ladeZeiterfassungen();
     }
+
+    console.log("testprozess")
   };
 
   const toggleTimer = async (eintrag) => {
@@ -129,6 +131,7 @@ export default function Zeiterfassung() {
 
     if (data){
       setTicketNummer(data.ticket_nummer + 1)
+      console.log("test+1")
     }
     else{
       setTicketNummer(1)
@@ -139,6 +142,7 @@ export default function Zeiterfassung() {
   useEffect(() => {
     ladeZeiterfassungen();
     naechsteNummer();
+    console.log("testlade")
   }, []);
 
   return (
