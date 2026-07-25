@@ -59,6 +59,7 @@ export default function Zeiterfassung() {
       setTicketNummer("");
       setProzessName("");
       setBeschreibung("");
+      await naechsteNummer();
       ladeZeiterfassungen();
     }
   };
@@ -115,9 +116,27 @@ export default function Zeiterfassung() {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const naechsteNummer = async () => {
+
+    const { data } = await supabase
+      .from("zeiterfassung")
+      .select("ticket_nummer")
+      .order("erstellt_am", {ascending: false})
+      .limit(1)
+      .single
+
+    if (data){
+      setTicketNummer(data.ticket_nummer + 1)
+    }
+    else{
+      setTicketNummer("0001")
+    }
+  }
+
 
   useEffect(() => {
     ladeZeiterfassungen();
+    naechsteNummer();
   }, []);
 
   return (
@@ -130,6 +149,7 @@ export default function Zeiterfassung() {
           <input
             value={ticketNummer}
             onChange={(e) => setTicketNummer(e.target.value)}
+            placeholder="Ticketnummer"
             style={{ flex: 1, padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
             required
           />
