@@ -114,7 +114,7 @@ export default function Zeiterfassung() {
       deadline: deadline || null,
       bereich,
       fortlaufende_notizen: notizen,
-      status: "plannung"
+      status: "planung"
     });
 
     setProzessName("");
@@ -252,7 +252,7 @@ export default function Zeiterfassung() {
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
-        { key: "plannung", label: "📋 Plannung" },
+        { key: "planung", label: "📋 planung" },
         { key: "offen", label: "🔓 Offen" },
         { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
         { key: "abgeschlossen", label: "✅ Abgeschlossen" }
@@ -397,7 +397,7 @@ export default function Zeiterfassung() {
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
               <option value="alle">Alle Status</option>
-              <option value="plannung">📋 Plannung</option>
+              <option value="planung">📋 planung</option>
               <option value="offen">🔓 Offen</option>
               <option value="in_bearbeitung">⚡ In Bearbeitung</option>
               <option value="abgeschlossen">✅ Abgeschlossen</option>
@@ -647,7 +647,7 @@ export default function Zeiterfassung() {
               <div>
                 <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Status:</label>
                 <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                  <option value="plannung">📋 Plannung</option>
+                  <option value="planung">📋 planung</option>
                   <option value="offen">🔓 Offen</option>
                   <option value="in_bearbeitung">⚡ In Bearbeitung</option>
                   <option value="abgeschlossen">✅ Abgeschlossen</option>
