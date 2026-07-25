@@ -92,14 +92,12 @@ export default function Zeiterfassung() {
       .select("ticket_nummer")
       .order("erstellt_am", { ascending: false })
       .limit(1)
-      .maybeSingle();
+      .Single();
 
-    if (data && data.ticket_nummer !== undefined && data.ticket_nummer !== null) {
-      const ticketStr = String(data.ticket_nummer);
-      const nummer = parseInt(ticketStr.replace(/\D/g, ""), 10);
-      setTicketNummer(`TICK-${isNaN(nummer) ? 1 : nummer + 1}`);
+    if (data) {
+      setTicketNummer(data.ticket_nummer + 1);
     } else {
-      setTicketNummer("TICK-1");
+      setTicketNummer(1);
     }
   };
 
