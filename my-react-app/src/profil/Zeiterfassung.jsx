@@ -100,7 +100,7 @@ export default function Zeiterfassung() {
       deadline: deadline || null,
       bereich,
       fortlaufende_notizen: notizen,
-      status: "offen"
+      status: "plannung"
     });
 
     setProzessName("");
