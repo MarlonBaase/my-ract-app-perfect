@@ -66,8 +66,10 @@ export default function Zeiterfassung() {
       .limit(1)
       .maybeSingle();
 
-    if (data && data.ticket_nummer) {
-      const nummer = parseInt(data.ticket_nummer.replace(/\D/g, ""), 10);
+    if (data && data.ticket_nummer !== undefined && data.ticket_nummer !== null) {
+      // Absicherung mit String(), damit replace() bei Zahlen nicht mehr abstürzt
+      const ticketStr = String(data.ticket_nummer);
+      const nummer = parseInt(ticketStr.replace(/\D/g, ""), 10);
       setTicketNummer(`TICK-${isNaN(nummer) ? 1 : nummer + 1}`);
     } else {
       setTicketNummer("TICK-1");
@@ -82,7 +84,7 @@ export default function Zeiterfassung() {
 
     await supabase.from("zeiterfassung").insert({
       benutzer_id: user.id,
-      ticket_nummer: ticketNummer,
+      ticket_nummer: String(ticketNummer),
       prozess_name: prozessName,
       beschreibung,
       prioritaet,
@@ -138,7 +140,7 @@ export default function Zeiterfassung() {
     await supabase
       .from("zeiterfassung")
       .update({
-        ticket_nummer: bearbeitenEintrag.ticket_nummer,
+        ticket_nummer: String(bearbeitenEintrag.ticket_nummer),
         prozess_name: bearbeitenEintrag.prozess_name,
         beschreibung: bearbeitenEintrag.beschreibung,
         prioritaet: bearbeitenEintrag.prioritaet,
@@ -174,11 +176,11 @@ export default function Zeiterfassung() {
     }
   };
 
-  // Gefilterte Liste
+  // Gefilterte Liste (sicher gegen falsche Typen & Groß/Kleinschreibung)
   const gefilterteEintraege = eintraege.filter((e) => {
-    const bereichMatch = filterBereich === "alle" || e.bereich === filterBereich;
-    const prioMatch = filterPrio === "alle" || e.prioritaet === filterPrio;
-    const statusMatch = filterStatus === "alle" || e.status === filterStatus;
+    const bereichMatch = filterBereich === "alle" || String(e.bereich).toLowerCase() === filterBereich.toLowerCase();
+    const prioMatch = filterPrio === "alle" || String(e.prioritaet).toLowerCase() === filterPrio.toLowerCase();
+    const statusMatch = filterStatus === "alle" || String(e.status).toLowerCase() === filterStatus.toLowerCase();
     return bereichMatch && prioMatch && statusMatch;
   });
 
@@ -316,9 +318,12 @@ export default function Zeiterfassung() {
       {ansicht === "cards" && (
         <div style={{ display: "flex", gap: "16px", overflowX: "auto", paddingBottom: "16px" }}>
           {verfuegbareBereiche
-            .filter(b => filterBereich === "alle" || filterBereich === b)
+            .filter(b => filterBereich === "alle" || filterBereich.toLowerCase() === b.toLowerCase())
             .map((bereichsName) => {
-              const bereichEintraege = gefilterteEintraege.filter(e => e.bereich === bereichsName);
+              // Toleranter Vergleich für Bereiche (behebt das Problem fehlender Karten)
+              const bereichEintraege = gefilterteEintraege.filter(
+                e => String(e.bereich || "").toLowerCase() === bereichsName.toLowerCase()
+              );
 
               return (
                 <div 
@@ -343,7 +348,7 @@ export default function Zeiterfassung() {
                         <div key={item.id} style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                             <span style={{ fontSize: "11px", fontWeight: "bold", color: getPrioFarbe(item.prioritaet) }}>
-                              ● {item.prioritaet.toUpperCase()}
+                              ● {String(item.prioritaet || "").toUpperCase()}
                             </span>
                             <span style={{ fontSize: "11px", color: "#64748b", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>
                               {item.status}
