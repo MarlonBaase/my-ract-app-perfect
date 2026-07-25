@@ -115,25 +115,6 @@ export default function Zeiterfassung() {
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const neueNummer = async () => {
-    const { data, error } = await supabase
-      .from("zeierfassung")
-      .select("ticket_nummer")
-      .order("erstellt_am", { ascending: false })
-      .limit(1)
-      .single();
-    
-    if (error) {
-      console.error("Fehler beim Abrufen:", error);
-    
-    } else {
-      console.log("Neueste Ticketnummer:", data.ticket_nummer);
-    }
-  };
-
-  const aktuelleNummer = async () => {
-    neueNummer + 1
-  }
 
   useEffect(() => {
     ladeZeiterfassungen();
@@ -147,7 +128,6 @@ export default function Zeiterfassung() {
       <form onSubmit={prozessErstellen} style={{ display: "grid", gap: "12px", marginBottom: "32px", background: "#f8fafc", padding: "16px", borderRadius: "8px" }}>
         <div style={{ display: "flex", gap: "12px" }}>
           <input
-            defaultValue={aktuelleNummer}
             value={ticketNummer}
             onChange={(e) => setTicketNummer(e.target.value)}
             style={{ flex: 1, padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
