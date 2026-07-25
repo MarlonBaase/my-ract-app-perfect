@@ -125,6 +125,8 @@ export default function Zeiterfassung() {
       .limit(1)
       .single
 
+      console.log("test")
+
     if (data){
       setTicketNummer(data.ticket_nummer + 1)
     }
