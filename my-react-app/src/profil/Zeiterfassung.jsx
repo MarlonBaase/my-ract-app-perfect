@@ -11,7 +11,7 @@ export default function Zeiterfassung() {
   const [beschreibung, setBeschreibung] = useState("");
   const [prioritaet, setPrioritaet] = useState("mittel");
   const [deadline, setDeadline] = useState("");
-  const [bereich, setBereich] = useState("Entwicklung");
+  const [bereich, setBereich] = useState("Aktiva_Liquidität&Geldmarkt");
   const [notizen, setNotizen] = useState("");
 
   // Filter-States
@@ -19,14 +19,28 @@ export default function Zeiterfassung() {
   const [filterPrio, setFilterPrio] = useState("alle");
   const [filterStatus, setFilterStatus] = useState("alle");
 
-  // Neu: Kanban Gruppierungs-Modus ('bereich', 'status' oder 'prio')
+  // Kanban Gruppierungs-Modus ('bereich', 'status' oder 'prio')
   const [kanbanGruppierung, setKanbanGruppierung] = useState("bereich");
+
+  // State für Drag & Drop (welches Element wird gerade gezogen?)
+  const [draggedItemId, setDraggedItemId] = useState(null);
 
   // Modal für Bearbeiten
   const [bearbeitenEintrag, setBearbeitenEintrag] = useState(null);
 
   // Standard-Bereiche + dynamisch erfasste aus den Einträgen
-  const vordefinierteBereiche = ["Aktiva_Liquidität&Geldmarkt", "Aktiva_Wertpapiere&Derivate", "Aktiva_Immobilien&Sachwerte", "Aktiva_Web3&Krypto", "Aktiva_Buisness&forderungen", "Aktiva_Vorsorge&Verträge" , "Passiva_Kredite&Schulden", "Hauptbereiche", "Begleitende Seite"];
+  const vordefinierteBereiche = [
+    "Aktiva_Liquidität&Geldmarkt",
+    "Aktiva_Wertpapiere&Derivate",
+    "Aktiva_Immobilien&Sachwerte",
+    "Aktiva_Web3&Krypto",
+    "Aktiva_Buisness&forderungen",
+    "Aktiva_Vorsorge&Verträge",
+    "Passiva_Kredite&Schulden",
+    "Hauptbereiche",
+    "Begleitende Seite"
+  ];
+  
   const verfuegbareBereiche = Array.from(
     new Set([
       ...vordefinierteBereiche,
@@ -168,6 +182,49 @@ export default function Zeiterfassung() {
     ladeZeiterfassungen();
   };
 
+  // DRAG & DROP LOGIK
+  const handleDragStart = (e, id) => {
+    setDraggedItemId(id);
+    e.dataTransfer.setData("text/plain", id);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Notwendig, um OnDrop zu erlauben
+  };
+
+  const handleDrop = async (e, zielSpaltenKey) => {
+    e.preventDefault();
+    const itemId = draggedItemId || e.dataTransfer.getData("text/plain");
+    if (!itemId) return;
+
+    // Finde den aktuellen Eintrag
+    const eintrag = eintraege.find((e) => String(e.id) === String(itemId));
+    if (!eintrag) return;
+
+    // Erstelle ein Update-Objekt je nach gewähltem Gruppierungs-Modus
+    let updateData = {};
+    if (kanbanGruppierung === "status") {
+      updateData = { status: zielSpaltenKey };
+    } else if (kanbanGruppierung === "prio") {
+      updateData = { prioritaet: zielSpaltenKey };
+    } else {
+      updateData = { bereich: zielSpaltenKey };
+    }
+
+    // Optimistisches UI-Update
+    setEintraege((prev) =>
+      prev.map((item) =>
+        String(item.id) === String(itemId) ? { ...item, ...updateData } : item
+      )
+    );
+
+    // Speicherung in Supabase
+    await supabase.from("zeiterfassung").update(updateData).eq("id", itemId);
+
+    setDraggedItemId(null);
+    ladeZeiterfassungen();
+  };
+
   const formatierteZeit = (sekundenGesamt) => {
     const hrs = Math.floor((sekundenGesamt || 0) / 3600);
     const mins = Math.floor(((sekundenGesamt || 0) % 3600) / 60);
@@ -195,7 +252,7 @@ export default function Zeiterfassung() {
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
-        { key: "plannung", label: "📋 Plannung"},
+        { key: "plannung", label: "📋 Plannung" },
         { key: "offen", label: "🔓 Offen" },
         { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
         { key: "abgeschlossen", label: "✅ Abgeschlossen" }
@@ -340,10 +397,10 @@ export default function Zeiterfassung() {
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
               <option value="alle">Alle Status</option>
-              <option value="plannung">Plannung</option>
-              <option value="offen">Offen</option>
-              <option value="in_bearbeitung">In Bearbeitung</option>
-              <option value="abgeschlossen">Abgeschlossen</option>
+              <option value="plannung">📋 Plannung</option>
+              <option value="offen">🔓 Offen</option>
+              <option value="in_bearbeitung">⚡ In Bearbeitung</option>
+              <option value="abgeschlossen">✅ Abgeschlossen</option>
             </select>
           </div>
         </div>
@@ -461,13 +518,16 @@ export default function Zeiterfassung() {
 
             return (
               <div 
-                key={spalte.key} 
+                key={spalte.key}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, spalte.key)}
                 style={{ 
                   flex: "0 0 320px", 
                   background: "#f1f5f9", 
                   borderRadius: "14px", 
                   padding: "16px",
-                  boxSizing: "border-box"
+                  boxSizing: "border-box",
+                  minHeight: "200px"
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
@@ -487,6 +547,8 @@ export default function Zeiterfassung() {
                     return (
                       <div 
                         key={item.id} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, item.id)}
                         style={{ 
                           background: "#ffffff", 
                           borderRadius: "12px", 
@@ -495,7 +557,9 @@ export default function Zeiterfassung() {
                           borderLeft: `4px solid ${prio.farbe}`,
                           display: "flex",
                           flexDirection: "column",
-                          gap: "8px"
+                          gap: "8px",
+                          cursor: "grab",
+                          opacity: draggedItemId === item.id ? 0.5 : 1
                         }}
                       >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -583,10 +647,10 @@ export default function Zeiterfassung() {
               <div>
                 <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Status:</label>
                 <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                  <option value="plannung">Plannung</option>
-                  <option value="offen">Offen</option>
-                  <option value="in_bearbeitung">In Bearbeitung</option>
-                  <option value="abgeschlossen">Abgeschlossen</option>
+                  <option value="plannung">📋 Plannung</option>
+                  <option value="offen">🔓 Offen</option>
+                  <option value="in_bearbeitung">⚡ In Bearbeitung</option>
+                  <option value="abgeschlossen">✅ Abgeschlossen</option>
                 </select>
               </div>
 
