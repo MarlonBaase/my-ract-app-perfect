@@ -40,7 +40,7 @@ export default function Zeiterfassung() {
     "Hauptbereiche",
     "Begleitende Seite"
   ];
-  
+
   const verfuegbareBereiche = Array.from(
     new Set([
       ...vordefinierteBereiche,
@@ -73,13 +73,17 @@ export default function Zeiterfassung() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("zeiterfassung")
       .select("*")
       .eq("benutzer_id", user.id)
       .order("erstellt_am", { ascending: false });
 
-    setEintraege(data || []);
+    if (error) {
+      console.error("Fehler beim Laden der Zeiterfassungen:", error.message);
+    } else {
+      setEintraege(data || []);
+    }
   };
 
   const ladeNaechsteTicketNummer = async () => {
@@ -104,8 +108,9 @@ export default function Zeiterfassung() {
     if (!ticketNummer || !prozessName) return;
 
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-    await supabase.from("zeiterfassung").insert({
+    const { error } = await supabase.from("zeiterfassung").insert({
       benutzer_id: user.id,
       ticket_nummer: String(ticketNummer),
       prozess_name: prozessName,
@@ -114,8 +119,14 @@ export default function Zeiterfassung() {
       deadline: deadline || null,
       bereich,
       fortlaufende_notizen: notizen,
-      status: "planung"
+      status: "planung" // Korrekter Enum- / Text-Wert
     });
+
+    if (error) {
+      console.error("Fehler beim Erstellen des Prozesses:", error.message, error.details);
+      alert(`Fehler beim Speichern: ${error.message}`);
+      return;
+    }
 
     setProzessName("");
     setBeschreibung("");
@@ -159,7 +170,7 @@ export default function Zeiterfassung() {
   const eintragSpeichern = async () => {
     if (!bearbeitenEintrag) return;
 
-    await supabase
+    const { error } = await supabase
       .from("zeiterfassung")
       .update({
         ticket_nummer: String(bearbeitenEintrag.ticket_nummer),
@@ -173,8 +184,13 @@ export default function Zeiterfassung() {
       })
       .eq("id", bearbeitenEintrag.id);
 
-    setBearbeitenEintrag(null);
-    ladeZeiterfassungen();
+    if (error) {
+      console.error("Fehler beim Aktualisieren des Eintrags:", error.message);
+      alert(`Fehler beim Aktualisieren: ${error.message}`);
+    } else {
+      setBearbeitenEintrag(null);
+      ladeZeiterfassungen();
+    }
   };
 
   const eintragLoeschen = async (id) => {
@@ -185,7 +201,7 @@ export default function Zeiterfassung() {
   // DRAG & DROP LOGIK
   const handleDragStart = (e, id) => {
     setDraggedItemId(id);
-    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.setData("text/plain", String(id));
   };
 
   const handleDragOver = (e) => {
@@ -218,8 +234,15 @@ export default function Zeiterfassung() {
       )
     );
 
+    // Wandle ID in eine Zahl um, falls deine DB Integer IDs nutzt
+    const targetId = isNaN(Number(itemId)) ? itemId : Number(itemId);
+
     // Speicherung in Supabase
-    await supabase.from("zeiterfassung").update(updateData).eq("id", itemId);
+    const { error } = await supabase.from("zeiterfassung").update(updateData).eq("id", targetId);
+
+    if (error) {
+      console.error("Fehler bei Drag&Drop Update:", error.message, error.details);
+    }
 
     setDraggedItemId(null);
     ladeZeiterfassungen();
@@ -252,7 +275,7 @@ export default function Zeiterfassung() {
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
-        { key: "planung", label: "📋 planung" },
+        { key: "planung", label: "📋 Planung" },
         { key: "offen", label: "🔓 Offen" },
         { key: "in_bearbeitung", label: "⚡ In Bearbeitung" },
         { key: "abgeschlossen", label: "✅ Abgeschlossen" }
@@ -397,7 +420,7 @@ export default function Zeiterfassung() {
             <span style={{ fontSize: "13px", fontWeight: "600", color: "#64748b" }}>Status:</span>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}>
               <option value="alle">Alle Status</option>
-              <option value="planung">📋 planung</option>
+              <option value="planung">📋 Planung</option>
               <option value="offen">🔓 Offen</option>
               <option value="in_bearbeitung">⚡ In Bearbeitung</option>
               <option value="abgeschlossen">✅ Abgeschlossen</option>
@@ -629,54 +652,93 @@ export default function Zeiterfassung() {
             <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700" }}>Eintrag bearbeiten</h3>
             
             <div style={{ display: "flex", gap: "10px" }}>
-              <input value={bearbeitenEintrag.ticket_nummer} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} placeholder="Ticket" style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
-              <input value={bearbeitenEintrag.prozess_name} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} placeholder="Name" style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+              <input 
+                value={bearbeitenEintrag.ticket_nummer || ""} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} 
+                placeholder="Ticket" 
+                style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
+              />
+              <input 
+                value={bearbeitenEintrag.prozess_name || ""} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} 
+                placeholder="Name" 
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
+              />
             </div>
 
-            <textarea value={bearbeitenEintrag.beschreibung || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} placeholder="Beschreibung" style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} />
-            <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} placeholder="Notizen / Wo stehe ich?" style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} />
-            
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-              <div>
-                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Bereich:</label>
-                <select value={bearbeitenEintrag.bereich} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, bereich: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                  {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select 
+                value={bearbeitenEintrag.bereich || ""} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, bereich: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              >
+                {verfuegbareBereiche.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
 
-              <div>
-                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Status:</label>
-                <select value={bearbeitenEintrag.status} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                  <option value="planung">📋 planung</option>
-                  <option value="offen">🔓 Offen</option>
-                  <option value="in_bearbeitung">⚡ In Bearbeitung</option>
-                  <option value="abgeschlossen">✅ Abgeschlossen</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Priorität:</label>
-                <select value={bearbeitenEintrag.prioritaet} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
-                  <option value="niedrig">Niedrig</option>
-                  <option value="mittel">Mittel</option>
-                  <option value="hoch">Hoch</option>
-                  <option value="dringend">Dringend</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>Deadline:</label>
-                <input type="date" value={bearbeitenEintrag.deadline || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})} style={{ width: "100%", padding: "7px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
-              </div>
+              <select 
+                value={bearbeitenEintrag.status || "planung"} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, status: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              >
+                <option value="planung">📋 Planung</option>
+                <option value="offen">🔓 Offen</option>
+                <option value="in_bearbeitung">⚡ In Bearbeitung</option>
+                <option value="abgeschlossen">✅ Abgeschlossen</option>
+              </select>
             </div>
 
-            <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
-              <button onClick={eintragSpeichern} style={{ flex: 1, padding: "10px", background: "#2563eb", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>Speichern</button>
-              <button onClick={() => setBearbeitenEintrag(null)} style={{ flex: 1, padding: "10px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}>Abbrechen</button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select 
+                value={bearbeitenEintrag.prioritaet || "mittel"} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              >
+                <option value="niedrig">🟢 Niedrig</option>
+                <option value="mittel">🟡 Mittel</option>
+                <option value="hoch">🟠 Hoch</option>
+                <option value="dringend">🔴 Dringend</option>
+              </select>
+
+              <input 
+                type="date" 
+                value={bearbeitenEintrag.deadline || ""} 
+                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})}
+                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              />
+            </div>
+
+            <textarea 
+              value={bearbeitenEintrag.beschreibung || ""} 
+              onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} 
+              placeholder="Beschreibung" 
+              style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} 
+            />
+
+            <textarea 
+              value={bearbeitenEintrag.fortlaufende_notizen || ""} 
+              onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} 
+              placeholder="Fortschritts-Notizen" 
+              style={{ height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }} 
+            />
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+              <button 
+                onClick={() => setBearbeitenEintrag(null)} 
+                style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}
+              >
+                Abbrechen
+              </button>
+              <button 
+                onClick={eintragSpeichern} 
+                style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#2563eb", color: "#fff", fontWeight: "600", cursor: "pointer" }}
+              >
+                Speichern
+              </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
