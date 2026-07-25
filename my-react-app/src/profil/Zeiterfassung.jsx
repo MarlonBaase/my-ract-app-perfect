@@ -171,17 +171,17 @@ export default function Zeiterfassung() {
     <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h2>⏱️ Zeiterfassung & Prozess-Tracking</h2>
-        
+
         {/* Toggle für Ansicht */}
         <div>
-          <button 
-            onClick={() => setAnsicht("tabelle")} 
+          <button
+            onClick={() => setAnsicht("tabelle")}
             style={{ padding: "8px 12px", marginRight: "8px", fontWeight: ansicht === "tabelle" ? "bold" : "normal" }}
           >
             📋 Tabelle
           </button>
-          <button 
-            onClick={() => setAnsicht("cards")} 
+          <button
+            onClick={() => setAnsicht("cards")}
             style={{ padding: "8px 12px", fontWeight: ansicht === "cards" ? "bold" : "normal" }}
           >
             🎴 Karten
@@ -249,7 +249,7 @@ export default function Zeiterfassung() {
                     </td>
                     <td>
                       <strong>{item.prozess_name}</strong>
-                      <br /><small>{item.beschreibung}</small>
+                      <br /><small style={{ whiteSpace: "pre-wrap" }}>{item.beschreibung}</small>
                     </td>
                     <td style={{ maxWidth: "200px", fontSize: "12px", color: "#475569" }}>
                       {item.fortlaufende_notizen || "—"}
@@ -280,19 +280,21 @@ export default function Zeiterfassung() {
                   <span style={{ fontSize: "12px", background: "#f1f5f9", padding: "2px 8px", borderRadius: "4px" }}>{item.bereich}</span>
                   <span style={{ color: getPrioFarbe(item.prioritaet), fontWeight: "bold", fontSize: "12px" }}>{item.prioritaet.toUpperCase()}</span>
                 </div>
-                
+
                 <h4 style={{ margin: "0 0 4px 0" }}>{item.ticket_nummer}: {item.prozess_name}</h4>
-                <p style={{ fontSize: "13px", color: "#64748b", margin: "0 0 12px 0" }}>{item.beschreibung}</p>
-                
+                <p style={{ fontSize: "13px", color: "#64748b", margin: "0 0 12px 0", whiteSpace: "pre-wrap" }}>
+                  {item.beschreibung}
+                </p>
+
                 {item.fortlaufende_notizen && (
-                  <div style={{ background: "#f8fafc", padding: "8px", borderRadius: "4px", fontSize: "12px", marginBottom: "12px" }}>
-                    📌 <strong>Stand:</strong> {item.fortlaufende_notizen}
+                  <div style={{ background: "#f8fafc", padding: "8px", borderRadius: "4px", fontSize: "12px", marginBottom: "12px", whiteSpace: "pre-wrap" }}>
+                    📌 <strong>Stand:</strong>{"\n"}{item.fortlaufende_notizen}
                   </div>
                 )}
 
                 <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>
                   📅 Deadline: {item.deadline || "Keine"} <br />
-                  🕒 Start: {item.start_zeit ? new Date(item.start_zeit).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "—"}
+                  🕒 Start: {item.start_zeit ? new Date(item.start_zeit).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "—"}
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", pt: "8px" }}>
@@ -314,19 +316,19 @@ export default function Zeiterfassung() {
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ background: "#fff", padding: "24px", borderRadius: "8px", width: "400px", display: "flex", flexDirection: "column", gap: "12px" }}>
             <h3>Eintrag bearbeiten</h3>
-            <input value={bearbeitenEintrag.ticket_nummer} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} placeholder="Ticket" />
-            <input value={bearbeitenEintrag.prozess_name} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} placeholder="Name" />
-            <textarea value={bearbeitenEintrag.beschreibung || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} placeholder="Beschreibung" />
-            <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, fortlaufende_notizen: e.target.value})} placeholder="Notizen / Wo stehe ich?" />
-            
+            <input value={bearbeitenEintrag.ticket_nummer} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, ticket_nummer: e.target.value })} placeholder="Ticket" />
+            <input value={bearbeitenEintrag.prozess_name} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, prozess_name: e.target.value })} placeholder="Name" />
+            <textarea value={bearbeitenEintrag.beschreibung || ""} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, beschreibung: e.target.value })} placeholder="Beschreibung" />
+            <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, fortlaufende_notizen: e.target.value })} placeholder="Notizen / Wo stehe ich?" />
+
             <div style={{ display: "flex", gap: "8px" }}>
-              <select value={bearbeitenEintrag.prioritaet} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prioritaet: e.target.value})}>
+              <select value={bearbeitenEintrag.prioritaet} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, prioritaet: e.target.value })}>
                 <option value="niedrig">Niedrig</option>
                 <option value="mittel">Mittel</option>
                 <option value="hoch">Hoch</option>
                 <option value="dringend">Dringend</option>
               </select>
-              <input type="date" value={bearbeitenEintrag.deadline || ""} onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, deadline: e.target.value})} />
+              <input type="date" value={bearbeitenEintrag.deadline || ""} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, deadline: e.target.value })} />
             </div>
 
             <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
