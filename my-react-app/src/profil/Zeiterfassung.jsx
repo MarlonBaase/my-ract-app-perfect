@@ -6,7 +6,7 @@ export default function Zeiterfassung() {
   const [ansicht, setAnsicht] = useState("cards"); // 'cards' (Kanban) oder 'tabelle'
 
   // Formular-States
-  const [ticketNummer, setTicketNummer] = useState("");
+  const [ticketNummer, setTicketNummer] = useState(1);
   const [prozessName, setProzessName] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
   const [prioritaet, setPrioritaet] = useState("mittel");
@@ -22,7 +22,7 @@ export default function Zeiterfassung() {
   // Kanban Gruppierungs-Modus ('bereich', 'status' oder 'prio')
   const [kanbanGruppierung, setKanbanGruppierung] = useState("bereich");
 
-  // State für Drag & Drop (welches Element wird gerade gezogen?)
+  // State für Drag & Drop
   const [draggedItemId, setDraggedItemId] = useState(null);
 
   // Modal für Bearbeiten
@@ -90,12 +90,13 @@ export default function Zeiterfassung() {
     const { data } = await supabase
       .from("zeiterfassung")
       .select("ticket_nummer")
-      .order("erstellt_am", { ascending: false })
+      .order("ticket_nummer", { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle();
 
-    if (data) {
-      setTicketNummer(data.ticket_nummer + 1);
+    if (data && data.ticket_nummer !== undefined && data.ticket_nummer !== null) {
+      const nummer = Number(data.ticket_nummer);
+      setTicketNummer(isNaN(nummer) ? 1 : nummer + 1);
     } else {
       setTicketNummer(1);
     }
@@ -110,14 +111,14 @@ export default function Zeiterfassung() {
 
     const { error } = await supabase.from("zeiterfassung").insert({
       benutzer_id: user.id,
-      ticket_nummer: String(ticketNummer),
+      ticket_nummer: Number(ticketNummer), // Als reine Zahl senden
       prozess_name: prozessName,
       beschreibung,
       prioritaet,
       deadline: deadline || null,
       bereich,
       fortlaufende_notizen: notizen,
-      status: "planung" // Korrekter Enum- / Text-Wert
+      status: "planung"
     });
 
     if (error) {
@@ -171,7 +172,7 @@ export default function Zeiterfassung() {
     const { error } = await supabase
       .from("zeiterfassung")
       .update({
-        ticket_nummer: String(bearbeitenEintrag.ticket_nummer),
+        ticket_nummer: Number(bearbeitenEintrag.ticket_nummer), // Als reine Zahl senden
         prozess_name: bearbeitenEintrag.prozess_name,
         beschreibung: bearbeitenEintrag.beschreibung,
         prioritaet: bearbeitenEintrag.prioritaet,
@@ -203,7 +204,7 @@ export default function Zeiterfassung() {
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // Notwendig, um OnDrop zu erlauben
+    e.preventDefault();
   };
 
   const handleDrop = async (e, zielSpaltenKey) => {
@@ -211,11 +212,9 @@ export default function Zeiterfassung() {
     const itemId = draggedItemId || e.dataTransfer.getData("text/plain");
     if (!itemId) return;
 
-    // Finde den aktuellen Eintrag
     const eintrag = eintraege.find((e) => String(e.id) === String(itemId));
     if (!eintrag) return;
 
-    // Erstelle ein Update-Objekt je nach gewähltem Gruppierungs-Modus
     let updateData = {};
     if (kanbanGruppierung === "status") {
       updateData = { status: zielSpaltenKey };
@@ -225,17 +224,14 @@ export default function Zeiterfassung() {
       updateData = { bereich: zielSpaltenKey };
     }
 
-    // Optimistisches UI-Update
     setEintraege((prev) =>
       prev.map((item) =>
         String(item.id) === String(itemId) ? { ...item, ...updateData } : item
       )
     );
 
-    // Wandle ID in eine Zahl um, falls deine DB Integer IDs nutzt
     const targetId = isNaN(Number(itemId)) ? itemId : Number(itemId);
 
-    // Speicherung in Supabase
     const { error } = await supabase.from("zeiterfassung").update(updateData).eq("id", targetId);
 
     if (error) {
@@ -269,7 +265,6 @@ export default function Zeiterfassung() {
     return bereichMatch && prioMatch && statusMatch;
   });
 
-  // Dynamische Generierung der Kanban-Spalten je nach Gruppierung
   const getKanbanSpalten = () => {
     if (kanbanGruppierung === "status") {
       return [
@@ -287,7 +282,6 @@ export default function Zeiterfassung() {
         { key: "niedrig", label: "🟢 Niedrig" }
       ];
     }
-    // Standard: Nach Bereichen
     return verfuegbareBereiche
       .filter(b => filterBereich === "alle" || filterBereich.toLowerCase() === b.toLowerCase())
       .map(b => ({ key: b, label: `📁 ${b}` }));
@@ -344,8 +338,15 @@ export default function Zeiterfassung() {
       <form onSubmit={prozessErstellen} style={{ background: "#ffffff", padding: "20px", borderRadius: "14px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", marginBottom: "24px", display: "grid", gap: "16px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2.5fr 1fr 1fr", gap: "12px" }}>
           <div>
-            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Ticket ID</label>
-            <input value={ticketNummer} onChange={(e) => setTicketNummer(e.target.value)} placeholder="TICK-1" required style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }} />
+            <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Ticket-Nr.</label>
+            <input 
+              type="number" 
+              value={ticketNummer} 
+              onChange={(e) => setTicketNummer(e.target.value)} 
+              placeholder="1" 
+              required 
+              style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "14px", boxSizing: "border-box" }} 
+            />
           </div>
           <div>
             <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "4px", display: "block" }}>Prozess / Aufgaben Name</label>
@@ -426,7 +427,7 @@ export default function Zeiterfassung() {
           </div>
         </div>
 
-        {/* Umschaltung für Kanban-Gruppierung (nur sichtbar in Cards-Ansicht) */}
+        {/* Umschaltung für Kanban-Gruppierung */}
         {ansicht === "cards" && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#f8fafc", padding: "4px 10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
             <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>Spalten Gruppieren nach:</span>
@@ -471,7 +472,7 @@ export default function Zeiterfassung() {
             <thead>
               <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 <th style={{ padding: "12px 16px" }}>Prio</th>
-                <th style={{ padding: "12px 16px" }}>Ticket & Bereich</th>
+                <th style={{ padding: "12px 16px" }}>Ticket-Nr. & Bereich</th>
                 <th style={{ padding: "12px 16px" }}>Prozess</th>
                 <th style={{ padding: "12px 16px" }}>Notizen / Wo stehe ich?</th>
                 <th style={{ padding: "12px 16px" }}>Deadline</th>
@@ -490,7 +491,7 @@ export default function Zeiterfassung() {
                       <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: prio.farbe }}></span>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
-                      <div style={{ fontWeight: "700" }}>{item.ticket_nummer}</div>
+                      <div style={{ fontWeight: "700" }}>#{item.ticket_nummer}</div>
                       <div style={{ fontSize: "12px", color: "#64748b" }}>{item.bereich}</div>
                     </td>
                     <td style={{ padding: "14px 16px" }}>
@@ -525,7 +526,6 @@ export default function Zeiterfassung() {
       {ansicht === "cards" && (
         <div style={{ display: "flex", gap: "20px", overflowX: "auto", paddingBottom: "16px", alignItems: "flex-start" }}>
           {getKanbanSpalten().map((spalte) => {
-            // Flexible Filterung je nach Gruppierungs-Modus
             const spaltenEintraege = gefilterteEintraege.filter((e) => {
               if (kanbanGruppierung === "status") {
                 return String(e.status || "").toLowerCase() === spalte.key.toLowerCase();
@@ -533,7 +533,6 @@ export default function Zeiterfassung() {
               if (kanbanGruppierung === "prio") {
                 return String(e.prioritaet || "").toLowerCase() === spalte.key.toLowerCase();
               }
-              // Standard: Nach Bereichen
               return String(e.bereich || "").toLowerCase() === spalte.key.toLowerCase();
             });
 
@@ -593,7 +592,7 @@ export default function Zeiterfassung() {
                         </div>
 
                         <div>
-                          <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700" }}>{item.ticket_nummer}</div>
+                          <div style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "700" }}>#{item.ticket_nummer}</div>
                           <h4 style={{ margin: "2px 0 0 0", fontSize: "14px", fontWeight: "600", color: "#0f172a" }}>{item.prozess_name}</h4>
                         </div>
 
@@ -651,9 +650,10 @@ export default function Zeiterfassung() {
             
             <div style={{ display: "flex", gap: "10px" }}>
               <input 
+                type="number"
                 value={bearbeitenEintrag.ticket_nummer || ""} 
                 onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: e.target.value})} 
-                placeholder="Ticket" 
+                placeholder="Ticket Nr." 
                 style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
               />
               <input 
