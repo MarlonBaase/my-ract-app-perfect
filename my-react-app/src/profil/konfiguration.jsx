@@ -60,27 +60,40 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
   };
 
   const startSetup = async () => {
-  const { data: factors } = await supabase.auth.mfa.listFactors();
+    const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
 
-  if (factors && factors.totp) {
-    const unverifiedFactors = factors.totp.filter(f => f.status === 'unverified');
-    for (const factor of unverifiedFactors) {
-      await supabase.auth.mfa.unenroll({ factorId: factor.id });
+    if (listError) {
+      alert(`Fehler beim Abrufen der Faktoren: ${listError.message}`);
+      return;
     }
-  }
 
-  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
+    if (factors && factors.totp) {
+      const verifiedFactor = factors.totp.find(f => f.status === 'verified');
+      if (verifiedFactor) {
+        alert("2FA ist auf diesem Account bereits aktiv eingerichtet!");
+        return;
+      }
 
-  if (error) {
-    alert(`Fehler beim Erstellen: ${error.message}`);
-    return;
-  }
+      for (const factor of factors.totp) {
+        await supabase.auth.mfa.unenroll({ factorId: factor.id });
+      }
+    }
 
-  if (data) {
-    setQrCodeUrl(data.totp.qr_code);
-    setFactorID(data.id);
-  }
-};
+    const { data, error } = await supabase.auth.mfa.enroll({
+      factorType: 'totp',
+      friendlyName: `MeinAuthenticator_${Date.now()}`
+    });
+
+    if (error) {
+      alert(`Fehler beim Erstellen: ${error.message}`);
+      return;
+    }
+
+    if (data) {
+      setQrCodeUrl(data.totp.qr_code);
+      setFactorID(data.id);
+    }
+  };
 
   const enableMfa = async () => {
     if (!confirmCode || !factorId) return;
@@ -93,7 +106,7 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
     if (error) {
       alert(`Fehler beim Aktivieren: ${error.message}`);
     }
-    else{
+    else {
       alert("2 FA wurde erfolgreich aktiviert! ");
       setQrCodeUrl("")
       setConfirmCode("");
