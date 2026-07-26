@@ -6,6 +6,10 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
   const [kategorien, setKategorien] = useState([]);
   const [neueKategorie, setNeueKategorie] = useState("");
   const [kategorieInter, setkategorieInter] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [factorId, setFactorID] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
+
 
   // 💡 Layout-State aus dem globalen Context holen
   const { ansicht, setAnsicht } = useContext(SettingsContext);
@@ -55,6 +59,31 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
     window.location.href = "https://my-ract-app-perfect.vercel.app/";
   };
 
+  const startSetup = async () => {
+    const { data } = await supabase.auth.mfa.enroll({ factorType: 'totp' })
+
+    if (data) setQrCodeUrl(data.totp.qr_code)
+    if (data) setFactorID(data.id)
+  }
+
+  const enableMfa = async () => {
+    if (!confirmCode || !factorId) return;
+
+    const { data, error } = await supabase.auth.mfa.challengeAndVerify({
+      factorId: factorId,
+      code: confirmCode
+    });
+
+    if (error) {
+      alert(`Fehler beim Aktivieren: ${error.message}`);
+    }
+    else{
+      alert("2 FA wurde erfolgreich aktiviert! ");
+      setQrCodeUrl("")
+      setConfirmCode("");
+    }
+  };
+
   return (
     <div>
       <button onClick={() => setDarkMode(!darkMode)}>
@@ -64,8 +93,8 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
       {/* 💡 Neues Auswahlfeld für die Layout-Ansicht */}
       <div style={{ marginTop: "20px", marginBottom: "20px" }}>
         <h4>Standard-Ansicht für Konten</h4>
-        <select 
-          value={ansicht} 
+        <select
+          value={ansicht}
           onChange={(e) => setAnsicht(e.target.value)}
           style={{ padding: "8px 12px", borderRadius: "6px" }}
         >
@@ -94,6 +123,20 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
           </li>
         ))}
       </ul>
+
+      <div>
+        <button onClick={startSetup}>2-FA aktivieren</button>
+        {qrCodeUrl === "" ?
+          (<div>
+            <h2>nicht vorhanden</h2>
+          </div>) :
+          (<div>
+            <h2>2-FA QR-Code</h2>
+            <img src={qrCodeUrl} alt="2FA QR Code" />
+            <input value={confirmCode} type="text" placeholder="code" onChange={(e) => setConfirmCode(e.target.value)}></input>
+            <button onClick={enableMfa}>Verifizieren & Aktivieren</button>
+          </div>)}
+      </div>
 
       <div>
         <h1>Profil</h1>
