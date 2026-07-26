@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from './supabase'
 
-export default function Home() { // Tipp: Großschreibung 'Home'
+export default function Home() { 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [step, setStep] = useState('login')
@@ -11,23 +11,30 @@ export default function Home() { // Tipp: Großschreibung 'Home'
 
   const signIn = async () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) return alert(error.message) // 1. Korrektur: return
+    if (error) return alert(error.message)
 
-    const { data: factors, error: mfaError } = await supabase.auth.mfa.listFactors()
-    if (mfaError) return alert(mfaError.message)
+    const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (mfaError) return alert(mfaError.message);
 
-    const totpFactor = factors.totp.find(f => f.status === 'verified')
+    if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
 
-    if (totpFactor) {
-      setFactorId(totpFactor.id)
-      setStep('mfa')
+      
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+      if (factorsError) return alert(factorsError.message);
+
+      const totpFactor = factors.totp.find(f => f.status === 'verified');
+
+      if (totpFactor) {
+        setFactorId(totpFactor.id);
+        setStep('mfa'); 
+      }
     } else {
-      alert('Erfolgreich eingeloggt!')
+      alert("Erfolgreich eingeloggt!");
     }
   }
 
   const verify = async () => {
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: otpCode }) // 2. Korrektur: await
+    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: otpCode }) 
     if (error) {
       alert(error.message)
     } else {
