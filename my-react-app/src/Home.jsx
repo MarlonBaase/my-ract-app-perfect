@@ -10,28 +10,33 @@ export default function Home() {
   const [factorId, setFactorId] = useState(null)
 
   const signIn = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) return alert(error.message)
+  
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return alert(error.message);
 
-    const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (mfaError) return alert(mfaError.message);
+ 
+  const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (mfaError) return alert(mfaError.message);
 
-    if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
+ 
+  if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
+    
+    
+    const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError) return alert(factorsError.message);
 
-      
-      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
-      if (factorsError) return alert(factorsError.message);
+    const totpFactor = factors.totp.find(f => f.status === 'verified');
 
-      const totpFactor = factors.totp.find(f => f.status === 'verified');
-
-      if (totpFactor) {
-        setFactorId(totpFactor.id);
-        setStep('mfa'); 
-      }
-    } else {
-      alert("Erfolgreich eingeloggt!");
+    if (totpFactor) {
+      setFactorId(totpFactor.id);
+      setStep('mfa'); 
+      return;
     }
   }
+
+  // Wenn kein 2FA aktiv ist:
+  alert("Erfolgreich eingeloggt!");
+};
 
   const verify = async () => {
     const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: otpCode }) 
