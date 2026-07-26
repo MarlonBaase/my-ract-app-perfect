@@ -45,9 +45,31 @@ function App() {
   const [ansicht, setAnsicht] = useState("card")
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    supabase.auth.onAuthStateChange((_event, session) => setSession(session))
-  }, [])
+  const checkMfaAndSetSession = async (currentSession) => {
+    if (!currentSession) {
+      setSession(null);
+      return;
+    }
+
+    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+    if (mfaData && mfaData.currentLevel === mfaData.nextLevel) {
+      setSession(currentSession);
+    } else {
+      setSession(null);
+    }
+  };
+
+  supabase.auth.getSession().then(({ data }) => {
+    checkMfaAndSetSession(data.session);
+  });
+
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    checkMfaAndSetSession(session);
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
 
   useEffect(() => {
     document.body.className = darkMode ? "dark" : "light"
@@ -60,7 +82,6 @@ function App() {
       <ErrorBoundary
         FallbackComponent={ErrorFallback}
         onReset={() => {
-          // Hier kannst du den App-State zurücksetzen, falls nötig
           window.location.reload();
         }}
       >
