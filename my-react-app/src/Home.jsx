@@ -10,31 +10,32 @@ export default function Home() {
   const [factorId, setFactorId] = useState(null)
 
   const signIn = async () => {
-  
+  // 1. Erstes Level: E-Mail & Passwort
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return alert(error.message);
 
- 
+  // 2. Prüfen, ob 2FA für diesen Account eingerichtet ist
   const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (mfaError) return alert(mfaError.message);
 
- 
+  console.log("MFA Levels:", mfaData); // 👈 Hilfreich zum Debuggen!
+
+  // Ist 2FA eingerichtet (nextLevel === 'aal2'), aber die Session erst bei Passwort (currentLevel === 'aal1')?
   if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
     
-    
-    const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
-    if (factorsError) return alert(factorsError.message);
-
-    const totpFactor = factors.totp.find(f => f.status === 'verified');
+    // Faktor-ID für das spätere Verify holen
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    console.log("Gefundene Faktoren:", factors);
+    const totpFactor = factors?.totp?.find(f => f.status === 'verified');
 
     if (totpFactor) {
       setFactorId(totpFactor.id);
-      setStep('mfa'); 
-      return;
+      setStep('mfa'); // 👈 Hier MUSS der State umschalten!
+      return; // Stop, damit nicht gleich "Erfolgreich eingeloggt" kommt
     }
   }
 
-  // Wenn kein 2FA aktiv ist:
+  // Falls KEIN 2FA aktiv ist:
   alert("Erfolgreich eingeloggt!");
 };
 
