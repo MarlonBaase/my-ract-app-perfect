@@ -60,11 +60,27 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
   };
 
   const startSetup = async () => {
-    const { data } = await supabase.auth.mfa.enroll({ factorType: 'totp' })
+  const { data: factors } = await supabase.auth.mfa.listFactors();
 
-    if (data) setQrCodeUrl(data.totp.qr_code)
-    if (data) setFactorID(data.id)
+  if (factors && factors.totp) {
+    const unverifiedFactors = factors.totp.filter(f => f.status === 'unverified');
+    for (const factor of unverifiedFactors) {
+      await supabase.auth.mfa.unenroll({ factorId: factor.id });
+    }
   }
+
+  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' });
+
+  if (error) {
+    alert(`Fehler beim Erstellen: ${error.message}`);
+    return;
+  }
+
+  if (data) {
+    setQrCodeUrl(data.totp.qr_code);
+    setFactorID(data.id);
+  }
+};
 
   const enableMfa = async () => {
     if (!confirmCode || !factorId) return;
