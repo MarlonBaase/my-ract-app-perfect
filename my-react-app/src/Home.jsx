@@ -29,11 +29,15 @@ export default function Home() {
     const totpFactor = factors?.totp?.find(f => f.status === 'verified');
 
     if (totpFactor) {
-      setFactorId(totpFactor.id);
-      setStep('mfa'); // 👈 Hier MUSS der State umschalten!
-      return; // Stop, damit nicht gleich "Erfolgreich eingeloggt" kommt
-    }
+  console.log("TotpFactor vorhanden! Schalte um auf MFA...");
+  setFactorId(totpFactor.id);
+  setStep('mfa');
+  console.log("step State wurde auf mfa gesetzt!");
+  return;
+}
   }
+
+  
 
   // Falls KEIN 2FA aktiv ist:
   alert("Erfolgreich eingeloggt!");
