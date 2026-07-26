@@ -114,6 +114,27 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
     }
   };
 
+  const disableMfa = async () => {
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const verifiedFactor = factors?.totp?.find(f => f.status === 'verified');
+
+  if (!verifiedFactor) {
+    alert("Es ist kein aktiver 2FA-Schutz vorhanden.");
+    return;
+  }
+
+  const { error } = await supabase.auth.mfa.unenroll({
+    factorId: verifiedFactor.id
+  });
+
+  if (error) {
+    alert(`Fehler beim Deaktivieren: ${error.message}`);
+  } else {
+    alert("2FA wurde erfolgreich deaktiviert!");
+    setQrCodeUrl(""); 
+  }
+};
+
   return (
     <div>
       <button onClick={() => setDarkMode(!darkMode)}>
@@ -156,6 +177,7 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
 
       <div>
         <button onClick={startSetup}>2-FA aktivieren</button>
+        <button onClick={disableMfa}>2-FA deaktivieren</button>
         {qrCodeUrl === "" ?
           (<div>
             <h2>nicht vorhanden</h2>
