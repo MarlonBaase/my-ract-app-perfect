@@ -119,7 +119,7 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
   const verifiedFactor = factors?.totp?.find(f => f.status === 'verified');
 
   if (!verifiedFactor) {
-    alert("Es ist kein aktiver 2FA-Schutz vorhanden.");
+    alert("Kein aktiver 2FA-Faktor vorhanden.");
     return;
   }
 
@@ -128,10 +128,9 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
   });
 
   if (error) {
-    alert(`Fehler beim Deaktivieren: ${error.message}`);
+    alert(`Fehler beim Deaktivieren: ${error.message}. (Hinweis: Du musst mit 2FA eingeloggt sein, um 2FA zu deaktivieren!)`);
   } else {
     alert("2FA wurde erfolgreich deaktiviert!");
-    setQrCodeUrl(""); 
   }
 };
 
