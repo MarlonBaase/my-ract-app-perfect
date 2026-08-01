@@ -38,7 +38,8 @@ export default function Zeiterfassung() {
     "Aktiva_Vorsorge&Verträge",
     "Passiva_Kredite&Schulden",
     "Hauptbereiche",
-    "Begleitende Seite"
+    "Begleitende Seite",
+    "alle Seiten"
   ];
 
   const verfuegbareBereiche = Array.from(
