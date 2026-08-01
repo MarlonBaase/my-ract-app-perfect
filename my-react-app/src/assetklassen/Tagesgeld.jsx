@@ -676,7 +676,10 @@ export default function Tagesgeld() {
                                     <label>Notizen</label>
                                     <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} />
                                 </div>
-
+                                <div className="form-group">
+                                    <label>Freistellingsauftrag</label>
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} />
+                                </div>
                                 <div className="form-group checkbox-group col-span-2">
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
@@ -685,10 +688,6 @@ export default function Tagesgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
                                         Als Notgroschen festlegen
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.checked)} />
-                                        Freistellungsauftrag hinterlegt
                                     </label>
                                 </div>
                             </div>
