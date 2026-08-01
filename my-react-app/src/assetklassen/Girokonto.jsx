@@ -335,6 +335,9 @@ export default function Girokonto() {
 
                         return (
                             <div className="account-card" key={e.id}>
+                                <div className="card-img">
+                                    <img src="https://yt3.googleusercontent.com/Eetl08UMJf1gf9BnFGhe3PukeR-WQWv8sBjMT1JaZv7iZ8-zyksV-ITKACBpu0F07zeamcUZ0A=s900-c-k-c0x00ffffff-no-rj" alt="Girokonto" />
+                                </div>
                                 <div className="card-header">
                                     <div>
                                         <h3>{e.asset?.asset_name}</h3>
