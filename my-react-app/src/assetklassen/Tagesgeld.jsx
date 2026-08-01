@@ -33,7 +33,17 @@ export default function Tagesgeld() {
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
-    const [intervall, setIntervall] = useState("");
+    const [zinssintervall, setZinssintervall] = useState("");
+    const [referenzkonto, setReferenzkonto] = useState("");
+    const [freistellungsauftrag, setFreistellungsauftrag] = useState(false);
+    const [aktionszins, setAktionszins] = useState("");
+    const [ablaufdatum_aktionszins, setAblaufdatum_aktionszins] = useState("");
+    const [notgroschen, setNotgroschen] = useState(false);
+    const [einlagensicherung, setEinlagensicherung] = useState("");
+    const [sparrate, setSparrate] = useState("");
+    const [sparziel, setSparziel] = useState("");
+    const [mindestbetrag, setMindestbetrag] = useState("");
+
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -108,17 +118,24 @@ export default function Tagesgeld() {
                     asset_id: asset_id,
                     name_der_bank: bank,
                     iban: iban,
-                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     waehrung: waehrung,
-                    eroeffnungsdatum: eroeffnungsdatum,
-                    notizen: transaktionsNotizen,
-                    kontoinhaber: kontoinhaber,
+                    zinssatz: parseFloat(zinssatz) || 0,
+                    zinsintervall: zinssintervall || "monatlich",
+                    referenzkonto: referenzkonto,
+                    freistellungsauftrag: freistellungsauftrag || false,
+                    aktionszins: parseFloat(aktionszins) || 0,
+                    ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
+                    notgroschen: notgroschen || false,
+                    einlagensicherung: parseFloat(einlagensicherung) || 100000,
+                    sparrate: parseFloat(sparrate) || 0,
+                    sparziel: parseFloat(sparziel) || 0,
+                    mindestbetrag: parseFloat(mindestbetrag) || 0,
                     ist_aktiv: true,
-                    hauptkonto: hauptkonto,
-                    elternkonto: ausgewaehltesElternkonto || null,
-                    dispo_limit: parseFloat(dispo_limit) || 0,
+                    notizen: transaktionsNotizen,
+                    eroeffnungsdatum: eroeffnungsdatum,
+                    kontoinhaber: kontoinhaber,
                     bic: bic,
-                    zinssatz: parseFloat(zinssatz) || 0
+                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 })
 
             if (tagesgeldkontoError) {
@@ -174,16 +191,23 @@ export default function Tagesgeld() {
         setIban(eintrag.iban || "")
         setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
         setWaehrung(eintrag.waehrung || "EUR")
+        setZinssatz(eintrag.zinssatz || "")
+        setZinssintervall(eintrag.zinsintervall || "")
+        setReferenzkonto(eintrag.referenzkonto || "")
+        setFreistellungsauftrag(eintrag.freistellungsauftrag || false)
+        setAktionszins(eintrag.aktionszins || "")
+        setAblaufdatum_aktionszins(eintrag.ablaufdatum_aktionszins || "")
+        setNotgroschen(eintrag.notgroschen || false)
+        setEinlagensicherung(eintrag.einlagensicherung || "")
+        setSparrate(eintrag.sparrate || "")
+        setSparziel(eintrag.sparziel || "")
+        setMindestbetrag(eintrag.mindestbetrag || "")
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setTransaktionsNotizen(eintrag.notizen || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
-        setIstAktiv(eintrag.ist_aktiv ?? true)
-        setHauptkonto(eintrag.hauptkonto ?? false)
-        setAusgewaehltesElternkonto(eintrag.elternkonto || "")
-        setDispoLimit(eintrag.dispo_limit || "")
+        setIstAktiv(eintrag.ist_aktiv || false)
         setBic(eintrag.bic || "")
-        setZinssatz(eintrag.zinssatz || "")
-        setModalOffen(true)
+        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
     }
 
     const eintragLoeschen = async (assetId) => {
@@ -219,19 +243,26 @@ export default function Tagesgeld() {
         const { error: tagesgeldkontoError } = await supabase
             .from("tagesgeldkonto")
             .update({
-                name_der_bank: bank,
-                iban: iban,
-                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                waehrung: waehrung,
-                eroeffnungsdatum: eroeffnungsdatum,
-                notizen: transaktionsNotizen,
-                kontoinhaber: kontoinhaber,
-                ist_aktiv: ist_aktiv,
-                hauptkonto: hauptkonto,
-                elternkonto: ausgewaehltesElternkonto || null,
-                dispo_limit: parseFloat(dispo_limit) || 0,
-                bic: bic,
-                zinssatz: parseFloat(zinssatz) || 0
+                    name_der_bank: bank,
+                    iban: iban,
+                    waehrung: waehrung,
+                    zinssatz: parseFloat(zinssatz) || 0,
+                    zinsintervall: zinssintervall || "monatlich",
+                    referenzkonto: referenzkonto,
+                    freistellungsauftrag: freistellungsauftrag || false,
+                    aktionszins: parseFloat(aktionszins) || 0,
+                    ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
+                    notgroschen: notgroschen || false,
+                    einlagensicherung: parseFloat(einlagensicherung) || 100000,
+                    sparrate: parseFloat(sparrate) || 0,
+                    sparziel: parseFloat(sparziel) || 0,
+                    mindestbetrag: parseFloat(mindestbetrag) || 0,
+                    ist_aktiv: true,
+                    notizen: transaktionsNotizen,
+                    eroeffnungsdatum: eroeffnungsdatum,
+                    kontoinhaber: kontoinhaber,
+                    bic: bic,
+                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
@@ -283,9 +314,8 @@ export default function Tagesgeld() {
     const ladeElternkontoListe = async () => {
         const { data } = await supabase
             .from("tagesgeldkonto")
-            .select("*")
-            .eq("hauptkonto", true)
-            .order("hauptkonto", { ascending: true });
+            .select("referenzkonto:asset_id, asset:asset_name")
+            .order("referenzkonto", { ascending: true });
 
         if (data) setElternkontoListe(data);
     };
@@ -322,7 +352,7 @@ export default function Tagesgeld() {
             {ansicht === 'card' ? (
                 <div className="karten-grid">
                     {listeTagesgeld.map((e) => {
-                        const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.elternkonto);
+                        const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.referenzkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
 
                         const transaktionen = e.asset?.transaktionsprotokoll || [];
@@ -340,7 +370,7 @@ export default function Tagesgeld() {
                                         <h3>{e.asset?.asset_name}</h3>
                                         <span className="bank-name">{e.name_der_bank}</span>
                                     </div>
-                                    {e.hauptkonto && <span className="badge">Hauptkonto</span>}
+                                    {e.referenzkonto && <span className="badge">Referenzkonto</span>}
                                 </div>
 
                                 <div className="card-body">
@@ -356,7 +386,6 @@ export default function Tagesgeld() {
                                         {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
-                                    {elternkontoName && <p className="parent"><strong>Elternkonto:</strong> {elternkontoName}</p>}
                                     {e.notizen && <p className="note">{e.notizen}</p>}
                                 </div>
 
@@ -384,7 +413,7 @@ export default function Tagesgeld() {
                         </thead>
                         <tbody>
                             {listeTagesgeld.map((e) => {
-                                const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.elternkonto);
+                                const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.referenzkonto);
                                 const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
                                 const transaktionen = e.asset?.transaktionsprotokoll || [];
@@ -672,7 +701,7 @@ export default function Tagesgeld() {
                                 {wiederkehrendaktiv && (
                                     <div className="form-group col-span-2">
                                         <label>Intervall</label>
-                                        <select value={intervall} onChange={(e) => setIntervall(e.target.value)}>
+                                        <select value={zinssintervall} onChange={(e) => setZinssintervall(e.target.value)}>
                                             <option value="">Intervall wählen</option>
                                             <option value="täglich">Täglich</option>
                                             <option value="wöchentlich">Wöchentlich</option>
