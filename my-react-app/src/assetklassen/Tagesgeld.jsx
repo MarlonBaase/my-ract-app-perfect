@@ -4,7 +4,7 @@ import { handleApiError } from "../utils/errorHandler";
 import { SettingsContext } from '../SettingsContext';
 
 export default function Tagesgeld() {
-    const [listeGirokonto, setListeGirokonto] = useState([])
+    const [listeTagesgeld, setListeTagesgeld] = useState([])
     const [name, setName] = useState("")
     const [bank, setBank] = useState("")
     const [iban, setIban] = useState("")
@@ -24,7 +24,7 @@ export default function Tagesgeld() {
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
-    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
+    const [listeTransaktionenTagesgeld, setListeTransaktionenTagesgeld] = useState([])
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
@@ -37,10 +37,10 @@ export default function Tagesgeld() {
 
     const { ansicht } = useContext(SettingsContext);
 
-    const ladeGirokonto = async () => {
+    const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
-            .from("girokonto")
+            .from("tagesgeld")
             .select(`*, 
                 asset!inner(
                     benutzer_id,
@@ -52,12 +52,12 @@ export default function Tagesgeld() {
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
-        if (handleApiError(error, "Girokonto laden")) return;
-        if (data) setListeGirokonto(data)
+        if (handleApiError(error, "Tagesgeld laden")) return;
+        if (data) setListeTagesgeld(data)
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenGirokonto(data)
+        if (data) setListeTransaktionenTagesgeld(data)
     }
 
     const transaktionenOeffnen = async (assetId) => {
@@ -76,10 +76,10 @@ export default function Tagesgeld() {
             .order('datum', { ascending: false });
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenGirokonto(data)
+        if (data) setListeTransaktionenTagesgeld(data)
     }
 
-    const girokontoHinzufuegen = async () => {
+    const tagesgeldHinzufuegen = async () => {
         if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
 
         try {
@@ -90,7 +90,7 @@ export default function Tagesgeld() {
                 .insert({
                     benutzer_id: user.id,
                     asset_name: name,
-                    asset_typ: "girokonto",
+                    asset_typ: "tagesgeld",
                 })
                 .select()
 
@@ -102,8 +102,8 @@ export default function Tagesgeld() {
 
             const asset_id = assetData[0].asset_id
 
-            const { error: giroError } = await supabase
-                .from("girokonto")
+            const { error: tagesgeldError } = await supabase
+                .from("tagesgeld")
                 .insert({
                     asset_id: asset_id,
                     name_der_bank: bank,
@@ -121,9 +121,9 @@ export default function Tagesgeld() {
                     zinssatz: parseFloat(zinssatz) || 0
                 })
 
-            if (giroError) {
-                console.error("Fehler beim Erstellen des Girokontos:", giroError)
-                alert("Fehler beim Girokonto-Insert.")
+            if (tagesgeldError) {
+                console.error("Fehler beim Erstellen des Tagesgeldkontos:", tagesgeldError)
+                alert("Fehler beim Tagesgeldkonto-Insert.")
                 return
             }
 
@@ -135,13 +135,13 @@ export default function Tagesgeld() {
                     betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
                     asset_id: asset_id,
-                    assetklasse: "girokonto",
+                    assetklasse: "tagesgeld",
                     typ: "einnahme"
                 })
 
             if (transError) {
                 console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError)
-                alert("Fehler beim Girokonto-Insert.")
+                alert("Fehler beim Tagesgeldkonto-Insert.")
                 return
             }
 
@@ -161,7 +161,7 @@ export default function Tagesgeld() {
             setZinssatz("")
             setModalOffenHinzu(false)
 
-            ladeGirokonto()
+            ladeTagesgeld()
         } catch (err) {
             console.error("Unerwarteter Fehler:", err)
         }
@@ -189,12 +189,12 @@ export default function Tagesgeld() {
     const eintragLoeschen = async (assetId) => {
         if (!assetId) return;
 
-        const { error: giroError } = await supabase
-            .from("girokonto")
+        const { error: tagesgeldError } = await supabase
+            .from("tagesgeld")
             .delete()
             .eq("asset_id", assetId);
 
-        if (handleApiError(giroError, "Girokonto löschen")) return;
+        if (handleApiError(tagesgeldError, "Tagesgeldkonto löschen")) return;
 
         const { error: assetError } = await supabase
             .from("asset")
@@ -203,10 +203,10 @@ export default function Tagesgeld() {
 
         if (handleApiError(assetError, "Asset löschen")) return;
 
-        ladeGirokonto()
+        ladeTagesgeld()
     }
 
-    const girokontoSpeichern = async () => {
+    const tagesgeldSpeichern = async () => {
         if (!zuBearbeiten) return;
 
         const { error: assetError } = await supabase
@@ -216,8 +216,8 @@ export default function Tagesgeld() {
 
         if (handleApiError(assetError, "Asset Name updaten")) return;
 
-        const { error: giroError } = await supabase
-            .from("girokonto")
+        const { error: tagesgeldError } = await supabase
+            .from("tagesgeld")
             .update({
                 name_der_bank: bank,
                 iban: iban,
@@ -235,11 +235,11 @@ export default function Tagesgeld() {
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
-        if (handleApiError(giroError, "Girokontodaten updaten")) return;
+        if (handleApiError(tagesgeldError, "Tagesgeldkontodaten updaten")) return;
 
         setModalOffen(false)
         setZuBearbeiten(null)
-        ladeGirokonto()
+        ladeTagesgeld()
     }
 
     const transaktionHinzufuegen = async () => {
@@ -252,7 +252,7 @@ export default function Tagesgeld() {
             betrag: parseFloat(transaktionsBetrag),
             kategorie_id: transaktionsKategorie,
             asset_id: ausgewaehltesAsset,
-            assetklasse: "girokonto",
+            assetklasse: "tagesgeld",
             typ: transaktionsTyp
         });
 
@@ -263,7 +263,7 @@ export default function Tagesgeld() {
         setTransaktionsKategorie("");
         setTransaktionsTyp("");
 
-        ladeGirokonto();
+        ladeTagesgeld();
         transaktionenOeffnen(ausgewaehltesAsset);
         setModalTranskationenHinzufuegen(false);
     };
@@ -282,7 +282,7 @@ export default function Tagesgeld() {
 
     const ladeElternkontoListe = async () => {
         const { data } = await supabase
-            .from("girokonto")
+            .from("tagesgeld")
             .select("*")
             .eq("hauptkonto", true)
             .order("hauptkonto", { ascending: true });
@@ -293,7 +293,7 @@ export default function Tagesgeld() {
     useEffect(() => {
         const init = async () => {
             try {
-                await ladeGirokonto()
+                await ladeTagesgeld()
                 await ladeKategorien();
                 await ladeElternkontoListe();
             } catch (err) {
@@ -304,9 +304,9 @@ export default function Tagesgeld() {
     }, []);
 
     return (
-        <div className="girokonto-container">
+        <div className="tagesgeld-container">
             <div className="header-bar">
-                <h2>Girokonto</h2>
+                <h2>Tagesgeld</h2>
                 <button className="btn-primary" onClick={() => {
                     setModalOffenHinzu(true);
                     setZuBearbeiten(null);
@@ -315,14 +315,14 @@ export default function Tagesgeld() {
                     setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto(""); setDispoLimit("");
                     setBic(""); setZinssatz("");
                 }}>
-                    + Girokonto hinzufügen
+                    + Tagesgeldkonto hinzufügen
                 </button>
             </div>
 
             {ansicht === 'card' ? (
                 <div className="karten-grid">
-                    {listeGirokonto.map((e) => {
-                        const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+                    {listeTagesgeld.map((e) => {
+                        const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.elternkonto);
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
 
                         const transaktionen = e.asset?.transaktionsprotokoll || [];
@@ -383,8 +383,8 @@ export default function Tagesgeld() {
                             </tr>
                         </thead>
                         <tbody>
-                            {listeGirokonto.map((e) => {
-                                const gefundenerEintrag = listeGirokonto.find(k => k.asset?.asset_id === e.elternkonto);
+                            {listeTagesgeld.map((e) => {
+                                const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.elternkonto);
                                 const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
                                 const transaktionen = e.asset?.transaktionsprotokoll || [];
@@ -426,11 +426,11 @@ export default function Tagesgeld() {
                             <button className="close-btn" onClick={() => setModalOffenTransaktionen(false)}>✕</button>
                         </div>
                         <div className="modal-body">
-                            {listeTransaktionenGirokonto.length === 0 ? (
+                            {listeTransaktionenTagesgeld.length === 0 ? (
                                 <p className="empty-text">Keine Transaktionen für dieses Konto vorhanden.</p>
                             ) : (
                                 <ul className="transaction-list">
-                                    {listeTransaktionenGirokonto.map((t) => (
+                                    {listeTransaktionenTagesgeld.map((t) => (
                                         <li key={t.id} className="transaction-item">
                                             <div className="tx-info">
                                                 <span className="tx-desc">{t.notizen || "Ohne Notizen"}</span>
@@ -457,7 +457,7 @@ export default function Tagesgeld() {
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
-                            <h3>Neues Girokonto hinzufügen</h3>
+                            <h3>Neues Tagesgeldkonto hinzufügen</h3>
                             <button className="close-btn" onClick={() => setModalOffenHinzu(false)}>✕</button>
                         </div>
                         <div className="modal-body">
@@ -519,7 +519,7 @@ export default function Tagesgeld() {
                                         <label>Elternkonto auswählen</label>
                                         <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
                                             <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeGirokonto.map((e) => (
+                                            {listeTagesgeld.map((e) => (
                                                 <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
                                                     {e.asset?.asset_name} ({e.name_der_bank})
                                                 </option>
@@ -531,7 +531,7 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={girokontoHinzufuegen}>Speichern</button>
+                            <button className="btn-primary" onClick={tagesgeldHinzufuegen}>Speichern</button>
                         </div>
                     </div>
                 </div>
@@ -608,7 +608,7 @@ export default function Tagesgeld() {
                                         <label>Elternkonto wählen</label>
                                         <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
                                             <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeGirokonto.map((e) => (
+                                            {listeTagesgeld.map((e) => (
                                                 <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
                                                     {e.asset?.asset_name} ({e.name_der_bank})
                                                 </option>
@@ -620,7 +620,7 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={girokontoSpeichern}>Speichern</button>
+                            <button className="btn-primary" onClick={tagesgeldSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>
