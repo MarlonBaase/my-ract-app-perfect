@@ -192,7 +192,7 @@ export default function Tagesgeld() {
         setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
         setWaehrung(eintrag.waehrung || "EUR")
         setZinssatz(eintrag.zinssatz || "")
-        setZinssintervall(eintrag.zinsintervall || "")
+        setZinssintervall(eintrag.zinsintervall || "monatlich")
         setReferenzkonto(eintrag.referenzkonto || "")
         setFreistellungsauftrag(eintrag.freistellungsauftrag || false)
         setAktionszins(eintrag.aktionszins || "")
@@ -205,9 +205,9 @@ export default function Tagesgeld() {
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setTransaktionsNotizen(eintrag.notizen || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
-        setIstAktiv(eintrag.ist_aktiv || false)
+        setIstAktiv(eintrag.ist_aktiv ?? true)
         setBic(eintrag.bic || "")
-        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
+        setModalOffen(true)
     }
 
     const eintragLoeschen = async (assetId) => {
@@ -257,7 +257,7 @@ export default function Tagesgeld() {
                     sparrate: parseFloat(sparrate) || 0,
                     sparziel: parseFloat(sparziel) || 0,
                     mindestbetrag: parseFloat(mindestbetrag) || 0,
-                    ist_aktiv: true,
+                    ist_aktiv: ist_aktiv,
                     notizen: transaktionsNotizen,
                     eroeffnungsdatum: eroeffnungsdatum,
                     kontoinhaber: kontoinhaber,
@@ -342,8 +342,10 @@ export default function Tagesgeld() {
                     setZuBearbeiten(null);
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
                     setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
-                    setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto(""); setDispoLimit("");
-                    setBic(""); setZinssatz("");
+                    setKontoinhaber(""); setIstAktiv(true); setBic(""); setZinssatz("");
+                    setZinssintervall("monatlich"); setReferenzkonto(""); setFreistellungsauftrag(false);
+                    setAktionszins(""); setAblaufdatum_aktionszins(""); setNotgroschen(false);
+                    setEinlagensicherung("100000"); setSparrate(""); setSparziel(""); setMindestbetrag("");
                 }}>
                     + Tagesgeldkonto hinzufügen
                 </button>
@@ -493,15 +495,23 @@ export default function Tagesgeld() {
                             <div className="form-grid">
                                 <div className="form-group">
                                     <label>Asset Name*</label>
-                                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z.B. Hauptkonto" />
+                                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z.B. Notgroschen ING" />
                                 </div>
                                 <div className="form-group">
                                     <label>Bank Name*</label>
-                                    <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="z.B. Sparkasse" />
+                                    <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="z.B. ING" />
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>IBAN*</label>
                                     <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="DE00 0000 0000 0000 0000 00" />
+                                </div>
+                                <div className="form-group">
+                                    <label>BIC</label>
+                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Kontoinhaber</label>
+                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
                                 </div>
                                 <div className="form-group">
                                     <label>Startguthaben*</label>
@@ -516,20 +526,44 @@ export default function Tagesgeld() {
                                     <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                                 </div>
                                 <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
+                                    <label>Zinssatz (% p.a.)</label>
+                                    <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="3.25" type="number" step="0.01" />
                                 </div>
                                 <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
+                                    <label>Zinsintervall</label>
+                                    <select value={zinssintervall} onChange={(e) => setZinssintervall(e.target.value)}>
+                                        <option value="monatlich">Monatlich</option>
+                                        <option value="quartalsweise">Quartalsweise</option>
+                                        <option value="jaehrlich">Jährlich</option>
+                                    </select>
                                 </div>
                                 <div className="form-group">
-                                    <label>Dispo-Limit</label>
-                                    <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="0.00" type="number" />
+                                    <label>Aktionszins (%)</label>
+                                    <input value={aktionszins} onChange={(e) => setAktionszins(e.target.value)} placeholder="3.75" type="number" step="0.01" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Zinssatz (%)</label>
-                                    <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="0.00" type="number" step="0.01" />
+                                    <label>Ablaufdatum Aktionszins</label>
+                                    <input type="date" value={ablaufdatum_aktionszins} onChange={(e) => setAblaufdatum_aktionszins(e.target.value)} />
+                                </div>
+                                <div className="form-group col-span-2">
+                                    <label>Referenzkonto / Auszahlungskonto</label>
+                                    <input value={referenzkonto} onChange={(e) => setReferenzkonto(e.target.value)} placeholder="z.B. Girokonto Sparkasse" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sparziel (€)</label>
+                                    <input value={sparziel} onChange={(e) => setSparziel(e.target.value)} placeholder="5000.00" type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sparrate (€/Monat)</label>
+                                    <input value={sparrate} onChange={(e) => setSparrate(e.target.value)} placeholder="200.00" type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Mindestbetrag (€)</label>
+                                    <input value={mindestbetrag} onChange={(e) => setMindestbetrag(e.target.value)} placeholder="0.00" type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Einlagensicherung (€)</label>
+                                    <input value={einlagensicherung} onChange={(e) => setEinlagensicherung(e.target.value)} placeholder="100000" type="number" />
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>Notizen</label>
@@ -538,24 +572,14 @@ export default function Tagesgeld() {
 
                                 <div className="form-group checkbox-group col-span-2">
                                     <label className="checkbox-label">
-                                        <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
-                                        Als Hauptkonto festlegen
+                                        <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
+                                        Als Notgroschen festlegen
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.checked)} />
+                                        Freistellungsauftrag hinterlegt
                                     </label>
                                 </div>
-
-                                {!hauptkonto && (
-                                    <div className="form-group col-span-2">
-                                        <label>Elternkonto auswählen</label>
-                                        <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
-                                            <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeTagesgeld.map((e) => (
-                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                    {e.asset?.asset_name} ({e.name_der_bank})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -571,7 +595,7 @@ export default function Tagesgeld() {
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
-                            <h3>Girokonto bearbeiten</h3>
+                            <h3>Tagesgeldkonto bearbeiten</h3>
                             <button className="close-btn" onClick={() => setModalOffen(false)}>✕</button>
                         </div>
                         <div className="modal-body">
@@ -589,6 +613,14 @@ export default function Tagesgeld() {
                                     <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
                                 </div>
                                 <div className="form-group">
+                                    <label>BIC</label>
+                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Kontoinhaber</label>
+                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} />
+                                </div>
+                                <div className="form-group">
                                     <label>Guthaben bei Eröffnung</label>
                                     <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} type="number" />
                                 </div>
@@ -601,23 +633,47 @@ export default function Tagesgeld() {
                                     <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
                                 </div>
                                 <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} />
-                                </div>
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Dispo Limit</label>
-                                    <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} type="number" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinssatz (%)</label>
+                                    <label>Zinssatz (% p.a.)</label>
                                     <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} type="number" step="0.01" />
                                 </div>
+                                <div className="form-group">
+                                    <label>Zinsintervall</label>
+                                    <select value={zinssintervall} onChange={(e) => setZinssintervall(e.target.value)}>
+                                        <option value="monatlich">Monatlich</option>
+                                        <option value="quartalsweise">Quartalsweise</option>
+                                        <option value="jaehrlich">Jährlich</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Aktionszins (%)</label>
+                                    <input value={aktionszins} onChange={(e) => setAktionszins(e.target.value)} type="number" step="0.01" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Ablaufdatum Aktionszins</label>
+                                    <input type="date" value={ablaufdatum_aktionszins} onChange={(e) => setAblaufdatum_aktionszins(e.target.value)} />
+                                </div>
                                 <div className="form-group col-span-2">
-                                    <label>notizen</label>
+                                    <label>Referenzkonto / Auszahlungskonto</label>
+                                    <input value={referenzkonto} onChange={(e) => setReferenzkonto(e.target.value)} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sparziel (€)</label>
+                                    <input value={sparziel} onChange={(e) => setSparziel(e.target.value)} type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Sparrate (€/Monat)</label>
+                                    <input value={sparrate} onChange={(e) => setSparrate(e.target.value)} type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Mindestbetrag (€)</label>
+                                    <input value={mindestbetrag} onChange={(e) => setMindestbetrag(e.target.value)} type="number" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Einlagensicherung (€)</label>
+                                    <input value={einlagensicherung} onChange={(e) => setEinlagensicherung(e.target.value)} type="number" />
+                                </div>
+                                <div className="form-group col-span-2">
+                                    <label>Notizen</label>
                                     <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} />
                                 </div>
 
@@ -627,94 +683,19 @@ export default function Tagesgeld() {
                                         Konto ist Aktiv
                                     </label>
                                     <label className="checkbox-label">
-                                        <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
-                                        Hauptkonto
+                                        <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
+                                        Als Notgroschen festlegen
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.checked)} />
+                                        Freistellungsauftrag hinterlegt
                                     </label>
                                 </div>
-
-                                {!hauptkonto && (
-                                    <div className="form-group col-span-2">
-                                        <label>Elternkonto wählen</label>
-                                        <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
-                                            <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeTagesgeld.map((e) => (
-                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                    {e.asset?.asset_name} ({e.name_der_bank})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
                             </div>
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
                             <button className="btn-primary" onClick={tagesgeldkontoSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL: Transaktion Hinzufügen */}
-            {modalTranskationenHinzufuegen && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>Transaktion hinzufügen</h3>
-                            <button className="close-btn" onClick={() => setModalTranskationenHinzufuegen(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group col-span-2">
-                                    <label>Notizen*</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="z.B. Gehalt, Supermarkt..." />
-                                </div>
-                                <div className="form-group">
-                                    <label>Betrag*</label>
-                                    <input value={transaktionsBetrag} onChange={(e) => setTransaktionsBetrag(e.target.value)} placeholder="0.00" type="number" step="0.01" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Typ*</label>
-                                    <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
-                                        <option value="">Typ wählen</option>
-                                        <option value="ausgabe">Ausgabe</option>
-                                        <option value="einnahme">Einnahme</option>
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Kategorie*</label>
-                                    <select value={transaktionsKategorie} onChange={(e) => setTransaktionsKategorie(e.target.value)}>
-                                        <option value="">Kategorie wählen</option>
-                                        {kategorien.map((k) => (
-                                            <option key={k.id} value={k.id}>{k.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={wiederkehrendaktiv} onChange={(e) => setWiederkehrendaktiv(e.target.checked)} />
-                                        Wiederkehrende Transaktion
-                                    </label>
-                                </div>
-
-                                {wiederkehrendaktiv && (
-                                    <div className="form-group col-span-2">
-                                        <label>Intervall</label>
-                                        <select value={zinssintervall} onChange={(e) => setZinssintervall(e.target.value)}>
-                                            <option value="">Intervall wählen</option>
-                                            <option value="täglich">Täglich</option>
-                                            <option value="wöchentlich">Wöchentlich</option>
-                                            <option value="monatlich">Monatlich</option>
-                                            <option value="jährlich">Jährlich</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalTranskationenHinzufuegen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={transaktionHinzufuegen}>Hinzufügen</button>
                         </div>
                     </div>
                 </div>
