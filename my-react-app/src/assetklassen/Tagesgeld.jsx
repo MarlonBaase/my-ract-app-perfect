@@ -40,7 +40,7 @@ export default function Tagesgeld() {
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
-            .from("tagesgeld")
+            .from("tagesgeldkonto")
             .select(`*, 
                 asset!inner(
                     benutzer_id,
@@ -79,7 +79,7 @@ export default function Tagesgeld() {
         if (data) setListeTransaktionenTagesgeld(data)
     }
 
-    const tagesgeldHinzufuegen = async () => {
+    const tagesgeldkontoHinzufuegen = async () => {
         if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
 
         try {
@@ -90,7 +90,7 @@ export default function Tagesgeld() {
                 .insert({
                     benutzer_id: user.id,
                     asset_name: name,
-                    asset_typ: "tagesgeld",
+                    asset_typ: "tagesgeldkonto",
                 })
                 .select()
 
@@ -102,8 +102,8 @@ export default function Tagesgeld() {
 
             const asset_id = assetData[0].asset_id
 
-            const { error: tagesgeldError } = await supabase
-                .from("tagesgeld")
+            const { error: tagesgeldkontoError } = await supabase
+                .from("tagesgeldkonto")
                 .insert({
                     asset_id: asset_id,
                     name_der_bank: bank,
@@ -121,8 +121,8 @@ export default function Tagesgeld() {
                     zinssatz: parseFloat(zinssatz) || 0
                 })
 
-            if (tagesgeldError) {
-                console.error("Fehler beim Erstellen des Tagesgeldkontos:", tagesgeldError)
+            if (tagesgeldkontoError) {
+                console.error("Fehler beim Erstellen des Tagesgeldkontos:", tagesgeldkontoError)
                 alert("Fehler beim Tagesgeldkonto-Insert.")
                 return
             }
@@ -135,7 +135,7 @@ export default function Tagesgeld() {
                     betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
                     asset_id: asset_id,
-                    assetklasse: "tagesgeld",
+                    assetklasse: "tagesgeldkonto",
                     typ: "einnahme"
                 })
 
@@ -189,12 +189,12 @@ export default function Tagesgeld() {
     const eintragLoeschen = async (assetId) => {
         if (!assetId) return;
 
-        const { error: tagesgeldError } = await supabase
-            .from("tagesgeld")
+        const { error: tagesgeldkontoError } = await supabase
+            .from("tagesgeldkonto")
             .delete()
             .eq("asset_id", assetId);
 
-        if (handleApiError(tagesgeldError, "Tagesgeldkonto löschen")) return;
+        if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
 
         const { error: assetError } = await supabase
             .from("asset")
@@ -206,7 +206,7 @@ export default function Tagesgeld() {
         ladeTagesgeld()
     }
 
-    const tagesgeldSpeichern = async () => {
+    const tagesgeldkontoSpeichern = async () => {
         if (!zuBearbeiten) return;
 
         const { error: assetError } = await supabase
@@ -216,8 +216,8 @@ export default function Tagesgeld() {
 
         if (handleApiError(assetError, "Asset Name updaten")) return;
 
-        const { error: tagesgeldError } = await supabase
-            .from("tagesgeld")
+        const { error: tagesgeldkontoError } = await supabase
+            .from("tagesgeldkonto")
             .update({
                 name_der_bank: bank,
                 iban: iban,
@@ -235,7 +235,7 @@ export default function Tagesgeld() {
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
-        if (handleApiError(tagesgeldError, "Tagesgeldkontodaten updaten")) return;
+        if (handleApiError(tagesgeldkontoError, "Tagesgeldkontodaten updaten")) return;
 
         setModalOffen(false)
         setZuBearbeiten(null)
@@ -252,7 +252,7 @@ export default function Tagesgeld() {
             betrag: parseFloat(transaktionsBetrag),
             kategorie_id: transaktionsKategorie,
             asset_id: ausgewaehltesAsset,
-            assetklasse: "tagesgeld",
+            assetklasse: "tagesgeldkonto",
             typ: transaktionsTyp
         });
 
@@ -282,7 +282,7 @@ export default function Tagesgeld() {
 
     const ladeElternkontoListe = async () => {
         const { data } = await supabase
-            .from("tagesgeld")
+            .from("tagesgeldkonto")
             .select("*")
             .eq("hauptkonto", true)
             .order("hauptkonto", { ascending: true });
@@ -304,7 +304,7 @@ export default function Tagesgeld() {
     }, []);
 
     return (
-        <div className="tagesgeld-container">
+        <div className="tagesgeldkonto-container">
             <div className="header-bar">
                 <h2>Tagesgeld</h2>
                 <button className="btn-primary" onClick={() => {
@@ -531,7 +531,7 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={tagesgeldHinzufuegen}>Speichern</button>
+                            <button className="btn-primary" onClick={tagesgeldkontoHinzufuegen}>Speichern</button>
                         </div>
                     </div>
                 </div>
@@ -620,7 +620,7 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={tagesgeldSpeichern}>Speichern</button>
+                            <button className="btn-primary" onClick={tagesgeldkontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>
