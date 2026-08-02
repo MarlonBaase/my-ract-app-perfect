@@ -43,6 +43,8 @@ export default function Tagesgeld() {
     const [sparrate, setSparrate] = useState("");
     const [sparziel, setSparziel] = useState("");
     const [mindestbetrag, setMindestbetrag] = useState("");
+    const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("");
+    const [listeReferenzkonto, setListeReferenzkonto] = useState([]);
 
 
     const { ansicht } = useContext(SettingsContext);
@@ -121,8 +123,8 @@ export default function Tagesgeld() {
                     waehrung: waehrung,
                     zinssatz: parseFloat(zinssatz) || 0,
                     zinsintervall: zinssintervall || "monatlich",
-                    referenzkonto: referenzkonto,
-                    freistellungsauftrag: freistellungsauftrag || false,
+                    referenzkonto: ausgewaehltesReferenzkonto,
+                    freistellungsauftrag: freistellungsauftrag,
                     aktionszins: parseFloat(aktionszins) || 0,
                     ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                     notgroschen: notgroschen || false,
@@ -193,7 +195,7 @@ export default function Tagesgeld() {
         setWaehrung(eintrag.waehrung || "EUR")
         setZinssatz(eintrag.zinssatz || "")
         setZinssintervall(eintrag.zinsintervall || "monatlich")
-        setReferenzkonto(eintrag.referenzkonto || "")
+        setAusgewaehltesReferenzkonto(eintrag.referenzkonto || "")
         setFreistellungsauftrag(eintrag.freistellungsauftrag || false)
         setAktionszins(eintrag.aktionszins || "")
         setAblaufdatum_aktionszins(eintrag.ablaufdatum_aktionszins || "")
@@ -320,12 +322,42 @@ export default function Tagesgeld() {
         if (data) setElternkontoListe(data);
     };
 
+    const ladeReferenzkonto = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data, error } = await supabase
+            .from("girokonto")
+            .select(`*, 
+                asset!inner(
+                    benutzer_id,
+                    asset_name,
+                    asset_id,
+                    transaktionsprotokoll(betrag, typ)
+                    tagesgeldkonto!inner(
+                        asset_id,
+                        name_der_bank,
+                        iban,
+                        waehrung
+                    )
+                )
+            `)
+            .eq("asset.benutzer_id", user.id)
+            .order('asset_name', { referencedTable: 'asset', ascending: true });
+
+        if (handleApiError(error, "Girokonto laden")) return;
+        if (data) setListeReferenzkonto(data)
+
+
+        if (handleApiError(error, "Transaktionen öffnen")) return;
+        if (data) setListeTransaktionenGirokonto(data)
+    }
+
     useEffect(() => {
         const init = async () => {
             try {
                 await ladeTagesgeld()
                 await ladeKategorien();
                 await ladeElternkontoListe();
+                await ladeReferenzkonto();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -343,7 +375,7 @@ export default function Tagesgeld() {
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
                     setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
                     setKontoinhaber(""); setIstAktiv(true); setBic(""); setZinssatz("");
-                    setZinssintervall("monatlich"); setReferenzkonto(""); setFreistellungsauftrag(false);
+                    setZinssintervall("monatlich"); setAusgewaehltesReferenzkonto(""); setFreistellungsauftrag(false);
                     setAktionszins(""); setAblaufdatum_aktionszins(""); setNotgroschen(false);
                     setEinlagensicherung("100000"); setSparrate(""); setSparziel(""); setMindestbetrag("");
                 }}>
@@ -547,7 +579,14 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>Referenzkonto / Auszahlungskonto</label>
-                                    <input value={referenzkonto} onChange={(e) => setReferenzkonto(e.target.value)} placeholder="z.B. Girokonto Sparkasse" />
+                                    <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
+                                            <option value="">Kein Referenzkonto (Optional)</option>
+                                            {listeReferenzkonto.map((e) => (
+                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
+                                                    {e.asset?.asset_name} ({e.name_der_bank})
+                                                </option>
+                                            ))}
+                                        </select>
                                 </div>
                                 <div className="form-group">
                                     <label>Sparziel (€)</label>
