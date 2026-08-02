@@ -314,15 +314,6 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Kategorie laden")) return;
     };
 
-    const ladeElternkontoListe = async () => {
-        const { data } = await supabase
-            .from("tagesgeldkonto")
-            .select("referenzkonto:asset_id, asset:asset_name")
-            .order("referenzkonto", { ascending: true });
-
-        if (data) setElternkontoListe(data);
-    };
-
     const ladeReferenzkonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
