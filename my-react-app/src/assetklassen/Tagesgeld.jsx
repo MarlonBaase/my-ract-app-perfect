@@ -319,8 +319,8 @@ export default function Tagesgeld() {
         const { data, error } = await supabase
             .from("asset")
             .select(`*, 
-                tagesgeldkonto(*),
-                girokonto(*),
+                tagesgeldkonto!left(*),
+                girokonto!left(*),
                 transaktionsprotokoll!left(betrag, typ)
             `)
             .eq("benutzer_id", user.id)
