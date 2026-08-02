@@ -326,7 +326,7 @@ export default function Tagesgeld() {
                 tagesgeldkonto!left(*),
                 girokonto!left(*)`)
             .eq("benutzer_id", user.id)
-            .or('tagesgeldkonto_ist_referenzkonto.eq.true,girokonto_ist_referenzkonto.eq.true')
+            .or('tagesgeldkonto.tagesgeldkonto_ist_referenzkonto.eq.true,girokonto.girokonto_ist_referenzkonto.eq.true')
             .order('asset_name', { ascending: true });
 
         if (data) setListeReferenzkonto(data);
