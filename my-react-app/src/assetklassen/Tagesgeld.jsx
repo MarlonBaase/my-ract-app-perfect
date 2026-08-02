@@ -326,25 +326,21 @@ export default function Tagesgeld() {
     const ladeReferenzkonto = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
-            .from("girokonto")
+            .from("asset")
             .select(`*, 
-                asset!inner(
-                    benutzer_id,
-                    asset_name,
-                    asset_id,
-                    transaktionsprotokoll(betrag, typ),
-                    tagesgeldkonto(asset_id, name_der_bank, iban, waehrung)
-                )
+                tagesgeldkonto(*),
+                girokonto(*),
+                transaktionsprotokoll(betrag, typ)
             `)
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
-        if (handleApiError(error, "Girokonto laden")) return;
+        if (handleApiError(error, "Referenzkonto laden")) return;
         if (data) setListeReferenzkonto(data)
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenGirokonto(data)
+        if (data) setListeTransaktionenTagesgeld(data)
     }
 
     useEffect(() => {
