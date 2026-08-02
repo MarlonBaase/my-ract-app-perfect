@@ -332,8 +332,8 @@ export default function Tagesgeld() {
                 girokonto(*),
                 transaktionsprotokoll(betrag, typ)
             `)
-            .eq("asset.benutzer_id", user.id)
-            .order('asset_name', { referencedTable: 'asset', ascending: true });
+            .eq("benutzer_id", user.id)
+            .order('asset_name', { ascending: true });
 
         if (handleApiError(error, "Referenzkonto laden")) return;
         if (data) setListeReferenzkonto(data)
