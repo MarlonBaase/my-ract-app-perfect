@@ -246,26 +246,26 @@ export default function Tagesgeld() {
         const { error: tagesgeldkontoError } = await supabase
             .from("tagesgeldkonto")
             .update({
-                    name_der_bank: bank,
-                    iban: iban,
-                    waehrung: waehrung,
-                    zinssatz: parseFloat(zinssatz) || 0,
-                    zinsintervall: zinssintervall || "monatlich",
-                    referenzkonto: referenzkonto,
-                    freistellungsauftrag: freistellungsauftrag || false,
-                    aktionszins: parseFloat(aktionszins) || 0,
-                    ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
-                    notgroschen: notgroschen || false,
-                    einlagensicherung: parseFloat(einlagensicherung) || 100000,
-                    sparrate: parseFloat(sparrate) || 0,
-                    sparziel: parseFloat(sparziel) || 0,
-                    mindestbetrag: parseFloat(mindestbetrag) || 0,
-                    ist_aktiv: ist_aktiv,
-                    notizen: transaktionsNotizen,
-                    eroeffnungsdatum: eroeffnungsdatum,
-                    kontoinhaber: kontoinhaber,
-                    bic: bic,
-                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                name_der_bank: bank,
+                iban: iban,
+                waehrung: waehrung,
+                zinssatz: parseFloat(zinssatz) || 0,
+                zinsintervall: zinssintervall || "monatlich",
+                referenzkonto: referenzkonto,
+                freistellungsauftrag: freistellungsauftrag || false,
+                aktionszins: parseFloat(aktionszins) || 0,
+                ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
+                notgroschen: notgroschen || false,
+                einlagensicherung: parseFloat(einlagensicherung) || 100000,
+                sparrate: parseFloat(sparrate) || 0,
+                sparziel: parseFloat(sparziel) || 0,
+                mindestbetrag: parseFloat(mindestbetrag) || 0,
+                ist_aktiv: ist_aktiv,
+                notizen: transaktionsNotizen,
+                eroeffnungsdatum: eroeffnungsdatum,
+                kontoinhaber: kontoinhaber,
+                bic: bic,
+                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
@@ -308,7 +308,7 @@ export default function Tagesgeld() {
             .select("*")
             .eq("sichtbar", true)
             .order("name", { ascending: true });
-            
+
 
         if (data) setKategorien(data);
         if (handleApiError(error, "Kategorie laden")) return;
@@ -326,8 +326,16 @@ export default function Tagesgeld() {
             .eq("benutzer_id", user.id)
             .order('asset_name', { ascending: true });
 
+        if (data) {
+            const nurKonten = data.filter(asset =>
+                (asset.girokonto && asset.girokonto.length > 0) ||
+                (asset.tagesgeldkonto && asset.tagesgeldkonto.length > 0)
+            );
+
+            setListeReferenzkonto(nurKonten);
+        }
+
         if (handleApiError(error, "Referenzkonto laden")) return;
-        if (data) setListeReferenzkonto(data)
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
@@ -562,13 +570,13 @@ export default function Tagesgeld() {
                                 <div className="form-group col-span-2">
                                     <label>Referenzkonto / Auszahlungskonto</label>
                                     <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
-                                            <option value="">Kein Referenzkonto (Optional)</option>
-                                            {listeReferenzkonto.map((e) => (
-                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                    {e.asset?.asset_name} ({e.name_der_bank})
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <option value="">Kein Referenzkonto (Optional)</option>
+                                        {listeReferenzkonto.map((e) => (
+                                            <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
+                                                {e.asset?.asset_name} ({e.name_der_bank})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label>Sparziel (€)</label>
