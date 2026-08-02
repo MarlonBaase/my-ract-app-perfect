@@ -315,29 +315,34 @@ export default function Tagesgeld() {
     };
 
     const ladeReferenzkonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data, error } = await supabase
-            .from("asset")
-            .select(`*, 
-                tagesgeldkonto!left(*),
-                girokonto!left(*)
-            `)
-            .eq("benutzer_id", user.id)
-            .order('asset_name', { ascending: true });
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+        .from("asset")
+        .select(`*, 
+            tagesgeldkonto!left(*),
+            girokonto!left(*)
+        `)
+        .eq("benutzer_id", user.id)
+        .order('asset_name', { ascending: true });
 
-        if (data) {
-            const nurKonten = data.filter(asset =>
-                (asset.girokonto && asset.girokonto.length > 0) ||
-                (asset.tagesgeldkonto && asset.tagesgeldkonto.length > 0)
-            );
+    if (handleApiError(error, "Referenzkonto laden")) return;
 
-            setListeReferenzkonto(nurKonten);
-        }
+    if (data) {
+        const nurKonten = data.filter(asset => {
+            const hatGiro = Array.isArray(asset.girokonto) 
+                ? asset.girokonto.length > 0 
+                : Boolean(asset.girokonto);
+                
+            const hatTagesgeld = Array.isArray(asset.tagesgeldkonto) 
+                ? asset.tagesgeldkonto.length > 0 
+                : Boolean(asset.tagesgeldkonto);
 
-        if (handleApiError(error, "Referenzkonto laden")) return;
+            return hatGiro || hatTagesgeld;
+        });
 
-
+        setListeReferenzkonto(nurKonten);
     }
+}
 
     useEffect(() => {
         const init = async () => {
