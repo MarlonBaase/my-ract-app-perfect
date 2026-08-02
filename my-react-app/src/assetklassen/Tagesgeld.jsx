@@ -320,8 +320,7 @@ export default function Tagesgeld() {
             .from("asset")
             .select(`*, 
                 tagesgeldkonto!left(*),
-                girokonto!left(*),
-                transaktionsprotokoll!left(betrag, typ)
+                girokonto!left(*)
             `)
             .eq("benutzer_id", user.id)
             .order('asset_name', { ascending: true });
@@ -338,8 +337,6 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Referenzkonto laden")) return;
 
 
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenTagesgeld(data)
     }
 
     useEffect(() => {
