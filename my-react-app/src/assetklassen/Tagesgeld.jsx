@@ -321,7 +321,7 @@ export default function Tagesgeld() {
             .select(`*, 
                 tagesgeldkonto(*),
                 girokonto(*),
-                transaktionsprotokoll(betrag, typ)
+                transaktionsprotokoll!left(betrag, typ)
             `)
             .eq("benutzer_id", user.id)
             .order('asset_name', { ascending: true });
