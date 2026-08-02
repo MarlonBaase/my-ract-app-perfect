@@ -326,10 +326,22 @@ export default function Tagesgeld() {
                 tagesgeldkonto!left(*),
                 girokonto!left(*)`)
             .eq("benutzer_id", user.id)
-            .or('tagesgeldkonto.tagesgeldkonto_ist_referenzkonto.eq.true,girokonto.girokonto_ist_referenzkonto.eq.true')
             .order('asset_name', { ascending: true });
 
-        if (data) setListeReferenzkonto(data);
+        if (data) {
+        // Filtern in JavaScript: Nur Konten behalten, die geladen wurden UND aktiv sind
+        const aktiveReferenzkonten = data.filter(asset => {
+            const tagesgeld = Array.isArray(asset.tagesgeldkonto) ? asset.tagesgeldkonto[0] : asset.tagesgeldkonto;
+            const girokonto = Array.isArray(asset.girokonto) ? asset.girokonto[0] : asset.girokonto;
+
+            const istTagesgeldAktiv = tagesgeld && tagesgeld.tagesgeldkonto_ist_aktiv === true;
+            const istGiroAktiv = girokonto && girokonto.girokonto_ist_aktiv === true;
+
+            return istTagesgeldAktiv || istGiroAktiv;
+        });
+
+        setListeReferenzkonto(aktiveReferenzkonten);
+    }
         if (handleApiError(error, "Referenzkonto laden")) return;
     };
 
