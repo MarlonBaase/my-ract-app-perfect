@@ -117,6 +117,7 @@ export default function Tagesgeld() {
             const { error: tagesgeldkontoError } = await supabase
                 .from("tagesgeldkonto")
                 .insert({
+                    benutzer_id: user.id,
                     asset_id: asset_id,
                     name_der_bank: bank,
                     iban: iban,
