@@ -334,8 +334,6 @@ export default function Tagesgeld() {
                     transaktionsprotokoll(betrag, typ)
                 ),
             `)
-            .from("tagesgeldkonto")
-            .select(`*,`)
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
