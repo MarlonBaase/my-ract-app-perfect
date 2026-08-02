@@ -339,7 +339,6 @@ export default function Tagesgeld() {
             try {
                 await ladeTagesgeld()
                 await ladeKategorien();
-                await ladeElternkontoListe();
                 await ladeReferenzkonto();
             } catch (err) {
                 console.error("Fehler in init:", err);
