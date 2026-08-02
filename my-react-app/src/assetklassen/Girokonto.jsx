@@ -34,6 +34,7 @@ export default function Girokonto() {
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
     const [intervall, setIntervall] = useState("");
+    const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -118,7 +119,8 @@ export default function Girokonto() {
                     elternkonto: ausgewaehltesElternkonto || null,
                     dispo_limit: parseFloat(dispo_limit) || 0,
                     bic: bic,
-                    zinssatz: parseFloat(zinssatz) || 0
+                    zinssatz: parseFloat(zinssatz) || 0,
+                    ist_referenzkonto: ist_referenzkonto || false
                 })
 
             if (giroError) {
@@ -183,6 +185,7 @@ export default function Girokonto() {
         setDispoLimit(eintrag.dispo_limit || "")
         setBic(eintrag.bic || "")
         setZinssatz(eintrag.zinssatz || "")
+        setIstReferenzkonto(eintrag.ist_referenzkonto || false)
         setModalOffen(true)
     }
 
@@ -231,7 +234,8 @@ export default function Girokonto() {
                 elternkonto: ausgewaehltesElternkonto || null,
                 dispo_limit: parseFloat(dispo_limit) || 0,
                 bic: bic,
-                zinssatz: parseFloat(zinssatz) || 0
+                zinssatz: parseFloat(zinssatz) || 0,
+                ist_referenzkonto: ist_referenzkonto || false
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
@@ -515,6 +519,10 @@ export default function Girokonto() {
                                         <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                                         Als Hauptkonto festlegen
                                     </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
+                                        Als Referenzkonto festlegen
+                                    </label>
                                 </div>
 
                                 {!hauptkonto && (
@@ -603,6 +611,10 @@ export default function Girokonto() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
                                         Hauptkonto
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
+                                        Referenzkonto
                                     </label>
                                 </div>
 

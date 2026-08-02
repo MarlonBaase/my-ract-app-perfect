@@ -45,6 +45,7 @@ export default function Tagesgeld() {
     const [mindestbetrag, setMindestbetrag] = useState("");
     const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("");
     const [listeReferenzkonto, setListeReferenzkonto] = useState([]);
+    const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
 
 
     const { ansicht } = useContext(SettingsContext);
@@ -139,6 +140,7 @@ export default function Tagesgeld() {
                     kontoinhaber: kontoinhaber,
                     bic: bic,
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                    ist_referenzkonto: false
                 })
 
             if (tagesgeldkontoError) {
@@ -210,6 +212,7 @@ export default function Tagesgeld() {
         setKontoinhaber(eintrag.kontoinhaber || "")
         setIstAktiv(eintrag.ist_aktiv ?? true)
         setBic(eintrag.bic || "")
+        setIstReferenzkonto(eintrag.ist_referenzkonto || false)
         setModalOffen(true)
     }
 
@@ -266,6 +269,7 @@ export default function Tagesgeld() {
                 kontoinhaber: kontoinhaber,
                 bic: bic,
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
+                ist_referenzkonto: ist_referenzkonto || false
             })
             .eq("asset_id", zuBearbeiten.asset_id);
 
@@ -322,6 +326,7 @@ export default function Tagesgeld() {
                 tagesgeldkonto!left(*),
                 girokonto!left(*)`)
             .eq("benutzer_id", user.id)
+            .eq("referenzkonto", true)
             .order('asset_name', { ascending: true });
 
         if (data) setListeReferenzkonto(data);
@@ -353,7 +358,7 @@ export default function Tagesgeld() {
                     setKontoinhaber(""); setIstAktiv(true); setBic(""); setZinssatz("");
                     setZinssintervall("monatlich"); setAusgewaehltesReferenzkonto(""); setFreistellungsauftrag(false);
                     setAktionszins(""); setAblaufdatum_aktionszins(""); setNotgroschen(false);
-                    setEinlagensicherung("100000"); setSparrate(""); setSparziel(""); setMindestbetrag("");
+                    setEinlagensicherung("100000"); setSparrate(""); setSparziel(""); setMindestbetrag(""); setIstReferenzkonto(false);
                 }}>
                     + Tagesgeldkonto hinzufügen
                 </button>
@@ -593,6 +598,7 @@ export default function Tagesgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
                                         Als Notgroschen festlegen
+                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
                                     </label>
                                 </div>
                             </div>
@@ -703,6 +709,10 @@ export default function Tagesgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
                                         Als Notgroschen festlegen
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
+                                        Als Referenzkonto festlegen
                                     </label>
                                 </div>
                             </div>
