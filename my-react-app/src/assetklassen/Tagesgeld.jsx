@@ -331,7 +331,8 @@ export default function Tagesgeld() {
                     benutzer_id,
                     asset_name,
                     asset_id,
-                    transaktionsprotokoll(betrag, typ)
+                    transaktionsprotokoll(betrag, typ),
+                    tagesgeldkonto(asset_id, name_der_bank, iban, waehrung)
                 )
             `)
             .eq("asset.benutzer_id", user.id)
