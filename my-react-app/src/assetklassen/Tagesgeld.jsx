@@ -319,44 +319,44 @@ export default function Tagesgeld() {
     };
 
     const ladeReferenzkonto = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-        .from("asset")
-        .select(`*,
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data, error } = await supabase
+            .from("asset")
+            .select(`*,
             tagesgeldkonto!left(*),
             girokonto!left(*)`)
-        .eq("benutzer_id", user.id)
-        .order('asset_name', { ascending: true });
+            .eq("benutzer_id", user.id)
+            .order('asset_name', { ascending: true });
 
-    if (data) {
-        const aufbereiteteKonten = data.map(asset => {
-            const tagesgeld = Array.isArray(asset.tagesgeldkonto) 
-                ? asset.tagesgeldkonto[0] 
-                : asset.tagesgeldkonto;
-                
-            const girokonto = Array.isArray(asset.girokonto) 
-                ? asset.girokonto[0] 
-                : asset.girokonto;
+        if (data) {
+            const aufbereiteteKonten = data.map(asset => {
+                const tagesgeld = Array.isArray(asset.tagesgeldkonto)
+                    ? asset.tagesgeldkonto[0]
+                    : asset.tagesgeldkonto;
 
-            return {
-                ...asset,
-                tagesgeldkonto: tagesgeld || null,
-                girokonto: girokonto || null
-            };
-        });
+                const girokonto = Array.isArray(asset.girokonto)
+                    ? asset.girokonto[0]
+                    : asset.girokonto;
 
-        const aktiveReferenzkonten = aufbereiteteKonten.filter(asset => {
-            const istTagesgeldAktiv = asset.tagesgeldkonto?.ist_aktiv === true;
-            const istGiroAktiv = asset.girokonto?.ist_aktiv === true;
+                return {
+                    ...asset,
+                    tagesgeldkonto: tagesgeld || null,
+                    girokonto: girokonto || null
+                };
+            });
 
-            return istTagesgeldAktiv || istGiroAktiv;
-        });
+            const aktiveReferenzkonten = aufbereiteteKonten.filter(asset => {
+                const istTagesgeldAktiv = asset.tagesgeldkonto?.ist_aktiv === true;
+                const istGiroAktiv = asset.girokonto?.ist_aktiv === true;
 
-        setListeReferenzkonto(aktiveReferenzkonten);
-    }
-    
-    if (handleApiError(error, "Referenzkonto laden")) return;
-};
+                return istTagesgeldAktiv || istGiroAktiv;
+            });
+
+            setListeReferenzkonto(aktiveReferenzkonten);
+        }
+
+        if (handleApiError(error, "Referenzkonto laden")) return;
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -588,8 +588,12 @@ export default function Tagesgeld() {
                                     <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
                                         <option value="">Kein Referenzkonto (Optional)</option>
                                         {listeReferenzkonto.map((e) => (
-                                            <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                {e.asset?.asset_name} ({e.name_der_bank})
+                                            // ✅ Korrektur: Zeige Name/IBAN an oder erstelle eine Bedingung
+                                            <option key={e.asset.id} value={e.asset.id}>
+                                                {e.asset.tagesgeldkonto
+                                                    ? `Tagesgeld (${e.asset.tagesgeldkonto.bank_name || e.asset.tagesgeldkonto.iban || 'Aktiv'})`
+                                                    : e.asset.asset_name
+                                                }
                                             </option>
                                         ))}
                                     </select>
