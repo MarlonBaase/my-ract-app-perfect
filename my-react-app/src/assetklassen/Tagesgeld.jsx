@@ -319,31 +319,44 @@ export default function Tagesgeld() {
     };
 
     const ladeReferenzkonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data, error } = await supabase
-            .from("asset")
-            .select(`*,
-                tagesgeldkonto!left(*),
-                girokonto!left(*)`)
-            .eq("benutzer_id", user.id)
-            .order('asset_name', { ascending: true });
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+        .from("asset")
+        .select(`*,
+            tagesgeldkonto!left(*),
+            girokonto!left(*)`)
+        .eq("benutzer_id", user.id)
+        .order('asset_name', { ascending: true });
 
-        if (data) {
-        // Filtern in JavaScript: Nur Konten behalten, die geladen wurden UND aktiv sind
-        const aktiveReferenzkonten = data.filter(asset => {
-            const tagesgeld = Array.isArray(asset.tagesgeldkonto) ? asset.tagesgeldkonto[0] : asset.tagesgeldkonto;
-            const girokonto = Array.isArray(asset.girokonto) ? asset.girokonto[0] : asset.girokonto;
+    if (data) {
+        const aufbereiteteKonten = data.map(asset => {
+            const tagesgeld = Array.isArray(asset.tagesgeldkonto) 
+                ? asset.tagesgeldkonto[0] 
+                : asset.tagesgeldkonto;
+                
+            const girokonto = Array.isArray(asset.girokonto) 
+                ? asset.girokonto[0] 
+                : asset.girokonto;
 
-            const istTagesgeldAktiv = tagesgeld && tagesgeld.ist_aktiv === true;
-            const istGiroAktiv = girokonto && girokonto.ist_aktiv === true;
+            return {
+                ...asset,
+                tagesgeldkonto: tagesgeld || null,
+                girokonto: girokonto || null
+            };
+        });
+
+        const aktiveReferenzkonten = aufbereiteteKonten.filter(asset => {
+            const istTagesgeldAktiv = asset.tagesgeldkonto?.ist_aktiv === true;
+            const istGiroAktiv = asset.girokonto?.ist_aktiv === true;
 
             return istTagesgeldAktiv || istGiroAktiv;
         });
 
         setListeReferenzkonto(aktiveReferenzkonten);
     }
-        if (handleApiError(error, "Referenzkonto laden")) return;
-    };
+    
+    if (handleApiError(error, "Referenzkonto laden")) return;
+};
 
     useEffect(() => {
         const init = async () => {
