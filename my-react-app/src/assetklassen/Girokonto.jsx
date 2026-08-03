@@ -4,62 +4,56 @@ import { handleApiError } from "../utils/errorHandler";
 import { SettingsContext } from '../SettingsContext';
 
 export default function Girokonto() {
-    const [listeGirokonto, setListeGirokonto] = useState([])
-    const [name, setName] = useState("")
-    const [bank, setBank] = useState("")
-    const [iban, setIban] = useState("")
-    const [kontoinhaber, setKontoinhaber] = useState("")
-    const [ist_aktiv, setIstAktiv] = useState(true)
-    const [hauptkonto, setHauptkonto] = useState(false)
-    const [elternkonto, setElternkonto] = useState("")
+    const [listeGirokonto, setListeGirokonto] = useState([]);
+    const [name, setName] = useState("");
+    const [bank, setBank] = useState("");
+    const [iban, setIban] = useState("");
+    const [kontoinhaber, setKontoinhaber] = useState("");
+    const [ist_aktiv, setIstAktiv] = useState(true);
+    const [hauptkonto, setHauptkonto] = useState(false);
     const [elternkontoListe, setElternkontoListe] = useState([]);
     const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState("");
-    const [dispo_limit, setDispoLimit] = useState("")
-    const [bic, setBic] = useState("")
-    const [zinssatz, setZinssatz] = useState("")
-    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
-    const [waehrung, setWaehrung] = useState("EUR")
-    const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
-    const [modalOffen, setModalOffen] = useState(false)
-    const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
-    const [zuBearbeiten, setZuBearbeiten] = useState(null)
-    const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
-    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([])
+    const [dispo_limit, setDispoLimit] = useState("");
+    const [bic, setBic] = useState("");
+    const [zinssatz, setZinssatz] = useState("");
+    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("");
+    const [waehrung, setWaehrung] = useState("EUR");
+    const [eroeffnungsdatum, setEroeffnungsdatum] = useState("");
+    const [modalOffen, setModalOffen] = useState(false);
+    const [modalOffenHinzu, setModalOffenHinzu] = useState(false);
+    const [zuBearbeiten, setZuBearbeiten] = useState(null);
+    const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false);
+    const [listeTransaktionenGirokonto, setListeTransaktionenGirokonto] = useState([]);
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("");
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
     const [transaktionsTyp, setTransaktionsTyp] = useState("");
-    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
     const [kategorien, setKategorien] = useState([]);
-    const [intervall, setIntervall] = useState("");
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
 
     const { ansicht } = useContext(SettingsContext);
 
     const ladeGirokonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
         const { data, error } = await supabase
             .from("girokonto")
             .select(`*, 
-                asset!inner(
+                asset(
                     benutzer_id,
                     asset_name,
                     asset_id,
                     transaktionsprotokoll(betrag, typ)
                 )
             `)
-            .eq("asset.benutzer_id", user.id)
-            .order('asset_name', { referencedTable: 'asset', ascending: true });
+            .eq("benutzer_id", user.id);
 
         if (handleApiError(error, "Girokonto laden")) return;
-        if (data) setListeGirokonto(data)
-
-
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenGirokonto(data)
-    }
+        if (data) setListeGirokonto(data);
+    };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -67,8 +61,8 @@ export default function Girokonto() {
             return;
         }
 
-        setModalOffenTransaktionen(true)
-        setAusgewaehltesAsset(assetId)
+        setModalOffenTransaktionen(true);
+        setAusgewaehltesAsset(assetId);
 
         const { data, error } = await supabase
             .from("transaktionsprotokoll")
@@ -77,14 +71,14 @@ export default function Girokonto() {
             .order('datum', { ascending: false });
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenGirokonto(data)
-    }
+        if (data) setListeTransaktionenGirokonto(data);
+    };
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
+        if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return;
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
+            const { data: { user } } = await supabase.auth.getUser();
 
             const { data: assetData, error: assetError } = await supabase
                 .from("asset")
@@ -93,20 +87,21 @@ export default function Girokonto() {
                     asset_name: name,
                     asset_typ: "girokonto",
                 })
-                .select()
+                .select();
 
             if (assetError || !assetData || assetData.length === 0) {
-                console.error("Fehler beim Erstellen des Assets:", assetError.message || JSON.stringify(assetError))
-                alert("Fehler beim Erstellen des übergeordneten Assets.")
-                return
+                console.error("Fehler beim Erstellen des Assets:", assetError?.message || JSON.stringify(assetError));
+                alert("Fehler beim Erstellen des übergeordneten Assets.");
+                return;
             }
 
-            const asset_id = assetData[0].asset_id
+            const asset_id = assetData[0].asset_id;
 
             const { error: giroError } = await supabase
                 .from("girokonto")
                 .insert({
                     asset_id: asset_id,
+                    benutzer_id: user.id, // Direct user ID binding
                     name_der_bank: bank,
                     iban: iban,
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
@@ -121,12 +116,12 @@ export default function Girokonto() {
                     bic: bic,
                     zinssatz: parseFloat(zinssatz) || 0,
                     ist_referenzkonto: ist_referenzkonto || false
-                })
+                });
 
             if (giroError) {
-                console.error("Fehler beim Erstellen des Girokontos:", giroError)
-                alert("Fehler beim Girokonto-Insert.")
-                return
+                console.error("Fehler beim Erstellen des Girokontos:", giroError);
+                alert("Fehler beim Girokonto-Insert.");
+                return;
             }
 
             const { error: transError } = await supabase
@@ -139,55 +134,55 @@ export default function Girokonto() {
                     asset_id: asset_id,
                     assetklasse: "girokonto",
                     typ: "einnahme"
-                })
+                });
 
             if (transError) {
-                console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError)
-                alert("Fehler beim Girokonto-Insert.")
-                return
+                console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError);
+                alert("Fehler beim Girokonto-Insert.");
+                return;
             }
 
-            setName("")
-            setBank("")
-            setIban("")
-            setEinzahlung_bei_eroeffnung("")
-            setWaehrung("EUR")
-            setEroeffnungsdatum("")
-            setTransaktionsNotizen("")
-            setKontoinhaber("")
-            setIstAktiv(true)
-            setHauptkonto(false)
-            setAusgewaehltesElternkonto("")
-            setDispoLimit("")
-            setBic("")
-            setZinssatz("")
-            setModalOffenHinzu(false)
+            setName("");
+            setBank("");
+            setIban("");
+            setEinzahlung_bei_eroeffnung("");
+            setWaehrung("EUR");
+            setEroeffnungsdatum("");
+            setTransaktionsNotizen("");
+            setKontoinhaber("");
+            setIstAktiv(true);
+            setHauptkonto(false);
+            setAusgewaehltesElternkonto("");
+            setDispoLimit("");
+            setBic("");
+            setZinssatz("");
+            setModalOffenHinzu(false);
 
-            ladeGirokonto()
+            ladeGirokonto();
         } catch (err) {
-            console.error("Unerwarteter Fehler:", err)
+            console.error("Unerwarteter Fehler:", err);
         }
-    }
+    };
 
     const bearbeitenOeffnen = (eintrag) => {
-        setZuBearbeiten(eintrag)
-        setName(eintrag.asset?.asset_name || "")
-        setBank(eintrag.name_der_bank || "")
-        setIban(eintrag.iban || "")
-        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "")
-        setWaehrung(eintrag.waehrung || "EUR")
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
-        setTransaktionsNotizen(eintrag.notizen || "")
-        setKontoinhaber(eintrag.kontoinhaber || "")
-        setIstAktiv(eintrag.ist_aktiv ?? true)
-        setHauptkonto(eintrag.hauptkonto ?? false)
-        setAusgewaehltesElternkonto(eintrag.elternkonto || "")
-        setDispoLimit(eintrag.dispo_limit || "")
-        setBic(eintrag.bic || "")
-        setZinssatz(eintrag.zinssatz || "")
-        setIstReferenzkonto(eintrag.ist_referenzkonto || false)
-        setModalOffen(true)
-    }
+        setZuBearbeiten(eintrag);
+        setName(eintrag.asset?.asset_name || "");
+        setBank(eintrag.name_der_bank || "");
+        setIban(eintrag.iban || "");
+        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "");
+        setWaehrung(eintrag.waehrung || "EUR");
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
+        setTransaktionsNotizen(eintrag.notizen || "");
+        setKontoinhaber(eintrag.kontoinhaber || "");
+        setIstAktiv(eintrag.ist_aktiv ?? true);
+        setHauptkonto(eintrag.hauptkonto ?? false);
+        setAusgewaehltesElternkonto(eintrag.elternkonto || "");
+        setDispoLimit(eintrag.dispo_limit || "");
+        setBic(eintrag.bic || "");
+        setZinssatz(eintrag.zinssatz || "");
+        setIstReferenzkonto(eintrag.ist_referenzkonto || false);
+        setModalOffen(true);
+    };
 
     const eintragLoeschen = async (assetId) => {
         if (!assetId) return;
@@ -206,8 +201,8 @@ export default function Girokonto() {
 
         if (handleApiError(assetError, "Asset löschen")) return;
 
-        ladeGirokonto()
-    }
+        ladeGirokonto();
+    };
 
     const girokontoSpeichern = async () => {
         if (!zuBearbeiten) return;
@@ -241,10 +236,10 @@ export default function Girokonto() {
 
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
-        setModalOffen(false)
-        setZuBearbeiten(null)
-        ladeGirokonto()
-    }
+        setModalOffen(false);
+        setZuBearbeiten(null);
+        ladeGirokonto();
+    };
 
     const transaktionHinzufuegen = async () => {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
@@ -278,18 +273,20 @@ export default function Girokonto() {
             .select("*")
             .eq("sichtbar", true)
             .order("name", { ascending: true });
-            
 
         if (data) setKategorien(data);
         if (handleApiError(error, "Kategorie laden")) return;
     };
 
     const ladeElternkontoListe = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
         const { data } = await supabase
             .from("girokonto")
             .select("*")
-            .eq("hauptkonto", true)
-            .order("hauptkonto", { ascending: true });
+            .eq("benutzer_id", user.id)
+            .eq("hauptkonto", true);
 
         if (data) setElternkontoListe(data);
     };
@@ -297,7 +294,7 @@ export default function Girokonto() {
     useEffect(() => {
         const init = async () => {
             try {
-                await ladeGirokonto()
+                await ladeGirokonto();
                 await ladeKategorien();
                 await ladeElternkontoListe();
             } catch (err) {
@@ -336,12 +333,8 @@ export default function Girokonto() {
                             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                         }, 0);
 
-
                         return (
                             <div className="account-card" key={e.id}>
-                                <div className="card-img">
-                                    <img src="https://yt3.googleusercontent.com/Eetl08UMJf1gf9BnFGhe3PukeR-WQWv8sBjMT1JaZv7iZ8-zyksV-ITKACBpu0F07zeamcUZ0A=s900-c-k-c0x00ffffff-no-rj" alt="Girokonto" />
-                                </div>
                                 <div className="card-header">
                                     <div>
                                         <h3>{e.asset?.asset_name}</h3>
@@ -352,16 +345,8 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="card-body">
-
-
                                     <div className="amount">
                                         <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
-                                    </div>
-
-
-                                    <div className="amount">
-
-                                        {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
                                     {elternkontoName && <p className="parent"><strong>Elternkonto:</strong> {elternkontoName}</p>}
@@ -600,7 +585,7 @@ export default function Girokonto() {
                                     <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} type="number" step="0.01" />
                                 </div>
                                 <div className="form-group col-span-2">
-                                    <label>notizen</label>
+                                    <label>Notizen</label>
                                     <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} />
                                 </div>
 
@@ -637,71 +622,6 @@ export default function Girokonto() {
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
                             <button className="btn-primary" onClick={girokontoSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL: Transaktion Hinzufügen */}
-            {modalTranskationenHinzufuegen && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>Transaktion hinzufügen</h3>
-                            <button className="close-btn" onClick={() => setModalTranskationenHinzufuegen(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group col-span-2">
-                                    <label>Notizen*</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="z.B. Gehalt, Supermarkt..." />
-                                </div>
-                                <div className="form-group">
-                                    <label>Betrag*</label>
-                                    <input value={transaktionsBetrag} onChange={(e) => setTransaktionsBetrag(e.target.value)} placeholder="0.00" type="number" step="0.01" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Typ*</label>
-                                    <select value={transaktionsTyp} onChange={(e) => setTransaktionsTyp(e.target.value)}>
-                                        <option value="">Typ wählen</option>
-                                        <option value="ausgabe">Ausgabe</option>
-                                        <option value="einnahme">Einnahme</option>
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Kategorie*</label>
-                                    <select value={transaktionsKategorie} onChange={(e) => setTransaktionsKategorie(e.target.value)}>
-                                        <option value="">Kategorie wählen</option>
-                                        {kategorien.map((k) => (
-                                            <option key={k.id} value={k.id}>{k.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={wiederkehrendaktiv} onChange={(e) => setWiederkehrendaktiv(e.target.checked)} />
-                                        Wiederkehrende Transaktion
-                                    </label>
-                                </div>
-
-                                {wiederkehrendaktiv && (
-                                    <div className="form-group col-span-2">
-                                        <label>Intervall</label>
-                                        <select value={intervall} onChange={(e) => setIntervall(e.target.value)}>
-                                            <option value="">Intervall wählen</option>
-                                            <option value="täglich">Täglich</option>
-                                            <option value="wöchentlich">Wöchentlich</option>
-                                            <option value="monatlich">Monatlich</option>
-                                            <option value="jährlich">Jährlich</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalTranskationenHinzufuegen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={transaktionHinzufuegen}>Hinzufügen</button>
                         </div>
                     </div>
                 </div>
