@@ -334,8 +334,8 @@ export default function Tagesgeld() {
             const tagesgeld = Array.isArray(asset.tagesgeldkonto) ? asset.tagesgeldkonto[0] : asset.tagesgeldkonto;
             const girokonto = Array.isArray(asset.girokonto) ? asset.girokonto[0] : asset.girokonto;
 
-            const istTagesgeldAktiv = tagesgeld && tagesgeld.tagesgeldkonto_ist_aktiv === true;
-            const istGiroAktiv = girokonto && girokonto.girokonto_ist_aktiv === true;
+            const istTagesgeldAktiv = tagesgeld && tagesgeld.ist_aktiv === true;
+            const istGiroAktiv = girokonto && girokonto.ist_aktiv === true;
 
             return istTagesgeldAktiv || istGiroAktiv;
         });
