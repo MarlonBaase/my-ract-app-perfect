@@ -348,6 +348,7 @@ export default function Girokonto() {
                                         <span className="bank-name">{e.name_der_bank}</span>
                                     </div>
                                     {e.hauptkonto && <span className="badge">Hauptkonto</span>}
+                                    {e.ist_referenzkonto && <span className="badge">Referenzkonto</span>}
                                 </div>
 
                                 <div className="card-body">
