@@ -59,13 +59,13 @@ export default function Girokonto() {
     };
 
     const ladeAssets = async () => {
-    const { data } = await supabase
-      .from("asset")
-      .select("*")
-      .order("asset_name", { ascending: true });
+        const { data } = await supabase
+            .from("asset")
+            .select("*")
+            .order("asset_name", { ascending: true });
 
-    if (data) setAssets(data);
-  };
+        if (data) setAssets(data);
+    };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -340,11 +340,13 @@ export default function Girokonto() {
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
 
                         const transaktionen = e.asset?.transaktionsprotokoll || [];
-
-                        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
+                        const summeTransaktionen = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                         }, 0);
+
+                        // 💡 KORREKTUR: Startguthaben + Transaktionssumme
+                        const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summeTransaktionen;
 
                         return (
                             <div className="account-card" key={e.id}>
@@ -353,15 +355,32 @@ export default function Girokonto() {
                                         <h3>{e.asset?.asset_name}</h3>
                                         <span className="bank-name">{e.name_der_bank}</span>
                                     </div>
-                                    {e.hauptkonto && <span className="badge">Hauptkonto</span>}
-                                    {e.ist_referenzkonto && <span className="badge">Referenzkonto</span>}
+                                    <div className="badge-group">
+                                        {e.hauptkonto && <span className="badge badge-primary">Hauptkonto</span>}
+                                        {e.ist_referenzkonto && <span className="badge badge-info">Referenzkonto</span>}
+                                        {e.ist_aktiv === false && <span className="badge badge-warning">Inaktiv</span>}
+                                    </div>
                                 </div>
 
                                 <div className="card-body">
                                     <div className="amount">
-                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
+                                        <strong>{aktuellerKontostand.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {e.waehrung}</strong>
                                     </div>
+
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
+                                    {e.bic && <p className="sub-text"><strong>BIC:</strong> {e.bic}</p>}
+                                    {e.kontoinhaber && <p className="sub-text"><strong>Inhaber:</strong> {e.kontoinhaber}</p>}
+
+                                    {/* 💡 ERGÄNZUNG: Zusätzliche nützliche Finanzdetails */}
+                                    <div className="account-details-grid">
+                                        {Number(e.dispo_limit) > 0 && (
+                                            <p className="detail-item"><strong>Dispo:</strong> {Number(e.dispo_limit).toFixed(2)} {e.waehrung}</p>
+                                        )}
+                                        {Number(e.zinssatz) > 0 && (
+                                            <p className="detail-item"><strong>Zins:</strong> {e.zinssatz}%</p>
+                                        )}
+                                    </div>
+
                                     {elternkontoName && <p className="parent"><strong>Elternkonto:</strong> {elternkontoName}</p>}
                                     {e.notizen && <p className="note">{e.notizen}</p>}
                                 </div>
@@ -381,8 +400,9 @@ export default function Girokonto() {
                         <thead>
                             <tr>
                                 <th>Asset / Bank</th>
-                                <th>IBAN</th>
+                                <th>IBAN / BIC</th>
                                 <th>Guthaben</th>
+                                <th>Konto-Details</th>
                                 <th>Inhaber</th>
                                 <th>Elternkonto</th>
                                 <th>Aktionen</th>
@@ -401,19 +421,31 @@ export default function Girokonto() {
                                 const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                                 return (
-                                    <tr key={e.id}>
+                                    <tr key={e.id} className={e.ist_aktiv === false ? 'row-inactive' : ''}>
                                         <td>
                                             <strong>{e.asset?.asset_name}</strong>
                                             <div className="subtext">{e.name_der_bank}</div>
+                                            {e.hauptkonto && <span className="badge-small">Hauptkonto</span>}
                                         </td>
-                                        <td className="code-text">{e.iban}</td>
-                                        <td><strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong></td>
+                                        <td className="code-text">
+                                            <div>{e.iban}</div>
+                                            {e.bic && <div className="subtext">BIC: {e.bic}</div>}
+                                        </td>
+                                        <td>
+                                            <strong>{aktuellerKontostand.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {e.waehrung}</strong>
+                                        </td>
+                                        {/* 💡 ERGÄNZUNG: Dispo und Zinsen übersichtlich in der Tabelle */}
+                                        <td className="subtext">
+                                            {Number(e.dispo_limit) > 0 && <div>Dispo: {e.dispo_limit} {e.waehrung}</div>}
+                                            {Number(e.zinssatz) > 0 && <div>Zins: {e.zinssatz}%</div>}
+                                            {!Number(e.dispo_limit) && !Number(e.zinssatz) && "—"}
+                                        </td>
                                         <td>{e.kontoinhaber || "—"}</td>
                                         <td>{elternkontoName}</td>
                                         <td className="table-actions">
-                                            <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
-                                            <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
+                                            <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
+                                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                                            <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                         </td>
                                     </tr>
                                 );
@@ -443,7 +475,7 @@ export default function Girokonto() {
                                                 <span className="tx-date">{t.datum}</span>
                                             </div>
                                             <span className={`tx-amount ${t.typ === 'einnahme' ? 'positive' : 'negative'}`}>
-                                                {t.typ === 'einnahme' ? '+' : '-'}{t.betrag} {t.waehrung || 'EUR'}
+                                                {t.typ === 'einnahme' ? '+' : '-'}{Number(t.betrag).toFixed(2)} {t.waehrung || 'EUR'}
                                             </span>
                                         </li>
                                     ))}
@@ -640,108 +672,102 @@ export default function Girokonto() {
                 </div>
             )}
 
+            {/* 💡 KORREKTUR: Transaktion hinzufügen Modal an das CSS-Klassendesign angepasst */}
             {modalTranskationenHinzufuegen && (
-                <div style={{
-                    position: "fixed",
-                    top: 0, left: 0,
-                    width: "100%", height: "100%",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        backgroundColor: "white",
-                        padding: "24px",
-                        borderRadius: "12px",
-                        minWidth: "320px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "12px",
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-                    }}>
-                        <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
-                        <input
-                            value={transaktionsNotizen}
-                            onChange={(e) => setTransaktionsNotizen(e.target.value)}
-                            placeholder="Notizen"
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        />
-                        <input
-                            value={transaktionsBetrag}
-                            onChange={(e) => setTransaktionsBetrag(e.target.value)}
-                            placeholder="Betrag"
-                            type="number"
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        />
-                        <select
-                            value={transaktionsKategorie}
-                            onChange={(e) => setTransaktionsKategorie(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Kategorie wählen</option>
-                            {kategorien.map((k) => (
-                                <option key={k.id} value={k.id}>{k.name}</option>
-                            ))}
-                        </select>
-                        <select
-                            value={transaktionsTyp}
-                            onChange={(e) => setTransaktionsTyp(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Typ wählen</option>
-                            <option value="ausgabe">Ausgabe</option>
-                            <option value="einnahme">Einnahme</option>
-                        </select>
-                        <select
-                            value={ausgewaehltesAsset}
-                            onChange={(e) => setAusgewaehltesAsset(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Asset wählen</option>
-                            {assets.map((a) => (
-                                <option key={a.asset_id} value={a.asset_id}>
-                                    {a.asset_typ} | {a.asset_name}
-                                </option>
-                            ))}
-                        </select>
-
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <input
-                                type="checkbox"
-                                id="wiederkehrend"
-                                checked={wiederkehrendaktiv}
-                                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-                            />
-                            <label htmlFor="wiederkehrend">Wiederkehrend</label>
+                <div className="modal-overlay">
+                    <div className="modal-container">
+                        <div className="modal-header">
+                            <h3>Transaktion hinzufügen</h3>
+                            <button className="close-btn" onClick={() => setModalTranskationenHinzufuegen(false)}>✕</button>
                         </div>
+                        <div className="modal-body">
+                            <div className="form-grid">
+                                <div className="form-group col-span-2">
+                                    <label>Notizen</label>
+                                    <input
+                                        value={transaktionsNotizen}
+                                        onChange={(e) => setTransaktionsNotizen(e.target.value)}
+                                        placeholder="Beschreibung der Transaktion"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Betrag</label>
+                                    <input
+                                        value={transaktionsBetrag}
+                                        onChange={(e) => setTransaktionsBetrag(e.target.value)}
+                                        placeholder="0.00"
+                                        type="number"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Typ</label>
+                                    <select
+                                        value={transaktionsTyp}
+                                        onChange={(e) => setTransaktionsTyp(e.target.value)}
+                                    >
+                                        <option value="">Typ wählen</option>
+                                        <option value="ausgabe">Ausgabe</option>
+                                        <option value="einnahme">Einnahme</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Kategorie</label>
+                                    <select
+                                        value={transaktionsKategorie}
+                                        onChange={(e) => setTransaktionsKategorie(e.target.value)}
+                                    >
+                                        <option value="">Kategorie wählen</option>
+                                        {kategorien.map((k) => (
+                                            <option key={k.id} value={k.id}>{k.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Asset</label>
+                                    <select
+                                        value={ausgewaehltesAsset}
+                                        onChange={(e) => setAusgewaehltesAsset(e.target.value)}
+                                    >
+                                        <option value="">Asset wählen</option>
+                                        {assets.map((a) => (
+                                            <option key={a.asset_id} value={a.asset_id}>
+                                                {a.asset_typ} | {a.asset_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        {wiederkehrendaktiv && (
-                            <select
-                                value={intervall}
-                                onChange={(e) => setIntervall(e.target.value)}
-                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                            >
-                                <option value="">Intervall wählen</option>
-                                <option value="täglich">Täglich</option>
-                                <option value="wöchentlich">Wöchentlich</option>
-                                <option value="monatlich">Monatlich</option>
-                                <option value="jährlich">Jährlich</option>
-                            </select>
-                        )}
+                                <div className="form-group checkbox-group col-span-2">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={wiederkehrendaktiv}
+                                            onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+                                        />
+                                        Wiederkehrende Transaktion
+                                    </label>
+                                </div>
 
-                        <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                            <button
-                                onClick={transaktionHinzufuegen}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                            >
-                                Hinzufügen
-                            </button>
-                            <button
-                                onClick={() => setModalTranskationenHinzufuegen(false)}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                            >
-                                Abbrechen
-                            </button>
+                                {wiederkehrendaktiv && (
+                                    <div className="form-group col-span-2">
+                                        <label>Intervall</label>
+                                        <select
+                                            value={intervall}
+                                            onChange={(e) => setIntervall(e.target.value)}
+                                        >
+                                            <option value="">Intervall wählen</option>
+                                            <option value="täglich">Täglich</option>
+                                            <option value="wöchentlich">Wöchentlich</option>
+                                            <option value="monatlich">Monatlich</option>
+                                            <option value="jährlich">Jährlich</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-secondary" onClick={() => setModalTranskationenHinzufuegen(false)}>Abbrechen</button>
+                            <button className="btn-primary" onClick={transaktionHinzufuegen}>Hinzufügen</button>
                         </div>
                     </div>
                 </div>
