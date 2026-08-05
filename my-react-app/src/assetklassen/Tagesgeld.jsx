@@ -35,7 +35,7 @@ export default function Tagesgeld() {
     const [kategorien, setKategorien] = useState([]);
     const [zinssintervall, setZinssintervall] = useState("");
     const [referenzkonto, setReferenzkonto] = useState("");
-    const [freistellungsauftrag, setFreistellungsauftrag] = useState(false);
+    const [freistellungsauftrag, setFreistellungsauftrag] = useState("");
     const [aktionszins, setAktionszins] = useState("");
     const [ablaufdatum_aktionszins, setAblaufdatum_aktionszins] = useState("");
     const [notgroschen, setNotgroschen] = useState(false);
@@ -199,7 +199,7 @@ export default function Tagesgeld() {
         setZinssatz(eintrag.zinssatz || "")
         setZinssintervall(eintrag.zinsintervall || "monatlich")
         setAusgewaehltesReferenzkonto(eintrag.referenzkonto || "")
-        setFreistellungsauftrag(eintrag.freistellungsauftrag || false)
+        setFreistellungsauftrag(eintrag.freistellungsauftrag || "")
         setAktionszins(eintrag.aktionszins || "")
         setAblaufdatum_aktionszins(eintrag.ablaufdatum_aktionszins || "")
         setNotgroschen(eintrag.notgroschen || false)
@@ -255,7 +255,7 @@ export default function Tagesgeld() {
                 zinssatz: parseFloat(zinssatz) || 0,
                 zinsintervall: zinssintervall || "monatlich",
                 referenzkonto: referenzkonto,
-                freistellungsauftrag: freistellungsauftrag || false,
+                freistellungsauftrag: freistellungsauftrag || "",
                 aktionszins: parseFloat(aktionszins) || 0,
                 ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                 notgroschen: notgroschen || false,
@@ -326,6 +326,7 @@ export default function Tagesgeld() {
             tagesgeldkonto!left(*),
             girokonto!left(*)`)
             .eq("benutzer_id", user.id)
+            .eq("ist_referenzkonto", true)
             .order('asset_name', { ascending: true });
 
         if (data) {
@@ -383,7 +384,7 @@ export default function Tagesgeld() {
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
                     setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
                     setKontoinhaber(""); setIstAktiv(true); setBic(""); setZinssatz("");
-                    setZinssintervall("monatlich"); setAusgewaehltesReferenzkonto(""); setFreistellungsauftrag(false);
+                    setZinssintervall("monatlich"); setAusgewaehltesReferenzkonto(""); setFreistellungsauftrag("");
                     setAktionszins(""); setAblaufdatum_aktionszins(""); setNotgroschen(false);
                     setEinlagensicherung("100000"); setSparrate(""); setSparziel(""); setMindestbetrag(""); setIstReferenzkonto(false);
                 }}>
