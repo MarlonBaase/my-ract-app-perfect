@@ -34,6 +34,7 @@ export default function Girokonto() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [intervall, setIntervall] = useState("");
+    const [assets, setAssets] = useState([]);
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -56,6 +57,15 @@ export default function Girokonto() {
         if (handleApiError(error, "Girokonto laden")) return;
         if (data) setListeGirokonto(data);
     };
+
+    const ladeAssets = async () => {
+    const { data } = await supabase
+      .from("asset")
+      .select("*")
+      .order("asset_name", { ascending: true });
+
+    if (data) setAssets(data);
+  };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -299,6 +309,7 @@ export default function Girokonto() {
                 await ladeGirokonto();
                 await ladeKategorien();
                 await ladeElternkontoListe();
+                await ladeAssets();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
