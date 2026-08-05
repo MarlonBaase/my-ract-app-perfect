@@ -380,7 +380,7 @@ export default function Tagesgeld() {
             <div className="header-bar">
                 <h2>Tagesgeld</h2>
                 <button className="btn-primary" onClick={() => {
-                    setModalOffenHinzu(true);
+                    setModalOffenHinzu(true, ladeReferenzkonto(), ladeKategorien());
                     setZuBearbeiten(null);
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
                     setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
@@ -528,7 +528,6 @@ export default function Tagesgeld() {
 
             {/* MODAL: Hinzufügen */}
             {modalOffenHinzu && (
-                ladeReferenzkonto(), ladeKategorien(),
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
