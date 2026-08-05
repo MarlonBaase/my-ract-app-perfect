@@ -196,25 +196,34 @@ export default function Girokonto() {
         setModalOffen(true);
     };
 
+
     const eintragLoeschen = async (assetId) => {
         if (!assetId) return;
 
-        const { error: giroError } = await supabase
+        const { error: tagesgeldkontoError } = await supabase
+            const { error: giroError } = await supabase
             .from("girokonto")
             .delete()
-            .eq("asset_id", assetId);
+            .eq("asset_id", assetId)
+            .select();
 
-        if (handleApiError(giroError, "Girokonto löschen")) return;
+            console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
+
+        if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
 
         const { error: assetError } = await supabase
             .from("asset")
             .delete()
-            .eq("asset_id", assetId);
+            .eq("asset_id", assetId)
+            .select();
+
+            console.log("Fehler Asset:", assetError);
 
         if (handleApiError(assetError, "Asset löschen")) return;
 
-        ladeGirokonto();
-    };
+        await ladeGirokonto()
+    }
+
 
     const girokontoSpeichern = async () => {
         if (!zuBearbeiten) return;
