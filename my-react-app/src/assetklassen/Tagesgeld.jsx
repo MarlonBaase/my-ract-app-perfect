@@ -227,6 +227,8 @@ export default function Tagesgeld() {
             .delete()
             .eq("asset_id", assetId);
 
+            console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
+
         if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
 
         const { error: assetError } = await supabase
@@ -234,9 +236,11 @@ export default function Tagesgeld() {
             .delete()
             .eq("asset_id", assetId);
 
+            console.log("Fehler Asset:", assetError);
+
         if (handleApiError(assetError, "Asset löschen")) return;
 
-        ladeTagesgeld()
+        await ladeTagesgeld()
     }
 
     const tagesgeldkontoSpeichern = async () => {
