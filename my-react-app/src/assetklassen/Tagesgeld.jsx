@@ -400,13 +400,13 @@ export default function Tagesgeld() {
             {ansicht === 'card' ? (
                 <div className="karten-grid">
                     {listeTagesgeld.map((e) => {
-                         const transaktionen = e.asset?.transaktionsprotokoll || [];
+                        const transaktionen = e.asset?.transaktionsprotokoll || [];
 
-                        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
+                        const summe = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                         }, 0);
-
+                        const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                         return (
                             <div className="account-card" key={e.id}>
@@ -420,16 +420,8 @@ export default function Tagesgeld() {
                                 </div>
 
                                 <div className="card-body">
-
-
                                     <div className="amount">
                                         <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
-                                    </div>
-
-
-                                    <div className="amount">
-
-                                        {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
                                     <p className="iban"><strong>IBAN:</strong> {e.iban}</p>
                                     {e.notizen && <p className="note">{e.notizen}</p>}
