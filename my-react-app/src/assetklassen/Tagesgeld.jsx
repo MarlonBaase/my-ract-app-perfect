@@ -414,7 +414,7 @@ export default function Tagesgeld() {
                                         <h3>{e.asset?.asset_name}</h3>
                                         <span className="bank-name">{e.name_der_bank}</span>
                                     </div>
-                                    {e.hauptkonto && <span className="badge">Hauptkonto</span>}
+                                    {e.notgroschen && <span className="badge">Notgroschen</span>}
                                     {e.ist_referenzkonto && <span className="badge">Referenzkonto</span>}
                                 </div>
 
