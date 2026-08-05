@@ -46,6 +46,9 @@ export default function Tagesgeld() {
     const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("");
     const [listeReferenzkonto, setListeReferenzkonto] = useState([]);
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
+    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
+    const [intervall, setIntervall] = useState("");
+    const [assets, setAssets] = useState([]);
 
 
     const { ansicht } = useContext(SettingsContext);
@@ -72,6 +75,15 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
     }
+
+    const ladeAssets = async () => {
+    const { data } = await supabase
+      .from("asset")
+      .select("*")
+      .order("asset_name", { ascending: true });
+
+    if (data) setAssets(data);
+  };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -368,6 +380,7 @@ export default function Tagesgeld() {
                 await ladeTagesgeld()
                 await ladeKategorien();
                 await ladeReferenzkonto();
+                await ladeAssets();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -752,6 +765,112 @@ export default function Tagesgeld() {
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
                             <button className="btn-primary" onClick={tagesgeldkontoSpeichern}>Speichern</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {modalTranskationenHinzufuegen && (
+                <div style={{
+                    position: "fixed",
+                    top: 0, left: 0,
+                    width: "100%", height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        backgroundColor: "white",
+                        padding: "24px",
+                        borderRadius: "12px",
+                        minWidth: "320px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "12px",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                    }}>
+                        <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
+                        <input
+                            value={transaktionsNotizen}
+                            onChange={(e) => setTransaktionsNotizen(e.target.value)}
+                            placeholder="Notizen"
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        />
+                        <input
+                            value={transaktionsBetrag}
+                            onChange={(e) => setTransaktionsBetrag(e.target.value)}
+                            placeholder="Betrag"
+                            type="number"
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        />
+                        <select
+                            value={transaktionsKategorie}
+                            onChange={(e) => setTransaktionsKategorie(e.target.value)}
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        >
+                            <option value="">Kategorie wählen</option>
+                            {kategorien.map((k) => (
+                                <option key={k.id} value={k.id}>{k.name}</option>
+                            ))}
+                        </select>
+                        <select
+                            value={transaktionsTyp}
+                            onChange={(e) => setTransaktionsTyp(e.target.value)}
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        >
+                            <option value="">Typ wählen</option>
+                            <option value="ausgabe">Ausgabe</option>
+                            <option value="einnahme">Einnahme</option>
+                        </select>
+                        <select
+                            value={ausgewaehltesAsset}
+                            onChange={(e) => setAusgewaehltesAsset(e.target.value)}
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                        >
+                            <option value="">Asset wählen</option>
+                            {assets.map((a) => (
+                                <option key={a.asset_id} value={a.asset_id}>
+                                    {a.asset_typ} | {a.asset_name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <input
+                                type="checkbox"
+                                id="wiederkehrend"
+                                checked={wiederkehrendaktiv}
+                                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
+                            />
+                            <label htmlFor="wiederkehrend">Wiederkehrend</label>
+                        </div>
+
+                        {wiederkehrendaktiv && (
+                            <select
+                                value={intervall}
+                                onChange={(e) => setIntervall(e.target.value)}
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+                            >
+                                <option value="">Intervall wählen</option>
+                                <option value="täglich">Täglich</option>
+                                <option value="wöchentlich">Wöchentlich</option>
+                                <option value="monatlich">Monatlich</option>
+                                <option value="jährlich">Jährlich</option>
+                            </select>
+                        )}
+
+                        <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+                            <button
+                                onClick={transaktionHinzufuegen}
+                                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+                            >
+                                Hinzufügen
+                            </button>
+                            <button
+                                onClick={() => setModalTranskationenHinzufuegen(false)}
+                                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+                            >
+                                Abbrechen
+                            </button>
                         </div>
                     </div>
                 </div>
