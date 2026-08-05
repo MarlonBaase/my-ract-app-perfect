@@ -225,7 +225,8 @@ export default function Tagesgeld() {
         const { error: tagesgeldkontoError } = await supabase
             .from("tagesgeldkonto")
             .delete()
-            .eq("asset_id", assetId);
+            .eq("asset_id", assetId)
+            .select();
 
             console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
 
@@ -234,7 +235,8 @@ export default function Tagesgeld() {
         const { error: assetError } = await supabase
             .from("asset")
             .delete()
-            .eq("asset_id", assetId);
+            .eq("asset_id", assetId)
+            .select();
 
             console.log("Fehler Asset:", assetError);
 
