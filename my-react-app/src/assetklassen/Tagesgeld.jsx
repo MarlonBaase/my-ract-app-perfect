@@ -528,6 +528,7 @@ export default function Tagesgeld() {
 
             {/* MODAL: Hinzufügen */}
             {modalOffenHinzu && (
+                ladeReferenzkonto(), ladeKategorien(),
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
