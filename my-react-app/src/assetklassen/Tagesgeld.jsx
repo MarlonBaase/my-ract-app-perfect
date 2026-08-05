@@ -10,11 +10,6 @@ export default function Tagesgeld() {
     const [iban, setIban] = useState("")
     const [kontoinhaber, setKontoinhaber] = useState("")
     const [ist_aktiv, setIstAktiv] = useState(true)
-    const [hauptkonto, setHauptkonto] = useState(false)
-    const [elternkonto, setElternkonto] = useState("")
-    const [elternkontoListe, setElternkontoListe] = useState([]);
-    const [ausgewaehltesElternkonto, setAusgewaehltesElternkonto] = useState("");
-    const [dispo_limit, setDispoLimit] = useState("")
     const [bic, setBic] = useState("")
     const [zinssatz, setZinssatz] = useState("")
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
@@ -46,7 +41,6 @@ export default function Tagesgeld() {
     const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("");
     const [listeReferenzkonto, setListeReferenzkonto] = useState([]);
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
-    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
 
