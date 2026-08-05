@@ -414,7 +414,8 @@ export default function Tagesgeld() {
                                         <h3>{e.asset?.asset_name}</h3>
                                         <span className="bank-name">{e.name_der_bank}</span>
                                     </div>
-                                    {e.referenzkonto && <span className="badge">Referenzkonto</span>}
+                                    {e.hauptkonto && <span className="badge">Hauptkonto</span>}
+                                    {e.ist_referenzkonto && <span className="badge">Referenzkonto</span>}
                                 </div>
 
                                 <div className="card-body">
@@ -629,7 +630,10 @@ export default function Tagesgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={notgroschen} onChange={(e) => setNotgroschen(e.target.checked)} />
                                         Als Notgroschen festlegen
+                                    </label>
+                                    <label className="checkbox-label">
                                         <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
+                                        Als Referenzkonto festlegen
                                     </label>
                                 </div>
                             </div>
