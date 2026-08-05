@@ -126,7 +126,7 @@ export default function Tagesgeld() {
                     zinssatz: parseFloat(zinssatz) || 0,
                     zinsintervall: zinssintervall || "monatlich",
                     referenzkonto: ausgewaehltesReferenzkonto,
-                    freistellungsauftrag: freistellungsauftrag,
+                    freistellungsauftrag: freistellungsauftrag || "",
                     aktionszins: parseFloat(aktionszins) || 0,
                     ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                     notgroschen: notgroschen || false,
@@ -380,7 +380,7 @@ export default function Tagesgeld() {
             <div className="header-bar">
                 <h2>Tagesgeld</h2>
                 <button className="btn-primary" onClick={() => {
-                    setModalOffenHinzu(true, ladeReferenzkonto(), ladeKategorien());
+                    setModalOffenHinzu(true, ladeReferenzkonto());
                     setZuBearbeiten(null);
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
                     setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
@@ -396,10 +396,7 @@ export default function Tagesgeld() {
             {ansicht === 'card' ? (
                 <div className="karten-grid">
                     {listeTagesgeld.map((e) => {
-                        const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.referenzkonto);
-                        const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
-
-                        const transaktionen = e.asset?.transaktionsprotokoll || [];
+                         const transaktionen = e.asset?.transaktionsprotokoll || [];
 
                         const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
