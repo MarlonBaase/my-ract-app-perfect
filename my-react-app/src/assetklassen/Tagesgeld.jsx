@@ -91,11 +91,6 @@ export default function Tagesgeld() {
             const sparrate = Number(konto.sparrate || 0);
             const zinssatz = Number(konto.zinssatz || 0);
 
-            console.log(ergebnisse.length);
-            if (ergebnisse.length === 0) {
-                setLoading(false);
-            }
-
             // --- Fall 1: Ziel bereits erreicht ---
             if (aktuellerKontostand >= sparziel) {
                 return {
@@ -143,6 +138,11 @@ export default function Tagesgeld() {
                 text: `Noch ca. ${monate} ${monate === 1 ? "Monat" : "Monate"} bis zum Sparziel.`,
             };
         });
+
+         console.log(ergebnisse.length);
+            if (ergebnisse.length === 0) {
+                setLoading(false);
+            }
 
         setKontenInfos(ergebnisse);
         setLoading(false);
