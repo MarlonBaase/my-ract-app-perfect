@@ -52,15 +52,20 @@ export default function Tagesgeld() {
 
 
     const berechneZiele = async () => {
-        setLoading(true);
+  setLoading(true);
 
-        // 1. User & Daten laden
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  try {
+    // 1. User prüfen
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.warn("Kein angemeldeter Benutzer gefunden.");
+      return;
+    }
 
-        const { data, error } = await supabase
-            .from("tagesgeldkonto")
-            .select(`
+    // 2. Daten laden
+    const { data, error } = await supabase
+      .from("tagesgeldkonto")
+      .select(`
         *, 
         asset!inner(
           benutzer_id,
@@ -68,89 +73,72 @@ export default function Tagesgeld() {
           asset_id
         )
       `)
-            .eq("asset.benutzer_id", user.id)
-            .order("asset_name", { referencedTable: "asset", ascending: true });
+      .eq("asset.benutzer_id", user.id);
 
-        if (error || !data) {
-            console.error("Fehler beim Laden:", error);
-            setLoading(false);
-            return;
-        }
+    if (error) {
+      console.error("Supabase-Fehler beim Laden:", error);
+      return;
+    }
 
-        if (!data || data.length === 0) {
-            setKontenInfos([]); // Keine Konten vorhanden
-            setLoading(false);
-            return;
-        }
+    if (!data || data.length === 0) {
+      setKontenInfos([]);
+      return;
+    }
 
-        // 2. Berechnung für JEDES Tagesgeldkonto im Array
-        const ergebnisse = data.map((konto) => {
-            // Aktuellen Kontostand aus den Transaktionen für dieses spezifische Asset berechnen
-            const aktuellerKontostand = transaktionen
-                .filter((t) => t.asset_id === konto.asset_id)
-                .reduce((acc, t) => {
-                    const betrag = Number(t.betrag || 0);
-                    return t.typ === "einnahme" ? acc + betrag : acc - betrag;
-                }, Number(konto.einzahlung_bei_eroeffnung || 0));
+    // 3. Berechnungen durchführen
+    const ergebnisse = data.map((konto) => {
+      // Sicherheitsabfrage: Existiert das verknüpfte Asset?
+      const assetName = konto.asset?.asset_name || "Unbenanntes Konto";
 
-            const sparziel = Number(konto.sparziel || 0);
-            const sparrate = Number(konto.sparrate || 0);
-            const zinssatz = Number(konto.zinssatz || 0);
+      const aktuellerKontostand = transaktionen
+        .filter((t) => t.asset_id === konto.asset_id)
+        .reduce((acc, t) => {
+          const betrag = Number(t.betrag || 0);
+          return t.typ === "einnahme" ? acc + betrag : acc - betrag;
+        }, Number(konto.einzahlung_bei_eroeffnung || 0));
 
-            // --- Fall 1: Ziel bereits erreicht ---
-            if (aktuellerKontostand >= sparziel) {
-                return {
-                    id: konto.id,
-                    name: konto.asset.asset_name,
-                    status: "success",
-                    text: "Ziel bereits erreicht! 🎉",
-                };
-            }
+      const sparziel = Number(konto.sparziel || 0);
+      const sparrate = Number(konto.sparrate || 0);
+      const zinssatz = Number(konto.zinssatz || 0);
 
-            // --- Fall 2: Keine Sparrate und kein Zins (Ziel unerreichbar) ---
-            if (sparrate <= 0 && zinssatz <= 0) {
-                return {
-                    id: konto.id,
-                    name: konto.asset.asset_name,
-                    status: "warning",
-                    text: "Bitte Sparrate oder Zinssatz anpassen, um das Ziel zu erreichen.",
-                };
-            }
+      if (aktuellerKontostand >= sparziel) {
+        return { id: konto.id, name: assetName, status: "success", text: "Ziel bereits erreicht! 🎉" };
+      }
 
-            // --- Fall 3: Monate berechnen (Formel mit Zinseszins) ---
-            const zins = zinssatz / 12 / 100; // Monatlicher Zins als Dezimalzahl
+      if (sparrate <= 0 && zinssatz <= 0) {
+        return { id: konto.id, name: assetName, status: "warning", text: "Bitte Sparrate oder Zinssatz anpassen." };
+      }
 
-            // Zähler & Nenner der Formel
-            const monatlichesWachstum = sparrate + aktuellerKontostand * zins;
-            const fehlenderBetragZins = (sparziel - aktuellerKontostand) * zins;
+      const zins = zinssatz / 12 / 100;
+      const monatlichesWachstum = sparrate + aktuellerKontostand * zins;
+      const fehlenderBetragZins = (sparziel - aktuellerKontostand) * zins;
 
-            let monate = 0;
+      let monate = 0;
+      if (monatlichesWachstum > 0) {
+        monate = zins > 0 
+          ? Math.ceil(Math.log(1 + fehlenderBetragZins / monatlichesWachstum) / Math.log(1 + zins))
+          : Math.ceil((sparziel - aktuellerKontostand) / sparrate);
+      }
 
-            if (monatlichesWachstum > 0) {
-                const zaehler = 1 + fehlenderBetragZins / monatlichesWachstum;
-                const logerZaehler = Math.log(zaehler);
-                const logerNenner = Math.log(1 + zins);
+      return {
+        id: konto.id,
+        name: assetName,
+        monate,
+        status: "info",
+        text: `Noch ca. ${monate} ${monate === 1 ? "Monat" : "Monate"} bis zum Sparziel.`,
+      };
+    });
 
-                // Falls kein Zins vorhanden ist (z. B. 0%), einfache lineare Berechnung nutzen:
-                monate = zins > 0
-                    ? Math.ceil(logerZaehler / logerNenner)
-                    : Math.ceil((sparziel - aktuellerKontostand) / sparrate);
-            }
-            return {
-                id: konto.id,
-                name: konto.asset.asset_name,
-                monate: monate,
-                status: "info",
-                text: `Noch ca. ${monate} ${monate === 1 ? "Monat" : "Monate"} bis zum Sparziel.`,
-            };
-        });
+    setKontenInfos(ergebnisse);
 
-
-        setKontenInfos(ergebnisse);
-        setLoading(false);
-    };
-
-    if (loading) return <div>Lade Sparziele...</div>;
+  } catch (err) {
+    // Fängt unerwartete Laufzeitfehler (z. B. Syntax/Typfehler) ab
+    console.error("Unerwarteter Fehler bei berechneZiele:", err);
+  } finally {
+    // WIRD IMMER AUSGEFÜHRT: Beendet den Ladezustand garantiert!
+    setLoading(false);
+  }
+};
 
 
 
