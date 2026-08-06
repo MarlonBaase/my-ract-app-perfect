@@ -51,20 +51,17 @@ export default function Tagesgeld() {
     const { ansicht } = useContext(SettingsContext);
 
 
-    const berechneZiele = () => {
+    const berechneZiele = (tagesgeldDaten) => {
         setLoading(true);
 
         try {
-            if (!listeTagesgeld || listeTagesgeld.length === 0) {
+            if (!tagesgeldDaten || tagesgeldDaten.length === 0) {
                 setKontenInfos([]);
                 return;
             }
 
-            // Berechnungen für jedes Konto durchführen
-            const ergebnisse = listeTagesgeld.map((konto) => {
+            const ergebnisse = tagesgeldDaten.map((konto) => {
                 const assetName = konto.asset?.asset_name || "Unbenanntes Konto";
-
-                // Transaktionen stecken bereits in konto.asset.transaktionsprotokoll
                 const protokoll = konto.asset?.transaktionsprotokoll || [];
 
                 const aktuellerKontostand = protokoll.reduce((acc, t) => {
@@ -76,17 +73,14 @@ export default function Tagesgeld() {
                 const sparrate = Number(konto.sparrate || 0);
                 const zinssatz = Number(konto.zinssatz || 0);
 
-                // --- Fall 1: Ziel erreicht ---
                 if (aktuellerKontostand >= sparziel && sparziel > 0) {
                     return { id: konto.id, name: assetName, status: "success", text: "Ziel bereits erreicht! 🎉" };
                 }
 
-                // --- Fall 2: Keine Sparrate und kein Zins ---
                 if (sparrate <= 0 && zinssatz <= 0) {
                     return { id: konto.id, name: assetName, status: "warning", text: "Bitte Sparrate oder Zinssatz anpassen." };
                 }
 
-                // --- Fall 3: Monate berechnen ---
                 const zins = zinssatz / 12 / 100;
                 const monatlichesWachstum = sparrate + aktuellerKontostand * zins;
                 const fehlenderBetragZins = (sparziel - aktuellerKontostand) * zins;
@@ -119,27 +113,29 @@ export default function Tagesgeld() {
 
 
     const ladeTagesgeld = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
             .from("tagesgeldkonto")
             .select(`*, 
-                asset!inner(
-                    benutzer_id,
-                    asset_name,
-                    asset_id,
-                    transaktionsprotokoll(betrag, typ)
-                )
-            `)
+            asset!inner(
+                benutzer_id,
+                asset_name,
+                asset_id,
+                transaktionsprotokoll(betrag, typ)
+            )
+        `)
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
         if (handleApiError(error, "Tagesgeld laden")) return;
-        if (data) setListeTagesgeld(data)
 
-
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenTagesgeld(data)
-    }
+        if (data) {
+            setListeTagesgeld(data);
+            setListeTransaktionenTagesgeld(data);
+            // Direct Call mit den frisch geladenen Daten:
+            berechneZiele(data);
+        }
+    };
 
     const ladeAssets = async () => {
         const { data } = await supabase
@@ -442,7 +438,7 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Referenzkonto laden")) return;
     };
 
-    // 1. Init-Effekt für die API-Daten
+    // Beim Mounten der Komponente einmalig alles laden
     useEffect(() => {
         const init = async () => {
             try {
@@ -457,14 +453,7 @@ export default function Tagesgeld() {
         init();
     }, []);
 
-    // 2. Ziel-Berechnung triggern, sobald listeTagesgeld geladen/aktualisiert ist
-    useEffect(() => {
-        if (listeTagesgeld.length > 0) {
-            berechneZiele();
-        }
-    }, [listeTagesgeld]);
-
-    // 3. Timer für die 5-Sekunden-Benachrichtigung
+    // 5-Sekunden-Timer für die Benachrichtigung
     useEffect(() => {
         const timer = setTimeout(() => {
             setZeigeBenachrichtigung(false);
