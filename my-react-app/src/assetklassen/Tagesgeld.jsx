@@ -450,6 +450,11 @@ export default function Tagesgeld() {
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                                     <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
+                                    <div>
+                                                <button onClick={notifySuccess}>Erfolg zeigen</button>
+                                                <button onClick={notifyError}>Fehler zeigen</button>
+                                                <ToastContainer position="top-right" autoClose={3000} />
+                                            </div>
                                 </div>
                             </div>
                         );
