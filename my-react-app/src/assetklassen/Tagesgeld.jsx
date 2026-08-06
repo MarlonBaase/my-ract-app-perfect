@@ -149,11 +149,6 @@ export default function Tagesgeld() {
 
 
 
-    useEffect(() => {
-        berechneZiele();
-    }, []);
-
-
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
         const { data, error } = await supabase
@@ -485,6 +480,7 @@ export default function Tagesgeld() {
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
+                await berechneZiele();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
