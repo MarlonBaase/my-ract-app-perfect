@@ -51,10 +51,6 @@ export default function Tagesgeld() {
     const { ansicht } = useContext(SettingsContext);
 
 
-    useEffect(() => {
-        berechneZiele();
-    }, []);
-
     const berechneZiele = async () => {
         setLoading(true);
 
@@ -487,6 +483,7 @@ export default function Tagesgeld() {
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
+                berechneZiele();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
