@@ -51,64 +51,42 @@ export default function Tagesgeld() {
     const { ansicht } = useContext(SettingsContext);
 
 
-    const berechneZiele = async () => {
+    const berechneZiele = () => {
         setLoading(true);
 
         try {
-            // 1. User prüfen
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
-            if (userError || !user) {
-                console.warn("Kein angemeldeter Benutzer gefunden.");
-                return;
-            }
-
-            // 2. Daten laden
-            const { data, error } = await supabase
-                .from("tagesgeldkonto")
-                .select(`
-        *, 
-        asset!inner(
-          benutzer_id,
-          asset_name,
-          asset_id
-        )
-      `)
-                .eq("asset.benutzer_id", user.id);
-
-            if (error) {
-                console.error("Supabase-Fehler beim Laden:", error);
-                return;
-            }
-
-            if (!data || data.length === 0) {
+            if (!listeTagesgeld || listeTagesgeld.length === 0) {
                 setKontenInfos([]);
                 return;
             }
 
-            // 3. Berechnungen durchführen
-            const ergebnisse = data.map((konto) => {
-                // Sicherheitsabfrage: Existiert das verknüpfte Asset?
+            // Berechnungen für jedes Konto durchführen
+            const ergebnisse = listeTagesgeld.map((konto) => {
                 const assetName = konto.asset?.asset_name || "Unbenanntes Konto";
 
-                const aktuellerKontostand = transaktionen
-                    .filter((t) => t.asset_id === konto.asset_id)
-                    .reduce((acc, t) => {
-                        const betrag = Number(t.betrag || 0);
-                        return t.typ === "einnahme" ? acc + betrag : acc - betrag;
-                    }, Number(konto.einzahlung_bei_eroeffnung || 0));
+                // Transaktionen stecken bereits in konto.asset.transaktionsprotokoll
+                const protokoll = konto.asset?.transaktionsprotokoll || [];
+
+                const aktuellerKontostand = protokoll.reduce((acc, t) => {
+                    const betrag = Number(t.betrag || 0);
+                    return t.typ === "einnahme" ? acc + betrag : acc - betrag;
+                }, Number(konto.einzahlung_bei_eroeffnung || 0));
 
                 const sparziel = Number(konto.sparziel || 0);
                 const sparrate = Number(konto.sparrate || 0);
                 const zinssatz = Number(konto.zinssatz || 0);
 
-                if (aktuellerKontostand >= sparziel) {
+                // --- Fall 1: Ziel erreicht ---
+                if (aktuellerKontostand >= sparziel && sparziel > 0) {
                     return { id: konto.id, name: assetName, status: "success", text: "Ziel bereits erreicht! 🎉" };
                 }
 
+                // --- Fall 2: Keine Sparrate und kein Zins ---
                 if (sparrate <= 0 && zinssatz <= 0) {
                     return { id: konto.id, name: assetName, status: "warning", text: "Bitte Sparrate oder Zinssatz anpassen." };
                 }
 
+                // --- Fall 3: Monate berechnen ---
                 const zins = zinssatz / 12 / 100;
                 const monatlichesWachstum = sparrate + aktuellerKontostand * zins;
                 const fehlenderBetragZins = (sparziel - aktuellerKontostand) * zins;
@@ -132,10 +110,8 @@ export default function Tagesgeld() {
             setKontenInfos(ergebnisse);
 
         } catch (err) {
-            // Fängt unerwartete Laufzeitfehler (z. B. Syntax/Typfehler) ab
             console.error("Unerwarteter Fehler bei berechneZiele:", err);
         } finally {
-            // WIRD IMMER AUSGEFÜHRT: Beendet den Ladezustand garantiert!
             setLoading(false);
         }
     };
@@ -466,14 +442,14 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Referenzkonto laden")) return;
     };
 
+    // 1. Init-Effekt für die API-Daten
     useEffect(() => {
         const init = async () => {
             try {
-                await ladeTagesgeld()
+                await ladeTagesgeld();
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
-                berechneZiele();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -481,8 +457,15 @@ export default function Tagesgeld() {
         init();
     }, []);
 
+    // 2. Ziel-Berechnung triggern, sobald listeTagesgeld geladen/aktualisiert ist
     useEffect(() => {
-        // Timer für 5000ms (5 Sekunden) starten
+        if (listeTagesgeld.length > 0) {
+            berechneZiele();
+        }
+    }, [listeTagesgeld]);
+
+    // 3. Timer für die 5-Sekunden-Benachrichtigung
+    useEffect(() => {
         const timer = setTimeout(() => {
             setZeigeBenachrichtigung(false);
         }, 5000);
@@ -993,10 +976,10 @@ export default function Tagesgeld() {
                                     padding: "16px",
                                     borderRadius: "10px",
                                     borderLeft: `6px solid ${info.status === "success"
-                                            ? "#2e7d32"
-                                            : info.status === "warning"
-                                                ? "#ed6c02"
-                                                : "#0288d1"
+                                        ? "#2e7d32"
+                                        : info.status === "warning"
+                                            ? "#ed6c02"
+                                            : "#0288d1"
                                         }`,
                                     backgroundColor:
                                         info.status === "success"
