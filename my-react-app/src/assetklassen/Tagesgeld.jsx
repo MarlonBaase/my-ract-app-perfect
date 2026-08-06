@@ -51,7 +51,9 @@ export default function Tagesgeld() {
     const { ansicht } = useContext(SettingsContext);
 
 
-
+    useEffect(() => {
+        berechneZiele();
+    }, []);
 
     const berechneZiele = async () => {
         setLoading(true);
