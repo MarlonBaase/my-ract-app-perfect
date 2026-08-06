@@ -69,10 +69,11 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
-        
-        if (data) setNotifyInfoValue(true);
-        console.log("Notify Info Value:", notifyInfoValue);
 
+        if (data.length > 0) {
+            setNotifyInfoValue(true);
+            console.log("Notify Info Value:", notifyInfoValue);
+        }
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
@@ -81,12 +82,12 @@ export default function Tagesgeld() {
             console.log("Daten geladen:", data);
             notifyInfo(data);
         }
-        
+
     }
 
     const notifyInfo = (data) => toast.info(data);
 
-        
+
 
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
