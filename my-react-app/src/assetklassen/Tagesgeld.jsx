@@ -120,7 +120,6 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
-        berechneZiel();
     }
 
     const ladeAssets = async () => {
