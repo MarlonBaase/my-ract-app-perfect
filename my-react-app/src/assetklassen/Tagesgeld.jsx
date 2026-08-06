@@ -77,6 +77,12 @@ export default function Tagesgeld() {
             return;
         }
 
+        if (!data || data.length === 0) {
+            setKontenInfos([]); // Keine Konten vorhanden
+            setLoading(false);
+            return;
+        }
+
         // 2. Berechnung für JEDES Tagesgeldkonto im Array
         const ergebnisse = data.map((konto) => {
             // Aktuellen Kontostand aus den Transaktionen für dieses spezifische Asset berechnen
@@ -139,10 +145,6 @@ export default function Tagesgeld() {
             };
         });
 
-         console.log(ergebnisse.length);
-            if (ergebnisse.length === 0) {
-                setLoading(false);
-            }
 
         setKontenInfos(ergebnisse);
         setLoading(false);
