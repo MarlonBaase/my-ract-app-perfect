@@ -76,7 +76,7 @@ export default function Tagesgeld() {
     }
 
 
-    const notifyInfo = () => toast.info(berechneZiel());
+    const notifyInfo = () => toast.info("Erfolgreich!");
 
 
 
