@@ -487,7 +487,6 @@ export default function Tagesgeld() {
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
-                await berechneZiele();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
