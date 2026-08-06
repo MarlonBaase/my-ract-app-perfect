@@ -45,7 +45,7 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
-    const [notifyInfoValue, setNotifyInfoValue] = useState(false);
+    const [notifyInfoValue, setNotifyInfoValue] = useState();
 
     const { ansicht } = useContext(SettingsContext);
 
