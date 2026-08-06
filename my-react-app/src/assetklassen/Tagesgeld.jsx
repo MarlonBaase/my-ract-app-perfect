@@ -465,20 +465,7 @@ export default function Tagesgeld() {
 
 
                         return (
-
-                            <div>
-                                <div>
-                                    {/* Banner wird nur gerendert, wenn eine Nachricht existiert */}
-                                    {nachricht && (
-                                        <div style={{ padding: "10px", background: "#d4edda", color: "#155724", marginBottom: "10px" }}>
-                                            {nachricht}
-                                        </div>
-                                    )}
-                                    <button onClick={() => showNotification("Datensatz erfolgreich gelöscht!")}>
-                                        Aktion ausführen
-                                    </button>
-                                </div>
-
+                                
                                 <div className="account-card" key={e.id}>
                                     <div className="card-header">
                                         <div>
@@ -936,6 +923,19 @@ export default function Tagesgeld() {
                             </div>
                         </div>
                     )}
+
+                    <div>
+                                    {/* Banner wird nur gerendert, wenn eine Nachricht existiert */}
+                                    {nachricht && (
+                                        <div style={{ padding: "10px", background: "#d4edda", color: "#155724", marginBottom: "10px" }}>
+                                            {nachricht}
+                                        </div>
+                                    )}
+                                    <button onClick={() => berechneZiel(nachricht)}>
+                                        Aktion ausführen
+                                    </button>
+                                </div>
+
                 </div>
             );
 }
