@@ -79,10 +79,7 @@ export default function Tagesgeld() {
 
     }
 
-    const notifyInfo = (data) => toast.info("Daten geladen:", data, {
-        position: "top-right",
-        autoClose: 3000
-    });
+    const notifyInfo = (data) => toast.info("Daten geladen:", data.map(e => `${e.asset?.asset_name}: ${e.einzahlung_bei_eroeffnung} ${e.waehrung}`).join(", "),);
 
 
 
