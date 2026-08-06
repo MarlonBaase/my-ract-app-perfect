@@ -93,6 +93,10 @@ export default function Tagesgeld() {
             const sparrate = Number(konto.sparrate || 0);
             const zinssatz = Number(konto.zinssatz || 0);
 
+            if (ergebnisse.length === 0) {
+                setLoading(false);
+            }
+
             // --- Fall 1: Ziel bereits erreicht ---
             if (aktuellerKontostand >= sparziel) {
                 return {
