@@ -120,6 +120,7 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
+        berechneZiel();
     }
 
     const ladeAssets = async () => {
@@ -430,7 +431,6 @@ export default function Tagesgeld() {
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
-                await berechneZiel();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
