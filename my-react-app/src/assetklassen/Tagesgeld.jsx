@@ -91,9 +91,8 @@ export default function Tagesgeld() {
         if (data.sparrate === 0) {
             setNachricht("Bitte Sparrate anpassen");
         }
+        console.log("Ziel:", ziel);
     }
-
-    console.log("Ziel:", ziel);
 
 
 
