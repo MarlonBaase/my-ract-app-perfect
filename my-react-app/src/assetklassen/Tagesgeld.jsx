@@ -77,6 +77,8 @@ export default function Tagesgeld() {
 
         
 
+    }
+
     const notifyInfo = (data) => toast.info("Daten geladen:", data, {
         position: "top-right",
         autoClose: 3000
