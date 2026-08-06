@@ -2,6 +2,8 @@ import { useEffect, useState, useContext } from "react";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
 import { SettingsContext } from '../SettingsContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Tagesgeld() {
     const [listeTagesgeld, setListeTagesgeld] = useState([])
@@ -43,6 +45,9 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
+    const notifySuccess = () => toast.success("Erfolgreich gespeichert!");
+    const notifyError = () => toast.error("Ein Fehler ist aufgetreten!");
+
 
 
     const { ansicht } = useContext(SettingsContext);
@@ -71,13 +76,13 @@ export default function Tagesgeld() {
     }
 
     const ladeAssets = async () => {
-    const { data } = await supabase
-      .from("asset")
-      .select("*")
-      .order("asset_name", { ascending: true });
+        const { data } = await supabase
+            .from("asset")
+            .select("*")
+            .order("asset_name", { ascending: true });
 
-    if (data) setAssets(data);
-  };
+        if (data) setAssets(data);
+    };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -228,7 +233,7 @@ export default function Tagesgeld() {
             .eq("asset_id", assetId)
             .select();
 
-            console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
+        console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
 
         if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
 
@@ -238,7 +243,7 @@ export default function Tagesgeld() {
             .eq("asset_id", assetId)
             .select();
 
-            console.log("Fehler Asset:", assetError);
+        console.log("Fehler Asset:", assetError);
 
         if (handleApiError(assetError, "Asset löschen")) return;
 
@@ -406,7 +411,7 @@ export default function Tagesgeld() {
             {ansicht === 'card' ? (
                 <div className="karten-grid">
                     {listeTagesgeld.map((e) => {
-                         const transaktionen = e.asset?.transaktionsprotokoll || [];
+                        const transaktionen = e.asset?.transaktionsprotokoll || [];
 
                         const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
@@ -872,6 +877,12 @@ export default function Tagesgeld() {
                     </div>
                 </div>
             )}
+
+            <div>
+                <button onClick={notifySuccess}>Erfolg zeigen</button>
+                <button onClick={notifyError}>Fehler zeigen</button>
+                <ToastContainer position="top-right" autoClose={3000} />
+            </div>
         </div>
     );
 }
