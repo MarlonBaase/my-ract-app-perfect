@@ -45,7 +45,7 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
-    const [notifyInfo, setNotifyInfo] = useState("");
+    const [notifyInfoValue, setNotifyInfoValue] = useState("");
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -69,16 +69,19 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
-        if (data) setNotifyInfo(true);
+        if (data) setNotifyInfoValue(true);
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
 
-        if (notifyInfo === true) {
-            const notifyInfo = () => toast.info(data);
+        if (notifyInfoValue === true) {
+            notifyInfo(data);
         }
+        
     }
+
+    const notifyInfo = (data) => toast.info(data);
 
         
 
