@@ -76,7 +76,7 @@ export default function Tagesgeld() {
     }
 
 
-    const notifyInfo = () => toast.info("Erfolgreich!");
+    const notifyInfo = () => toast.info(berechneZiel());
 
 
 
@@ -411,6 +411,7 @@ export default function Tagesgeld() {
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
+                await berechneZiel();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
