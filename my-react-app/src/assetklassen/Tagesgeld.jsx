@@ -46,29 +46,7 @@ export default function Tagesgeld() {
     const [transaktionen, setTransaktionen] = useState([]);
 
 
-    const [ziel, setZiel] = useState("");
-    const [nachricht, setNachricht] = useState("");
-
-
     const { ansicht } = useContext(SettingsContext);
-
-
-
-    const berechneZiel = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data, error } = await supabase
-            .from("tagesgeldkonto")
-            .select(`*, 
-                asset!inner(
-                    benutzer_id,
-                    asset_name,
-                    asset_id
-                )
-            `)
-            .eq("asset.benutzer_id", user.id)
-            .order('asset_name', { referencedTable: 'asset', ascending: true });
-
-    }
 
 
 
