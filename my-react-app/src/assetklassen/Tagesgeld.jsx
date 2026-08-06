@@ -74,24 +74,23 @@ export default function Tagesgeld() {
             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
         }, 0);
 
-        if (data.sparziel > aktuellerKontostand) {
-            const zins = (data.zinssatz / 12) / 100;
-            const fehlenderBetrag = (data.sparziel - data.einzahlung_bei_eroeffnung) * zins;
-            const ersterMonat = data.sparrate + (data.einzahlung_bei_eroeffnung * zins);
+        if (data[0].sparziel > aktuellerKontostand) {
+            const zins = (data[0].zinssatz / 12) / 100;
+            const fehlenderBetrag = (data[0].sparziel - data[0].einzahlung_bei_eroeffnung) * zins;
+            const ersterMonat = data[0].sparrate + (data[0].einzahlung_bei_eroeffnung * zins);
             const zaehler = 1 + (fehlenderBetrag / ersterMonat);
             const logerZaehler = Math.log(zaehler);
             const logerNenner = Math.log(1 + zins);
             const ziel = Math.ceil(logerZaehler / logerNenner);
             setZiel(ziel);
         }
-        if (data.sparziel <= aktuellerKontostand) {
+        if (data[0].sparziel <= aktuellerKontostand) {
             setNachricht("Ziel erreicht");
         }
 
-        if (data.sparrate === 0) {
+        if (data[0].sparrate === 0) {
             setNachricht("Bitte Sparrate anpassen");
         }
-        console.log("Ziel:", ziel);
     }
 
 
