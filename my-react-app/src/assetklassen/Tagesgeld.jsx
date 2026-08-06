@@ -93,6 +93,7 @@ export default function Tagesgeld() {
             const sparrate = Number(konto.sparrate || 0);
             const zinssatz = Number(konto.zinssatz || 0);
 
+            console.log(ergebnisse.length);
             if (ergebnisse.length === 0) {
                 setLoading(false);
             }
