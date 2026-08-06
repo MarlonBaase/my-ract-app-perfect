@@ -45,6 +45,7 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
+    const [notifyInfo, setNotifyInfo] = useState("");
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -68,17 +69,18 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
+        if (data) setNotifyInfo(true);
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
 
+        if (notifyInfo === true) {
+            const notifyInfo = () => toast.info(data);
+        }
     }
 
-
-    const notifyInfo = () => toast.info(berechneZiel());
-
-
+        
 
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
