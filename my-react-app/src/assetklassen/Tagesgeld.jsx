@@ -45,12 +45,40 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
-    const notifySuccess = () => toast.success("Erfolgreich gespeichert!");
-    const notifyError = () => toast.error("Ein Fehler ist aufgetreten!");
-
-
 
     const { ansicht } = useContext(SettingsContext);
+
+
+
+
+    const berechneZiel = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data, error } = await supabase
+            .from("tagesgeldkonto")
+            .select(`*, 
+                asset!inner(
+                    benutzer_id,
+                    asset_name,
+                    asset_id,
+                    transaktionsprotokoll(betrag, typ)
+                )
+            `)
+            .eq("asset.benutzer_id", user.id)
+            .order('asset_name', { referencedTable: 'asset', ascending: true });
+
+        if (handleApiError(error, "Tagesgeld laden")) return;
+        if (data) setListeTagesgeld(data)
+
+
+        if (handleApiError(error, "Transaktionen öffnen")) return;
+        if (data) setListeTransaktionenTagesgeld(data)
+
+    }
+
+
+    const notifyInfo = () => toast.info(berechneZiel());
+
+
 
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -451,10 +479,9 @@ export default function Tagesgeld() {
                                     <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                     <div>
-                                                <button onClick={notifySuccess}>Erfolg zeigen</button>
-                                                <button onClick={notifyError}>Fehler zeigen</button>
-                                                <ToastContainer position="top-right" autoClose={3000} />
-                                            </div>
+                                        <button onClick={notifyInfo}>Erfolg zeigen</button>
+                                        <ToastContainer position="top-right" autoClose={3000} />
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -500,8 +527,7 @@ export default function Tagesgeld() {
                                             <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
                                             <div>
-                                                <button onClick={notifySuccess}>Erfolg zeigen</button>
-                                                <button onClick={notifyError}>Fehler zeigen</button>
+                                                <button onClick={notifyInfo}>Erfolg zeigen</button>
                                                 <ToastContainer position="top-right" autoClose={3000} />
                                             </div>
                                         </td>
