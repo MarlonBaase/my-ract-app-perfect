@@ -71,6 +71,7 @@ export default function Tagesgeld() {
         if (data) setListeTagesgeld(data)
         
         if (data) setNotifyInfoValue(true);
+        console.log("Notify Info Value:", notifyInfoValue);
 
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
