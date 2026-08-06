@@ -44,98 +44,83 @@ export default function Tagesgeld() {
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
     const [transaktionen, setTransaktionen] = useState([]);
-    const [kontenInfos, setKontenInfos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [zeigeBenachrichtigung, setZeigeBenachrichtigung] = useState(true);
+
+
+    const [ziel, setZiel] = useState("");
+    const [nachricht, setNachricht] = useState("");
+
 
     const { ansicht } = useContext(SettingsContext);
 
 
-    const berechneZiele = (tagesgeldDaten) => {
-        setLoading(true);
 
-        try {
-            if (!tagesgeldDaten || tagesgeldDaten.length === 0) {
-                setKontenInfos([]);
-                return;
-            }
-
-            const ergebnisse = tagesgeldDaten.map((konto) => {
-                const assetName = konto.asset?.asset_name || "Unbenanntes Konto";
-                const protokoll = konto.asset?.transaktionsprotokoll || [];
-
-                const aktuellerKontostand = protokoll.reduce((acc, t) => {
-                    const betrag = Number(t.betrag || 0);
-                    return t.typ === "einnahme" ? acc + betrag : acc - betrag;
-                }, Number(konto.einzahlung_bei_eroeffnung || 0));
-
-                const sparziel = Number(konto.sparziel || 0);
-                const sparrate = Number(konto.sparrate || 0);
-                const zinssatz = Number(konto.zinssatz || 0);
-
-                if (aktuellerKontostand >= sparziel && sparziel > 0) {
-                    return { id: konto.id, name: assetName, status: "success", text: "Ziel bereits erreicht! 🎉" };
-                }
-
-                if (sparrate <= 0 && zinssatz <= 0) {
-                    return { id: konto.id, name: assetName, status: "warning", text: "Bitte Sparrate oder Zinssatz anpassen." };
-                }
-
-                const zins = zinssatz / 12 / 100;
-                const monatlichesWachstum = sparrate + aktuellerKontostand * zins;
-                const fehlenderBetragZins = (sparziel - aktuellerKontostand) * zins;
-
-                let monate = 0;
-                if (monatlichesWachstum > 0) {
-                    monate = zins > 0
-                        ? Math.ceil(Math.log(1 + fehlenderBetragZins / monatlichesWachstum) / Math.log(1 + zins))
-                        : Math.ceil((sparziel - aktuellerKontostand) / sparrate);
-                }
-
-                return {
-                    id: konto.id,
-                    name: assetName,
-                    monate,
-                    status: "info",
-                    text: `Noch ca. ${monate} ${monate === 1 ? "Monat" : "Monate"} bis zum Sparziel.`,
-                };
-            });
-
-            setKontenInfos(ergebnisse);
-
-        } catch (err) {
-            console.error("Unerwarteter Fehler bei berechneZiele:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-
-    const ladeTagesgeld = async () => {
+    const berechneZiel = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
             .from("tagesgeldkonto")
             .select(`*, 
-            asset!inner(
-                benutzer_id,
-                asset_name,
-                asset_id,
-                transaktionsprotokoll(betrag, typ)
-            )
-        `)
+                asset!inner(
+                    benutzer_id,
+                    asset_name,
+                    asset_id
+                )
+            `)
+            .eq("asset.benutzer_id", user.id)
+            .order('asset_name', { referencedTable: 'asset', ascending: true });
+
+
+        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
+            const betrag = Number(t.betrag || 0);
+            return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
+        }, 0);
+
+        if (data.sparziel > aktuellerKontostand) {
+            const zins = (data.zinssatz / 12) / 100;
+            const fehlenderBetrag = (data.sparziel - data.einzahlung_bei_eroeffnung) * zins;
+            const ersterMonat = data.sparrate + (data.einzahlung_bei_eroeffnung * zins);
+            const zaehler = 1 + (fehlenderBetrag / ersterMonat);
+            const logerZaehler = Math.log(zaehler);
+            const logerNenner = Math.log(1 + zins);
+            const ziel = Math.ceil(logerZaehler / logerNenner);
+            setZiel(ziel);
+        }
+        if (data.sparziel <= aktuellerKontostand) {
+            setNachricht("Ziel erreicht");
+        }
+
+        if (data.sparrate === 0) {
+            setNachricht("Bitte Sparrate anpassen");
+        }
+    }
+
+    console.log("Ziel:", ziel);
+
+
+
+
+
+    const ladeTagesgeld = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        const { data, error } = await supabase
+            .from("tagesgeldkonto")
+            .select(`*, 
+                asset!inner(
+                    benutzer_id,
+                    asset_name,
+                    asset_id,
+                    transaktionsprotokoll(betrag, typ)
+                )
+            `)
             .eq("asset.benutzer_id", user.id)
             .order('asset_name', { referencedTable: 'asset', ascending: true });
 
         if (handleApiError(error, "Tagesgeld laden")) return;
+        if (data) setListeTagesgeld(data)
 
-        if (data) {
-            setListeTagesgeld(data);
-            setListeTransaktionenTagesgeld(data);
-            // Direct Call mit den frisch geladenen Daten:
-            berechneZiele(data);
-        }
-    };
+
+        if (handleApiError(error, "Transaktionen öffnen")) return;
+        if (data) setListeTransaktionenTagesgeld(data)
+    }
 
     const ladeAssets = async () => {
         const { data } = await supabase
@@ -438,28 +423,19 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Referenzkonto laden")) return;
     };
 
-    // Beim Mounten der Komponente einmalig alles laden
     useEffect(() => {
         const init = async () => {
             try {
-                await ladeTagesgeld();
+                await ladeTagesgeld()
                 await ladeKategorien();
                 await ladeReferenzkonto();
                 await ladeAssets();
+                await berechneZiel();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
         };
         init();
-    }, []);
-
-    // 5-Sekunden-Timer für die Benachrichtigung
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setZeigeBenachrichtigung(false);
-        }, 5000);
-
-        return () => clearTimeout(timer);
     }, []);
 
     return (
@@ -493,7 +469,6 @@ export default function Tagesgeld() {
 
 
                         return (
-
                             <div className="account-card" key={e.id}>
                                 <div className="card-header">
                                     <div>
@@ -948,43 +923,6 @@ export default function Tagesgeld() {
                                 Abbrechen
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {zeigeBenachrichtigung && kontenInfos.length > 0 && (
-                <div style={{ maxWidth: "600px", margin: "20px auto", fontFamily: "sans-serif" }}>
-                    <h2>Deine Tagesgeld-Sparziele</h2>
-
-                    {/* Benachrichtigungs-Karten */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                        {kontenInfos.map((info) => (
-                            <div
-                                key={info.id}
-                                style={{
-                                    padding: "16px",
-                                    borderRadius: "10px",
-                                    borderLeft: `6px solid ${info.status === "success"
-                                        ? "#2e7d32"
-                                        : info.status === "warning"
-                                            ? "#ed6c02"
-                                            : "#0288d1"
-                                        }`,
-                                    backgroundColor:
-                                        info.status === "success"
-                                            ? "#edf7ed"
-                                            : info.status === "warning"
-                                                ? "#fff4e5"
-                                                : "#e5f6fd",
-                                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                <h4 style={{ margin: "0 0 6px 0", color: "#333" }}>{info.name}</h4>
-                                <p style={{ margin: 0, color: "#555", fontSize: "0.95rem" }}>
-                                    {info.text}
-                                </p>
-                            </div>
-                        ))}
                     </div>
                 </div>
             )}
