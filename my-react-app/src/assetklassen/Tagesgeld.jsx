@@ -51,9 +51,9 @@ export default function Tagesgeld() {
 
 
 
-    const berechneZiel = async (data) => {
+    const berechneZiel = async () => {
         const { data: { user } } = await supabase.auth.getUser()
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from("tagesgeldkonto")
             .select(`*, 
                 asset!inner(
@@ -69,6 +69,8 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
         if (data) notifyInfo(data)
+        
+        console.log("Daten geladen:", data); // Debugging-Ausgabe
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
