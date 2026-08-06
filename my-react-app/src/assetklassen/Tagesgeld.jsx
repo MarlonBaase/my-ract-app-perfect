@@ -43,14 +43,9 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
-    const [transaktionen, setTransaktionen] = useState([]);
 
 
     const { ansicht } = useContext(SettingsContext);
-
-
-
-
 
     const ladeTagesgeld = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -76,13 +71,13 @@ export default function Tagesgeld() {
     }
 
     const ladeAssets = async () => {
-        const { data } = await supabase
-            .from("asset")
-            .select("*")
-            .order("asset_name", { ascending: true });
+    const { data } = await supabase
+      .from("asset")
+      .select("*")
+      .order("asset_name", { ascending: true });
 
-        if (data) setAssets(data);
-    };
+    if (data) setAssets(data);
+  };
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
@@ -233,7 +228,7 @@ export default function Tagesgeld() {
             .eq("asset_id", assetId)
             .select();
 
-        console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
+            console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
 
         if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
 
@@ -243,7 +238,7 @@ export default function Tagesgeld() {
             .eq("asset_id", assetId)
             .select();
 
-        console.log("Fehler Asset:", assetError);
+            console.log("Fehler Asset:", assetError);
 
         if (handleApiError(assetError, "Asset löschen")) return;
 
@@ -411,8 +406,7 @@ export default function Tagesgeld() {
             {ansicht === 'card' ? (
                 <div className="karten-grid">
                     {listeTagesgeld.map((e) => {
-                        const transaktionen = e.asset?.transaktionsprotokoll || [];
-                        setTransaktionen(transaktionen);
+                         const transaktionen = e.asset?.transaktionsprotokoll || [];
 
                         const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
