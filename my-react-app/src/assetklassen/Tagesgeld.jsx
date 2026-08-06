@@ -70,7 +70,7 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
 
-        if (data.length > 0) {
+        if (data) {
             setNotifyInfoValue(true);
             console.log("Notify Info Value:", notifyInfoValue);
         }
