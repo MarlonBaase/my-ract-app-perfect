@@ -223,11 +223,11 @@ export default function Tagesgeld() {
                     asset_id: asset_id,
                     name_der_bank: bank,
                     iban: iban,
-                    waehrung: waehrung,
+                    waehrung: waehrung || "EUR",
                     zinssatz: parseFloat(zinssatz) || 0,
                     zinsintervall: zinssintervall || "monatlich",
                     referenzkonto: ausgewaehltesReferenzkonto,
-                    freistellungsauftrag: freistellungsauftrag || "",
+                    freistellungsauftrag: freistellungsauftrag || 0,
                     aktionszins: parseFloat(aktionszins) || 0,
                     ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                     notgroschen: notgroschen || false,
@@ -238,10 +238,10 @@ export default function Tagesgeld() {
                     ist_aktiv: true,
                     notizen: transaktionsNotizen || "",
                     eroeffnungsdatum: eroeffnungsdatum,
-                    kontoinhaber: kontoinhaber,
-                    bic: bic,
+                    kontoinhaber: kontoinhaber || "",
+                    bic: bic || 0,
                     einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    ist_referenzkonto: false
+                    ist_referenzkonto: ist_referenzkonto || false
                 })
 
             if (tagesgeldkontoError) {
