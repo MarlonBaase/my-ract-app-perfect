@@ -332,8 +332,9 @@ export default function Girokonto() {
                 naechsteFaelligkeit.setFullYear(heute.getFullYear() + 1)
             }
 
-            setNaechsteFaelligkeit(naechsteFaelligkeit)
         }
+
+        setNaechsteFaelligkeit(naechsteFaelligkeit)
 
         console.log(naechsteFaelligkeit)
 
