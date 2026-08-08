@@ -957,3 +957,17 @@ body.dark .btn-secondary {
   font-size: 44px;
   margin-bottom: 12px;
 }
+
+/* Roter Rahmen & leicht roter Hintergrund für ungültige Inputs */
+.input-error {
+  border: 1px solid #dc3545 !important;
+  background-color: #fff8f8 !important;
+}
+
+/* Roter Text für die Fehlermeldung unterhalb des Inputs */
+.error-text {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+}

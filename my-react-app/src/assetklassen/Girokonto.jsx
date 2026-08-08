@@ -35,6 +35,7 @@ export default function Girokonto() {
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
+    const [errors, setErrors] = useState({});
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -241,7 +242,7 @@ export default function Girokonto() {
 
             if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
 
-           
+
 
         } catch (err) {
             console.error("Unerwarteter Fehler beim Löschen:", err);
@@ -250,6 +251,27 @@ export default function Girokonto() {
         ladeGirokonto()
     };
 
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
+        if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
+        if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
+        if (!einzahlung_bei_eroeffnung) newErrors.einzahlung = "Startguthaben ist erforderlich";
+        if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
+        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
+    };
+
+    const handleGirokontoSpeichern = () => {
+        if (validateForm()) {
+            girokontoHinzufuegen(); // Deine Speicherfunktion
+            setErrors({}); // Fehler zurücksetzen
+        }
+    };
 
     const girokontoSpeichern = async () => {
         if (!zuBearbeiten) return;
@@ -531,34 +553,77 @@ export default function Girokonto() {
                     <div className="modal-container">
                         <div className="modal-header">
                             <h3>Neues Girokonto hinzufügen</h3>
-                            <button className="close-btn" onClick={() => setModalOffenHinzu(false)}>✕</button>
+                            <button className="close-btn" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>✕</button>
                         </div>
                         <div className="modal-body">
                             <div className="form-grid">
                                 <div className="form-group">
                                     <label>Asset Name*</label>
-                                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z.B. Hauptkonto" />
+                                    <input
+                                        className={errors.name ? "input-error" : ""}
+                                        value={name}
+                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
+                                        placeholder="z.B. Hauptkonto"
+                                    />
+                                    {errors.name && <span className="error-text">{errors.name}</span>}
                                 </div>
+
                                 <div className="form-group">
                                     <label>Bank Name*</label>
-                                    <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="z.B. Sparkasse" />
+                                    <input
+                                        className={errors.bank ? "input-error" : ""}
+                                        value={bank}
+                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
+                                        placeholder="z.B. Sparkasse"
+                                    />
+                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
                                 </div>
+
                                 <div className="form-group col-span-2">
                                     <label>IBAN*</label>
-                                    <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="DE00 0000 0000 0000 0000 00" />
+                                    <input
+                                        className={errors.iban ? "input-error" : ""}
+                                        value={iban}
+                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
+                                        placeholder="DE00 0000 0000 0000 0000 00"
+                                    />
+                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
                                 </div>
+
                                 <div className="form-group">
                                     <label>Startguthaben*</label>
-                                    <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
+                                    <input
+                                        className={errors.einzahlung ? "input-error" : ""}
+                                        value={einzahlung_bei_eroeffnung}
+                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung: null }); }}
+                                        placeholder="0.00"
+                                        type="number"
+                                    />
+                                    {errors.einzahlung && <span className="error-text">{errors.einzahlung}</span>}
                                 </div>
+
                                 <div className="form-group">
                                     <label>Währung*</label>
-                                    <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="EUR" />
+                                    <input
+                                        className={errors.waehrung ? "input-error" : ""}
+                                        value={waehrung}
+                                        onChange={(e) => { setWaehrung(e.target.value); setErrors({ ...errors, waehrung: null }); }}
+                                        placeholder="EUR"
+                                    />
+                                    {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
                                 </div>
+
                                 <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
-                                    <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                                    <input
+                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        type="date"
+                                        value={eroeffnungsdatum}
+                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
+                                    />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
+
                                 <div className="form-group">
                                     <label>Kontoinhaber</label>
                                     <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
@@ -607,8 +672,8 @@ export default function Girokonto() {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={girokontoHinzufuegen}>Speichern</button>
+                            <button className="btn-secondary" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>Abbrechen</button>
+                            <button className="btn-primary" onClick={handleGirokontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>
