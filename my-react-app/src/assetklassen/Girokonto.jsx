@@ -335,6 +335,8 @@ export default function Girokonto() {
             setNaechsteFaelligkeit(naechsteFaelligkeit)
         }
 
+        console.log(naechsteFaelligkeit)
+
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
             notizen: transaktionsNotizen,
