@@ -371,10 +371,10 @@ export default function Girokonto() {
         setModalTranskationenHinzufuegen(false);
     };
 
-    const pruefeWiederkehren = async(benutzer_id) => {
+    const pruefeWiederkehren = async () => {
 
         const heute = new Date();
-        
+
 
         const { data: faellige, error } = await supabase
             .from("transaktionsprotokoll")
@@ -385,30 +385,31 @@ export default function Girokonto() {
         if (error || !faellige || faellige.length === 0) return;
 
         for (const t of faellige) {
-        await supabase.from("transaktionsprotokoll").insert({
-            benutzer_id: t.benutzer_id,
-            notizen: `${t.notizen} (Automatisch)`,
-            betrag: t.betrag,
-            kategorie_id: t.kategorie_id,
-            asset_id: t.asset_id,
-            assetklasse: t.assetklasse,
-            typ: t.typ,
-            datum: heute, 
-            wiederkehrend: false 
-        });
+            await supabase.from("transaktionsprotokoll").insert({
+                benutzer_id: t.benutzer_id,
+                notizen: `${t.notizen} (Automatisch)`,
+                betrag: t.betrag,
+                kategorie_id: t.kategorie_id,
+                asset_id: t.asset_id,
+                assetklasse: t.assetklasse,
+                typ: t.typ,
+                datum: heute,
+                wiederkehrend: false
+            });
 
-        const naechstesDatum = new Date(t.naechste_faelligkeit);
-        if (t.intervall === "täglich") naechstesDatum.setDate(naechstesDatum.getDate() + 1);
-        if (t.intervall === "wöchentlich") naechstesDatum.setDate(naechstesDatum.getDate() + 7);
-        if (t.intervall === "monatlich") naechstesDatum.setMonth(naechstesDatum.getMonth() + 1);
-        if (t.intervall === "jährlich") naechstesDatum.setFullYear(naechstesDatum.getFullYear() + 1);
-        
+            const naechstesDatum = new Date(t.naechste_faelligkeit);
+            if (t.intervall === "täglich") naechstesDatum.setDate(naechstesDatum.getDate() + 1);
+            if (t.intervall === "wöchentlich") naechstesDatum.setDate(naechstesDatum.getDate() + 7);
+            if (t.intervall === "monatlich") naechstesDatum.setMonth(naechstesDatum.getMonth() + 1);
+            if (t.intervall === "jährlich") naechstesDatum.setFullYear(naechstesDatum.getFullYear() + 1);
 
-        await supabase
-            .from("transaktionsprotokoll")
-            .update({ naechste_faelligkeit: naechstesDatum.toISOString().split('T')[0] })
-            .eq("id", t.id);
-    }
+
+            await supabase
+                .from("transaktionsprotokoll")
+                .update({ naechste_faelligkeit: naechstesDatum.toISOString().split('T')[0] })
+                .eq("id", t.id);
+        }
+    };
 
     const ladeKategorien = async () => {
         const { data, error } = await supabase
@@ -437,7 +438,7 @@ export default function Girokonto() {
     useEffect(() => {
         const init = async () => {
             try {
-                await pruefeUndErstelleWiederkehrende(user.id);
+                await pruefeWiederkehren();
                 await ladeAssets();
                 await ladeGirokonto();
                 await ladeKategorien();
