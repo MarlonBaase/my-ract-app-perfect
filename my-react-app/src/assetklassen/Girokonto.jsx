@@ -422,7 +422,7 @@ export default function Girokonto() {
 
                                 <div className="card-actions">
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "Girokonto", "Girokonto")} title="Löschen">🗑️</button>
+                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "girokonto", "girokonto")} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                 </div>
                             </div>
@@ -479,7 +479,7 @@ export default function Girokonto() {
                                         <td>{elternkontoName}</td>
                                         <td className="table-actions">
                                             <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "Girokonto", "Girokonto")} title="Löschen">🗑️</button>
+                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "girokonto", "girokonto")} title="Löschen">🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                         </td>
                                     </tr>
