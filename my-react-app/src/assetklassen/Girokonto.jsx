@@ -343,7 +343,8 @@ export default function Girokonto() {
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
-            naechsteFaelligkeit: naechsteFaelligkeit
+            naechste_faelligkeit: naechsteFaelligkeit,
+            intervall: intervall
         });
 
         if (handleApiError(error, "Transaktion hinzufügen")) return;
