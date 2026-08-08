@@ -317,7 +317,7 @@ export default function Girokonto() {
 
         if (wiederkehrendaktiv === true) {
             const heute = new Date();
-            const naechsteFaelligkeit = new Date(heute);
+            let naechsteFaelligkeit = new Date(heute);
 
             if (intervall === "täglich") {
                 naechsteFaelligkeit.setDate(heute.getDate() + 1)
@@ -334,11 +334,13 @@ export default function Girokonto() {
 
         }
 
-        if (!isNaN(naechsteFaelligkeit.getTime())) {
-            const isoString = naechsteFaelligkeit.toISOString().split('T')[0];
-            setNaechsteFaelligkeit(isoString);
+        const validerDate = new Date(naechsteFaelligkeit);
+
+        if (!isNaN(validerDate.getTime())) {
+            const datumText = validerDate.toISOString()
+            setNaechsteFaelligkeit(datumText);
         } else {
-            console.error("Ungültiges Datum berechnet:", naechsteFaelligkeit);
+            console.error("Fehler bei der Datumsberechnung.");
         }
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
