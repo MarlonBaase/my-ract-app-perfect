@@ -334,13 +334,12 @@ export default function Girokonto() {
 
         }
 
-        setNaechsteFaelligkeit(naechsteFaelligkeit)
-
-        const datumObjekt = new Date(naechsteFaelligkeit);
-
-        const isoString = datumObjekt.toISOString();
-
-        console.log(isoString)
+        if (!isNaN(naechsteFaelligkeit.getTime())) {
+            const isoString = naechsteFaelligkeit.toISOString().split('T')[0];
+            setNaechsteFaelligkeit(isoString);
+        } else {
+            console.error("Ungültiges Datum berechnet:", naechsteFaelligkeit);
+        }
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
@@ -351,7 +350,7 @@ export default function Girokonto() {
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
-            naechste_faelligkeit: isoString,
+            naechste_faelligkeit: naechsteFaelligkeit,
             intervall: intervall
         });
 
