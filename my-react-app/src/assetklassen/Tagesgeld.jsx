@@ -76,7 +76,7 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
 
-        if (data) {
+        if (data && data.length > 0) {
 
 
             const notifyInfo = data.map(info => {
