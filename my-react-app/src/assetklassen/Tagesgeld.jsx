@@ -568,7 +568,7 @@ export default function Tagesgeld() {
                                     const betrag = Number(t.betrag || 0);
                                     return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                                 }, 0);
-                                const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
+                                const aktuellerKontostand = summe;
 
                                 return (
                                     <tr key={e.id}>
