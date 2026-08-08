@@ -34,6 +34,7 @@ export default function Girokonto() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
     const [intervall, setIntervall] = useState("");
+    const [naechsteFaelligkeit, setNaechsteFaelligkeit] = useState("");
     const [assets, setAssets] = useState([]);
     const [errors, setErrors] = useState({});
 
@@ -314,6 +315,25 @@ export default function Girokonto() {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
         const { data: { user } } = await supabase.auth.getUser();
 
+        if (wiederkehrendaktiv === true){
+            const heute = new Date();
+            
+            if (intervall === "täglich"){
+                naechsteFaelligkeit.setDate(heute.getDate + 1)
+            }
+            if (intervall === "wöchentlich"){
+                naechsteFaelligkeit.setDate(heute.getDate() + 7)
+            }
+            if (intervall === "monatlich"){
+                naechsteFaelligkeit.setMonth(heute.getMonth() + 1)
+            }
+            if (intervall === "jährlich"){
+                naechsteFaelligkeit.setFullYear(heute.getFullYear() + 1)
+            }
+
+            setNaechsteFaelligkeit()
+        }
+
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
             notizen: transaktionsNotizen,
@@ -322,7 +342,8 @@ export default function Girokonto() {
             asset_id: ausgewaehltesAsset,
             assetklasse: "girokonto",
             typ: transaktionsTyp,
-            wiederkehrend: wiederkehrendaktiv
+            wiederkehrend: wiederkehrendaktiv,
+            naechsteFaelligkeit: naechsteFaelligkeit
         });
 
         if (handleApiError(error, "Transaktion hinzufügen")) return;
