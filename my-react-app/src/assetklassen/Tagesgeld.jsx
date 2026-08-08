@@ -96,7 +96,14 @@ export default function Tagesgeld() {
 
     }
 
-    const nachricht = () => toast.info("Daten:",  listeNachricht)
+    const nachricht = () => toast.info(
+        <div>
+            <p>Daten:</p>
+            {listeNachricht.map((item, index) => (
+                <div key={index}>Asset Name: {item.assetName}</div>
+            ))}
+        </div>
+    );
 
 
 
