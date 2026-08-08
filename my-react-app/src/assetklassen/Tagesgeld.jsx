@@ -46,7 +46,6 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
-    const [listeNachricht, setListeNachricht] = useState([]);
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -88,7 +87,6 @@ export default function Tagesgeld() {
                 };
             });
 
-            setListeNachricht(notifyInfo);
 
             // Direkt anzeigen, ohne den asynchronen State abzuwarten:
             toast.info(
@@ -439,7 +437,6 @@ export default function Tagesgeld() {
                 await ladeReferenzkonto();
                 await ladeAssets();
                 await berechneZiel();
-                await nachricht();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
