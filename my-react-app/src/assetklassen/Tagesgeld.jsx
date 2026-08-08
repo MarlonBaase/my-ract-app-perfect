@@ -78,32 +78,31 @@ export default function Tagesgeld() {
         if (data) setListeTransaktionenTagesgeld(data)
 
         if (data) {
-            const notifyInfo = data
-                .map(info => {
-                    const werte = Array.isArray(info.asset?.asset_name)
-                        ? info.asset.asset_name[0]
-                        : info.asset?.asset_name;
+            const notifyInfo = data.map(info => {
+                const werte = Array.isArray(info.asset?.asset_name)
+                    ? info.asset.asset_name[0]
+                    : info.asset?.asset_name;
 
-                    return {
-                        assetName: werte || "Unbekannt",
-                    };
-                })
-            setListeNachricht(notifyInfo)
+                return {
+                    assetName: werte || "Unbekannt",
+                };
+            });
 
+            setListeNachricht(notifyInfo);
 
+            // Direkt anzeigen, ohne den asynchronen State abzuwarten:
+            toast.info(
+                <div>
+                    <p>Daten:</p>
+                    {notifyInfo.map((item, index) => (
+                        <div key={index}>Asset Name: {item.assetName}</div>
+                    ))}
+                </div>
+            );
         }
 
 
     }
-
-    const nachricht = () => toast.info(
-        <div>
-            <p>Daten:</p>
-            {listeNachricht.map((item, index) => (
-                <div key={index}>Asset Name: {item.assetName}</div>
-            ))}
-        </div>
-    );
 
 
 
