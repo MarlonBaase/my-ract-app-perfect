@@ -218,7 +218,6 @@ export default function Girokonto() {
                     benutzer_id: user.id,
                     asset_id: assetId,
                     asset_typ: assetTyp, // z.B. "tagesgeldkonto"
-                    asset_name: werte?.name || werte?.name_der_bank || "Unbenannt",
                     daten: werte,
                 });
 
