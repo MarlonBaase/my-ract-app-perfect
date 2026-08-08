@@ -87,10 +87,9 @@ export default function Tagesgeld() {
                 };
             });
 
-
-            console.log("Nachricht erreich")
             // Direkt anzeigen, ohne den asynchronen State abzuwarten:
             toast.info(
+                console.log("Nachricht erreich"),
                 <div>
                     <p>Daten:</p>
                     {notifyInfo.map((item, index) => (
