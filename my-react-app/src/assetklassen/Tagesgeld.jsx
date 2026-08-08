@@ -4,6 +4,7 @@ import { handleApiError } from "../utils/errorHandler";
 import { SettingsContext } from '../SettingsContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { data } from "react-router-dom";
 
 export default function Tagesgeld() {
     const [listeTagesgeld, setListeTagesgeld] = useState([])
@@ -45,6 +46,7 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
+    const [listeNachricht, setListeNachricht] = useState([]);
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -68,22 +70,34 @@ export default function Tagesgeld() {
 
         if (handleApiError(error, "Tagesgeld laden")) return;
         if (data) setListeTagesgeld(data)
-        if (data) notifyInfo(data)
-        
+
+
         console.log("Daten geladen:", data); // Debugging-Ausgabe
 
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
 
-        
+        if (data) {
+            const notifyInfo = data
+                .map(info => {
+                    const werte = Array.isArray(info.asset?.asset_name)
+                        ? info.asset.asset_name[0]
+                        : info.asset?.asset_name;
+
+                    return {
+                        assetName: werte || "Unbekannt",
+                    };
+                })
+            setListeNachricht(notifyInfo)
+
+
+        }
+
 
     }
 
-    const notifyInfo = (data) => toast.info("Daten geladen:", data.map((data, index) => (
-        <div key={index}>
-            <p>Asset Name: {data.asset?.asset_name}</p>
-        </div>
-    )));
+    const nachricht = () => toast.info("Daten " + listeNachricht)
+
 
 
 
@@ -419,6 +433,7 @@ export default function Tagesgeld() {
                 await ladeReferenzkonto();
                 await ladeAssets();
                 await berechneZiel();
+                await nachricht();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -486,10 +501,6 @@ export default function Tagesgeld() {
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                                     <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
-                                    <div>
-                                        <button onClick={notifyInfo}>Erfolg zeigen</button>
-                                        <ToastContainer position="top-right" autoClose={3000} />
-                                    </div>
                                 </div>
                             </div>
                         );
@@ -534,10 +545,6 @@ export default function Tagesgeld() {
                                             <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                                             <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
-                                            <div>
-                                                <button onClick={notifyInfo}>Erfolg zeigen</button>
-                                                <ToastContainer position="top-right" autoClose={3000} />
-                                            </div>
                                         </td>
                                     </tr>
                                 );
