@@ -426,7 +426,7 @@ export default function Girokonto() {
                         }, 0);
 
                         // 💡 KORREKTUR: Startguthaben + Transaktionssumme
-                        const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summeTransaktionen;
+                        const aktuellerKontostand = summeTransaktionen;
 
                         return (
                             <div className="account-card" key={e.id}>
