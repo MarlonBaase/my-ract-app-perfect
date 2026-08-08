@@ -371,6 +371,45 @@ export default function Girokonto() {
         setModalTranskationenHinzufuegen(false);
     };
 
+    const pruefeWiederkehren = async(benutzer_id) => {
+
+        const heute = new Date();
+        
+
+        const { data: faellige, error } = await supabase
+            .from("transaktionsprotokoll")
+            .select("*")
+            .eq("wiederkehrend", true)
+            .lte("naechste_faelligkeit", heute);
+
+        if (error || !faellige || faellige.length === 0) return;
+
+        for (const t of faellige) {
+        await supabase.from("transaktionsprotokoll").insert({
+            benutzer_id: t.benutzer_id,
+            notizen: `${t.notizen} (Automatisch)`,
+            betrag: t.betrag,
+            kategorie_id: t.kategorie_id,
+            asset_id: t.asset_id,
+            assetklasse: t.assetklasse,
+            typ: t.typ,
+            datum: heute, 
+            wiederkehrend: false 
+        });
+
+        const naechstesDatum = new Date(t.naechste_faelligkeit);
+        if (t.intervall === "täglich") naechstesDatum.setDate(naechstesDatum.getDate() + 1);
+        if (t.intervall === "wöchentlich") naechstesDatum.setDate(naechstesDatum.getDate() + 7);
+        if (t.intervall === "monatlich") naechstesDatum.setMonth(naechstesDatum.getMonth() + 1);
+        if (t.intervall === "jährlich") naechstesDatum.setFullYear(naechstesDatum.getFullYear() + 1);
+        
+
+        await supabase
+            .from("transaktionsprotokoll")
+            .update({ naechste_faelligkeit: naechstesDatum.toISOString().split('T')[0] })
+            .eq("id", t.id);
+    }
+
     const ladeKategorien = async () => {
         const { data, error } = await supabase
             .from("transaktionskategorie")
@@ -398,10 +437,11 @@ export default function Girokonto() {
     useEffect(() => {
         const init = async () => {
             try {
+                await pruefeUndErstelleWiederkehrende(user.id);
+                await ladeAssets();
                 await ladeGirokonto();
                 await ladeKategorien();
                 await ladeElternkontoListe();
-                await ladeAssets();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -510,6 +550,8 @@ export default function Girokonto() {
                                     const betrag = Number(t.betrag || 0);
                                     return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                                 }, 0);
+
+
                                 const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                                 return (
