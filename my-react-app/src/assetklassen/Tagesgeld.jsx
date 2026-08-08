@@ -757,7 +757,7 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group">
                                     <label>Freistellingsauftrag</label>
-                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} />
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000"/>
                                 </div>
 
                                 <div className="form-group checkbox-group col-span-2">
