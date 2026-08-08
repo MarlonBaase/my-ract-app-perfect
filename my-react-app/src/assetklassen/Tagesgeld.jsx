@@ -131,7 +131,7 @@ export default function Tagesgeld() {
                     <p style={{ fontWeight: "bold", margin: "0 0 8px 0" }}>Verbleibende Sparzeit:</p>
                     {notifyInfo.map((info, index) => (
                         <div key={index}>
-                            {info.assetName}: {typeof info.zielwert === "number" ? `${info.zielwert} Monate` : info.zielwert}
+                            {info.assetName}: {typeof info.zielwert === "number" ? `${info.zielwert} ${info.zielwert === 1 ? "Monat" : "Monate"}` : info.zielwert}
                         </div>
                     ))}
                 </div>
