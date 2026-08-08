@@ -555,14 +555,13 @@ export default function Tagesgeld() {
                                 <th>IBAN</th>
                                 <th>Guthaben</th>
                                 <th>Inhaber</th>
-                                <th>Elternkonto</th>
+                                <th>Referenzkonto</th>
                                 <th>Aktionen</th>
                             </tr>
                         </thead>
                         <tbody>
                             {listeTagesgeld.map((e) => {
                                 const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.referenzkonto);
-                                const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
                                 const transaktionen = e.asset?.transaktionsprotokoll || [];
                                 const summe = transaktionen.reduce((acc, t) => {
@@ -580,7 +579,7 @@ export default function Tagesgeld() {
                                         <td className="code-text">{e.iban}</td>
                                         <td><strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong></td>
                                         <td>{e.kontoinhaber || "—"}</td>
-                                        <td>{elternkontoName}</td>
+                                        <td>{referenzkonto}</td>
                                         <td className="table-actions">
                                             <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
                                             <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
@@ -813,7 +812,16 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>Referenzkonto / Auszahlungskonto</label>
-                                    <input value={referenzkonto} onChange={(e) => setReferenzkonto(e.target.value)} />
+                                    <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
+                                        <option value="">Kein Referenzkonto (Optional)</option>
+                                        {listeReferenzkonto.map(konto => (
+                                            <option key={konto.id} value={konto.id}>
+                                                {konto.girokonto
+                                                    ? `Girokonto (${konto.girokonto.iban || ''})`
+                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label>Sparziel (€)</label>
