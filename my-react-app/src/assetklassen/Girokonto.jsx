@@ -373,7 +373,7 @@ export default function Girokonto() {
 
     const pruefeWiederkehren = async () => {
 
-        const heute = new Date();
+        const heute = new Date().toISOString();
 
 
         const { data: faellige, error } = await supabase
