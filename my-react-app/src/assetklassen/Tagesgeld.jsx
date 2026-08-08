@@ -422,7 +422,7 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Kategorie laden")) return;
     };
 
-    const ladeReferenzkonto = async (assetId) => {
+    const ladeReferenzkonto = async () => {
         const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
             .from("asset")
@@ -432,7 +432,6 @@ export default function Tagesgeld() {
             .eq("benutzer_id", user.id)
             .eq("tagesgeldkonto.ist_referenzkonto", true)
             .eq("girokonto.ist_referenzkonto", true)
-            .eq("asset_id" != assetId)
             .order('asset_name', { ascending: true });
 
         if (data) {
@@ -562,7 +561,6 @@ export default function Tagesgeld() {
                         </thead>
                         <tbody>
                             {listeTagesgeld.map((e) => {
-                                const gefundenerEintrag = listeTagesgeld.find(k => k.asset?.asset_id === e.referenzkonto);
 
                                 const transaktionen = e.asset?.transaktionsprotokoll || [];
                                 const summe = transaktionen.reduce((acc, t) => {
@@ -815,7 +813,9 @@ export default function Tagesgeld() {
                                     <label>Referenzkonto / Auszahlungskonto</label>
                                     <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
                                         <option value="">Kein Referenzkonto (Optional)</option>
-                                        {listeReferenzkonto.map(konto => (
+                                        {listeReferenzkonto
+                                        .filter((refKonto) => refKonto.asset_id !== zuBearbeiten?.asset_id)
+                                        .map(konto => (
                                             <option key={konto.id} value={konto.id}>
                                                 {konto.girokonto
                                                     ? `Girokonto (${konto.girokonto.iban || ''})`
