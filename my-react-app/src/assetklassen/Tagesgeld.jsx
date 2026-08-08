@@ -358,12 +358,13 @@ export default function Tagesgeld() {
 
             if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
 
-            ladeAssets()
-            ladeTagesgeld()
+           
 
         } catch (err) {
             console.error("Unerwarteter Fehler beim Löschen:", err);
         }
+
+        ladeTagesgeld()
     };
 
     const tagesgeldkontoSpeichern = async () => {
