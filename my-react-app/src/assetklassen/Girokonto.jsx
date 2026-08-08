@@ -317,9 +317,10 @@ export default function Girokonto() {
 
         if (wiederkehrendaktiv === true){
             const heute = new Date();
+            const naechsteFaelligkeit = new Date(heute);
             
             if (intervall === "täglich"){
-                naechsteFaelligkeit.setDate(heute.getDate + 1)
+                naechsteFaelligkeit.setDate(heute.getDate() + 1)
             }
             if (intervall === "wöchentlich"){
                 naechsteFaelligkeit.setDate(heute.getDate() + 7)
@@ -331,7 +332,7 @@ export default function Girokonto() {
                 naechsteFaelligkeit.setFullYear(heute.getFullYear() + 1)
             }
 
-            setNaechsteFaelligkeit()
+            setNaechsteFaelligkeit(naechsteFaelligkeit)
         }
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
