@@ -321,7 +321,8 @@ export default function Girokonto() {
             kategorie_id: transaktionsKategorie,
             asset_id: ausgewaehltesAsset,
             assetklasse: "girokonto",
-            typ: transaktionsTyp
+            typ: transaktionsTyp,
+            wiederkehrend: wiederkehrendaktiv
         });
 
         if (handleApiError(error, "Transaktion hinzufügen")) return;
