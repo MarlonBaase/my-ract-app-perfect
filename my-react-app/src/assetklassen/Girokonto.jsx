@@ -313,34 +313,33 @@ export default function Girokonto() {
 
     const transaktionHinzufuegen = async () => {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
+
         const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-        if (wiederkehrendaktiv === true) {
+        let berechneteFaelligkeit = null;
+
+        if (wiederkehrendaktiv) {
             const heute = new Date();
-            let naechsteFaelligkeit = new Date(heute);
 
-            if (intervall === "täglich") {
-                naechsteFaelligkeit.setDate(heute.getDate() + 1)
-            }
-            if (intervall === "wöchentlich") {
-                naechsteFaelligkeit.setDate(heute.getDate() + 7)
-            }
-            if (intervall === "monatlich") {
-                naechsteFaelligkeit.setMonth(heute.getMonth() + 1)
-            }
-            if (intervall === "jährlich") {
-                naechsteFaelligkeit.setFullYear(heute.getFullYear() + 1)
+            switch (intervall) {
+                case "täglich":
+                    heute.setDate(heute.getDate() + 1);
+                    break;
+                case "wöchentlich":
+                    heute.setDate(heute.getDate() + 7);
+                    break;
+                case "monatlich":
+                    heute.setMonth(heute.getMonth() + 1);
+                    break;
+                case "jährlich":
+                    heute.setFullYear(heute.getFullYear() + 1);
+                    break;
+                default:
+                    break;
             }
 
-        }
-
-        const validerDate = new Date(naechsteFaelligkeit);
-
-        if (!isNaN(validerDate.getTime())) {
-            const datumText = validerDate.toISOString()
-            setNaechsteFaelligkeit(datumText);
-        } else {
-            console.error("Fehler bei der Datumsberechnung.");
+            berechneteFaelligkeit = heute.toISOString();
         }
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
@@ -352,16 +351,20 @@ export default function Girokonto() {
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
-            naechste_faelligkeit: naechsteFaelligkeit,
-            intervall: intervall
+            naechste_faelligkeit: berechneteFaelligkeit,
+            intervall: wiederkehrendaktiv ? intervall : null
         });
 
         if (handleApiError(error, "Transaktion hinzufügen")) return;
 
+        // State zurücksetzen
         setTransaktionsNotizen("");
         setTransaktionsBetrag("");
         setTransaktionsKategorie("");
         setTransaktionsTyp("");
+        setWiederkehrendaktiv(false);
+        setIntervall("");
+        setNaechsteFaelligkeit("");
 
         ladeGirokonto();
         transaktionenOeffnen(ausgewaehltesAsset);
