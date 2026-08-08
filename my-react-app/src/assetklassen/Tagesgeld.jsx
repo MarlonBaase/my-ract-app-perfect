@@ -93,7 +93,7 @@ export default function Tagesgeld() {
                     <p>Daten:</p>
                     {notifyInfo.map((item, index) => (
                         <div key={index}>Asset Name: {item.assetName}</div>
-                    )),console.log("Nachricht erreich")}
+                    ))}
                 </div>
             );
         }
@@ -931,7 +931,7 @@ export default function Tagesgeld() {
                 </div>
             )}
 
-
+            <ToastContainer />
         </div>
     );
 }
