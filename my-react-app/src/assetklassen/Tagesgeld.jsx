@@ -87,11 +87,10 @@ export default function Tagesgeld() {
 
                 const transaktionen = info.asset?.transaktionsprotokoll || [];
 
-                const startKapital = Number(info.einzahlung_bei_eroeffnung || 0);
                 const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                     const betrag = Number(t.betrag || 0);
                     return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
-                }, startKapital);
+                });
 
 
                 const zinssatz = Number(info.zinssatz || 0);
