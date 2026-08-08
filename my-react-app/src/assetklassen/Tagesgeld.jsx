@@ -314,31 +314,54 @@ export default function Tagesgeld() {
         setModalOffen(true)
     }
 
-    const eintragLoeschen = async (assetId) => {
+    const assetLoeschenMitLog = async (assetId, assetTyp, tabelleName) => {
         if (!assetId) return;
 
-        const { error: tagesgeldkontoError } = await supabase
-            .from("tagesgeldkonto")
-            .delete()
-            .eq("asset_id", assetId)
-            .select();
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
 
-        console.log("Fehler Tagesgeldkonto:", tagesgeldkontoError);
+            // 1. Daten des spezifischen Assets laden (egal aus welcher Tabelle)
+            const { data: eintrag, error: fetchError } = await supabase
+                .from(tabelleName)
+                .select("*")
+                .eq("asset_id", assetId)
+                .single();
 
-        if (handleApiError(tagesgeldkontoError, "Tagesgeldkonto löschen")) return;
+            if (handleApiError(fetchError, "Asset vor dem Löschen abrufen")) return;
 
-        const { error: assetError } = await supabase
-            .from("asset")
-            .delete()
-            .eq("asset_id", assetId)
-            .select();
+            // 2. In die GLOBALE Log-Tabelle schreiben
+            const { error: logError } = await supabase
+                .from("geloeschte_assets_log")
+                .insert({
+                    benutzer_id: user.id,
+                    asset_id: assetId,
+                    asset_typ: assetTyp, // z.B. "tagesgeldkonto"
+                    asset_name: eintrag?.name || eintrag?.name_der_bank || "Unbenannt",
+                    daten: eintrag,      // Speichert alle spezifischen Spalten als JSON
+                });
 
-        console.log("Fehler Asset:", assetError);
+            if (handleApiError(logError, "Globale Log-Tabelle befüllen")) return;
 
-        if (handleApiError(assetError, "Asset löschen")) return;
+            // 3. Aus der spezifischen Tabelle löschen
+            const { error: subDeleteError } = await supabase
+                .from(tabelleName)
+                .delete()
+                .eq("asset_id", assetId);
 
-        await ladeTagesgeld()
-    }
+            if (handleApiError(subDeleteError, `${assetTyp} löschen`)) return;
+
+            // 4. Aus der übergeordneten Asset-Haupttabelle löschen
+            const { error: mainDeleteError } = await supabase
+                .from("asset")
+                .delete()
+                .eq("asset_id", assetId);
+
+            if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
+
+        } catch (err) {
+            console.error("Unerwarteter Fehler beim Löschen:", err);
+        }
+    };
 
     const tagesgeldkontoSpeichern = async () => {
         if (!zuBearbeiten) return;
@@ -539,7 +562,7 @@ export default function Tagesgeld() {
 
                                 <div className="card-actions">
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => eintragLoeschen(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                 </div>
                             </div>
@@ -581,7 +604,7 @@ export default function Tagesgeld() {
                                         <td>{referenzkonto}</td>
                                         <td className="table-actions">
                                             <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                                            <button onClick={() => eintragLoeschen(e.asset?.asset_id)}>🗑️</button>
+                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id)}>🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
                                         </td>
                                     </tr>
@@ -814,14 +837,14 @@ export default function Tagesgeld() {
                                     <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
                                         <option value="">Kein Referenzkonto (Optional)</option>
                                         {listeReferenzkonto
-                                        .filter((refKonto) => refKonto.asset_id !== zuBearbeiten?.asset_id)
-                                        .map(konto => (
-                                            <option key={konto.id} value={konto.id}>
-                                                {konto.girokonto
-                                                    ? `Girokonto (${konto.girokonto.iban || ''})`
-                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
-                                            </option>
-                                        ))}
+                                            .filter((refKonto) => refKonto.asset_id !== zuBearbeiten?.asset_id)
+                                            .map(konto => (
+                                                <option key={konto.id} value={konto.id}>
+                                                    {konto.girokonto
+                                                        ? `Girokonto (${konto.girokonto.iban || ''})`
+                                                        : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
                                 <div className="form-group">
