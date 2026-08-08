@@ -194,7 +194,7 @@ export default function Tagesgeld() {
     }
 
     const tagesgeldkontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return
+        if (!name || !bank || !iban || !eroeffnungsdatum) return
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
