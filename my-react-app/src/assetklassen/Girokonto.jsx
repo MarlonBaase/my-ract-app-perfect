@@ -336,7 +336,9 @@ export default function Girokonto() {
 
         setNaechsteFaelligkeit(naechsteFaelligkeit)
 
-        console.log(naechsteFaelligkeit)
+        const datumsString = naechsteFaelligkeit.toISOString()
+
+        console.log(datumsString)
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
@@ -347,7 +349,7 @@ export default function Girokonto() {
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
-            naechste_faelligkeit: naechsteFaelligkeit,
+            naechste_faelligkeit: datumsString,
             intervall: intervall
         });
 
