@@ -562,7 +562,7 @@ export default function Tagesgeld() {
 
                                 <div className="card-actions">
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "tagesgeldkonto", "tagesgeldkonto")} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                 </div>
                             </div>
