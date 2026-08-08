@@ -90,7 +90,7 @@ export default function Tagesgeld() {
                 const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                     const betrag = Number(t.betrag || 0);
                     return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
-                });
+                }, 0);
 
 
                 const zinssatz = Number(info.zinssatz || 0);
