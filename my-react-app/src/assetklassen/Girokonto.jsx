@@ -315,20 +315,20 @@ export default function Girokonto() {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
         const { data: { user } } = await supabase.auth.getUser();
 
-        if (wiederkehrendaktiv === true){
+        if (wiederkehrendaktiv === true) {
             const heute = new Date();
             const naechsteFaelligkeit = new Date(heute);
-            
-            if (intervall === "täglich"){
+
+            if (intervall === "täglich") {
                 naechsteFaelligkeit.setDate(heute.getDate() + 1)
             }
-            if (intervall === "wöchentlich"){
+            if (intervall === "wöchentlich") {
                 naechsteFaelligkeit.setDate(heute.getDate() + 7)
             }
-            if (intervall === "monatlich"){
+            if (intervall === "monatlich") {
                 naechsteFaelligkeit.setMonth(heute.getMonth() + 1)
             }
-            if (intervall === "jährlich"){
+            if (intervall === "jährlich") {
                 naechsteFaelligkeit.setFullYear(heute.getFullYear() + 1)
             }
 
@@ -336,9 +336,11 @@ export default function Girokonto() {
 
         setNaechsteFaelligkeit(naechsteFaelligkeit)
 
-        const datumsString = naechsteFaelligkeit.toISOString()
+        const datumObjekt = new Date(naechsteFaelligkeit);
 
-        console.log(datumsString)
+        const isoString = datumObjekt.toISOString();
+
+        console.log(isoString)
 
         const { error } = await supabase.from("transaktionsprotokoll").insert({
             benutzer_id: user.id,
@@ -349,7 +351,7 @@ export default function Girokonto() {
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
-            naechste_faelligkeit: datumsString,
+            naechste_faelligkeit: isoString,
             intervall: intervall
         });
 
