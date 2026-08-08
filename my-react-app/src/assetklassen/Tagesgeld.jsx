@@ -236,7 +236,7 @@ export default function Tagesgeld() {
                     sparziel: parseFloat(sparziel) || 0,
                     mindestbetrag: parseFloat(mindestbetrag) || 0,
                     ist_aktiv: true,
-                    notizen: transaktionsNotizen,
+                    notizen: transaktionsNotizen || "",
                     eroeffnungsdatum: eroeffnungsdatum,
                     kontoinhaber: kontoinhaber,
                     bic: bic,
@@ -358,7 +358,7 @@ export default function Tagesgeld() {
 
             if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
 
-           
+
 
         } catch (err) {
             console.error("Unerwarteter Fehler beim Löschen:", err);
@@ -368,6 +368,12 @@ export default function Tagesgeld() {
     };
 
     const tagesgeldkontoSpeichern = async () => {
+
+        if (!name || !bank || !iban || !eroeffnungsdatum) {
+            alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
+            return;
+        }
+
         if (!zuBearbeiten) return;
 
         const { error: assetError } = await supabase
@@ -386,7 +392,7 @@ export default function Tagesgeld() {
                 zinssatz: parseFloat(zinssatz) || 0,
                 zinsintervall: zinssintervall || "monatlich",
                 referenzkonto: referenzkonto,
-                freistellungsauftrag: freistellungsauftrag || "",
+                freistellungsauftrag: freistellungsauftrag || "1000",
                 aktionszins: parseFloat(aktionszins) || 0,
                 ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                 notgroschen: notgroschen || false,
@@ -395,9 +401,9 @@ export default function Tagesgeld() {
                 sparziel: parseFloat(sparziel) || 0,
                 mindestbetrag: parseFloat(mindestbetrag) || 0,
                 ist_aktiv: ist_aktiv,
-                notizen: transaktionsNotizen,
+                notizen: transaktionsNotizen || "",
                 eroeffnungsdatum: eroeffnungsdatum,
-                kontoinhaber: kontoinhaber,
+                kontoinhaber: kontoinhaber || "",
                 bic: bic,
                 einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 ist_referenzkonto: ist_referenzkonto || false
@@ -608,7 +614,7 @@ export default function Tagesgeld() {
                                         <td>{referenzkonto}</td>
                                         <td className="table-actions">
                                             <button onClick={() => bearbeitenOeffnen(e)}>✏️</button>
-                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id)}>🗑️</button>
+                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "tagesgeldkonto", "tagesgeldkonto")}>🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)}>💰</button>
                                         </td>
                                     </tr>
@@ -685,11 +691,11 @@ export default function Tagesgeld() {
                                     <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Startguthaben*</label>
+                                    <label>Startguthaben</label>
                                     <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Währung*</label>
+                                    <label>Währung</label>
                                     <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="EUR" />
                                 </div>
                                 <div className="form-group">
