@@ -422,7 +422,7 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Kategorie laden")) return;
     };
 
-    const ladeReferenzkonto = async () => {
+    const ladeReferenzkonto = async (assetId) => {
         const { data: { user } } = await supabase.auth.getUser();
         const { data, error } = await supabase
             .from("asset")
@@ -432,6 +432,7 @@ export default function Tagesgeld() {
             .eq("benutzer_id", user.id)
             .eq("tagesgeldkonto.ist_referenzkonto", true)
             .eq("girokonto.ist_referenzkonto", true)
+            .eq("asset_id" != assetId)
             .order('asset_name', { ascending: true });
 
         if (data) {
