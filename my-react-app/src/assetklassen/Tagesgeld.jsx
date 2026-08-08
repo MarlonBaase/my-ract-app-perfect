@@ -108,24 +108,23 @@ export default function Tagesgeld() {
         }
 
         return {
-            assetName: assetName,
-            zielwert: isFinite(zielwert) ? Math.ceil(zielwert) : "Unerreichbar",
+            assetName: werte || "Unbekannt",
+            zielwert: zielwert
         };
+
+        // Direkt anzeigen, ohne den asynchronen State abzuwarten:
+        toast.info(
+            <div>
+                <p>Daten:</p>
+                {notifyInfo.map((info, index) => (
+                    <div key={index}>{info.assetName}: {info.zielwert.toFixed(2)}</div>
+                ))}
+            </div>
+        );
     }
 
-    // Toast-Benachrichtigung anzeigen
-    toast.info(
-        <div>
-            <p style={{ fontWeight: "bold", margin: "0 0 8px 0" }}>Verbleibende Sparzeit:</p>
-            {notifyInfo.map((info, index) => (
-                <div key={index}>
-                    {info.assetName}: {typeof info.zielwert === "number" ? `${info.zielwert} Monate` : info.zielwert}
-                </div>
-            ))}
-        </div>
-    );
-}
 
+}
 
 
 
