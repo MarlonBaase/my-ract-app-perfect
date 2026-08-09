@@ -296,8 +296,16 @@ export default function Girokonto() {
 
     const handleGirokontoSpeichern = () => {
         if (validateForm()) {
-            girokontoHinzufuegen(); // Deine Speicherfunktion
-            setErrors({}); // Fehler zurücksetzen
+
+            if(zuBearbeiten){
+                girokontoSpeichern(); 
+                setErrors({});
+            }
+            else{
+                girokontoHinzufuegen(); 
+                setErrors({});
+            }
+             
         }
     };
 
@@ -871,7 +879,7 @@ export default function Girokonto() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={girokontoSpeichern}>Speichern</button>
+                            <button className="btn-primary" onClick={handleGirokontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>

@@ -46,6 +46,7 @@ export default function Tagesgeld() {
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
+    const [errors, setErrors] = useState({});
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -192,6 +193,28 @@ export default function Tagesgeld() {
         if (handleApiError(error, "Transaktionen öffnen")) return;
         if (data) setListeTransaktionenTagesgeld(data)
     }
+
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
+        if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
+        if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
+        if (!einzahlung_bei_eroeffnung) newErrors.einzahlung = "Startguthaben ist erforderlich";
+        if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
+        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
+    };
+
+    const handleTagesgeldkontoSpeichern = () => {
+        if (validateForm()) {
+            tagesgeldkontoHinzufuegen(); // Deine Speicherfunktion
+            setErrors({}); // Fehler zurücksetzen
+        }
+    };
 
     const tagesgeldkontoHinzufuegen = async () => {
         if (!name || !bank || !iban || !eroeffnungsdatum) return
@@ -799,11 +822,12 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={tagesgeldkontoHinzufuegen}>Speichern</button>
+                            <button className="btn-primary" onClick={handleTagesgeldkontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>
             )}
+    
 
             {/* MODAL: Bearbeiten */}
             {modalOffen && (
@@ -924,7 +948,7 @@ export default function Tagesgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={tagesgeldkontoSpeichern}>Speichern</button>
+                            <button className="btn-primary" onClick={handleTagesgeldkontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>
