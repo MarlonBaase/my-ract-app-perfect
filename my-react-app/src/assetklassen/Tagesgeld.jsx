@@ -203,8 +203,8 @@ export default function Tagesgeld() {
         if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
         if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
         if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
-        if (!sparziel.trim()) newErrors.sparziel = "Sparziel ist erforderlich";
-        if (!sparziel.trim()) newErrors.sparrate = "Sparrate ist erforderlich";
+        if (!sparziel) newErrors.sparziel = "Sparziel ist erforderlich";
+        if (!sparziel) newErrors.sparrate = "Sparrate ist erforderlich";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
