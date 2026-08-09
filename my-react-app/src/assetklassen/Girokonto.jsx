@@ -805,14 +805,17 @@ export default function Girokonto() {
                                 <div className="form-group">
                                     <label>Asset Name</label>
                                     <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Asset Name" />
+                                    {errors.name && <span className="error-text">{errors.name}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Bank</label>
                                     <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="Bank" />
+                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>IBAN</label>
                                     <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="IBAN" />
+                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Guthaben bei Eröffnung</label>
@@ -825,6 +828,7 @@ export default function Girokonto() {
                                 <div className="form-group">
                                     <label>Eröffnungsdatum</label>
                                     <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Kontoinhaber</label>
