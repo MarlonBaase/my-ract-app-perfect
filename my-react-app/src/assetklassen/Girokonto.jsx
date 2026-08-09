@@ -341,20 +341,7 @@ export default function Girokonto() {
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
 
-        setName("");
-        setBank("");
-        setIban("");
-        setEinzahlung_bei_eroeffnung("");
-        setWaehrung("EUR");
-        setEroeffnungsdatum("");
-        setTransaktionsNotizen("");
-        setKontoinhaber("");
-        setIstAktiv(true);
-        setHauptkonto(false);
-        setAusgewaehltesElternkonto("");
-        setDispoLimit("");
-        setBic("");
-        setZinssatz("");
+        window.location.reload()
         setModalOffen(false);
         setZuBearbeiten(null);
         ladeGirokonto();
