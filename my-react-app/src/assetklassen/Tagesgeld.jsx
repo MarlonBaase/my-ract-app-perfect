@@ -427,7 +427,7 @@ export default function Tagesgeld() {
     const tagesgeldkontoSpeichern = async () => {
 
         if (!name || !bank || !iban || !eroeffnungsdatum || !sparrate || !sparziel) {
-            alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
+            alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum, Sparrate, Sparziel) aus!");
             return;
         }
 
