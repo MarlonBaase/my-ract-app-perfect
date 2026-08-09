@@ -827,7 +827,7 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Startguthaben*</label>
+                                    <label>Startguthaben</label>
                                     <input
                                         className={errors.einzahlung ? "input-error" : ""}
                                         value={einzahlung_bei_eroeffnung}

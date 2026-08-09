@@ -201,9 +201,10 @@ export default function Tagesgeld() {
         if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
         if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
         if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
-        if (!einzahlung_bei_eroeffnung) newErrors.einzahlung = "Startguthaben ist erforderlich";
         if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
         if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
+        if (!sparziel.trim()) newErrors.sparziel = "Sparziel ist erforderlich";
+        if (!sparziel.trim()) newErrors.sparrate = "Sparrate ist erforderlich";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
@@ -225,7 +226,7 @@ export default function Tagesgeld() {
     };
 
     const tagesgeldkontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !eroeffnungsdatum) return
+        if (!name || !bank || !iban || !eroeffnungsdatum || !sparziel || !sparrate) return
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
