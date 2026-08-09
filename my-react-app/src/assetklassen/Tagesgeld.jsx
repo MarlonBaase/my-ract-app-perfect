@@ -320,6 +320,31 @@ export default function Tagesgeld() {
         try {
             const { data: { user } } = await supabase.auth.getUser();
 
+            const { data: werte, error: tlogError } = await supabase
+                .from("transaktionsprotokoll")
+                .select("*")
+                .eq("asset_id", assetId)
+
+            if (handleApiError(tlogError, "Asset vor dem Löschen abrufen")) return;
+
+            const { error: ttlogError } = await supabase
+                .from("geloeschte_transaktionen_log")
+                .insert({
+                    benutzer_id: user.id,
+                    asset_id: assetId,
+                    asset_typ: assetTyp, // z.B. "tagesgeldkonto"
+                    daten: werte,
+                });
+
+            if (handleApiError(ttlogError, "Globale Log-Tabelle befüllen")) return;
+
+            const { error: tDeleteError } = await supabase
+                .from("transaktionsprotokoll")
+                .delete()
+                .eq("asset_id", assetId);
+
+            if (handleApiError(tDeleteError, `${assetTyp} löschen`)) return;
+
             // 1. Daten des spezifischen Assets laden (egal aus welcher Tabelle)
             const { data: eintrag, error: fetchError } = await supabase
                 .from(tabelleName)
