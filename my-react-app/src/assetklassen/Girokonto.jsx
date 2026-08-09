@@ -223,12 +223,12 @@ export default function Girokonto() {
 
             if (handleApiError(ttlogError, "Globale Log-Tabelle befüllen")) return;
 
-            const { error: subDeleteError } = await supabase
+            const { error: tDeleteError } = await supabase
                 .from("transaktionsprotokoll")
                 .delete()
                 .eq("asset_id", assetId);
 
-            if (handleApiError(subDeleteError, `${assetTyp} löschen`)) return;
+            if (handleApiError(tDeleteError, `${assetTyp} löschen`)) return;
 
 
 
