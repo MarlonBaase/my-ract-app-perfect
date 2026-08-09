@@ -232,8 +232,8 @@ export default function Tagesgeld() {
                     ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                     notgroschen: notgroschen || false,
                     einlagensicherung: parseFloat(einlagensicherung) || 100000,
-                    sparrate: parseFloat(sparrate) || 0,
-                    sparziel: parseFloat(sparziel) || 0,
+                    sparrate: parseFloat(sparrate),
+                    sparziel: parseFloat(sparziel),
                     mindestbetrag: parseFloat(mindestbetrag) || 0,
                     ist_aktiv: true,
                     notizen: transaktionsNotizen || "",
@@ -394,7 +394,7 @@ export default function Tagesgeld() {
 
     const tagesgeldkontoSpeichern = async () => {
 
-        if (!name || !bank || !iban || !eroeffnungsdatum) {
+        if (!name || !bank || !iban || !eroeffnungsdatum || !sparrate || !sparziel) {
             alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
             return;
         }
@@ -422,8 +422,8 @@ export default function Tagesgeld() {
                 ablaufdatum_aktionszins: ablaufdatum_aktionszins || null,
                 notgroschen: notgroschen || false,
                 einlagensicherung: parseFloat(einlagensicherung) || 100000,
-                sparrate: parseFloat(sparrate) || 0,
-                sparziel: parseFloat(sparziel) || 0,
+                sparrate: parseFloat(sparrate),
+                sparziel: parseFloat(sparziel),
                 mindestbetrag: parseFloat(mindestbetrag) || 0,
                 ist_aktiv: ist_aktiv,
                 notizen: transaktionsNotizen || "",
