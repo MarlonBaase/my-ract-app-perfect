@@ -331,7 +331,7 @@ export default function Girokonto() {
         ladeGirokonto();
     };
 
-    const transaktionHinzufuegen = async () => {
+    const transaktionHinzufuegen = async (assetId) => {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
 
         const { data: { user } } = await supabase.auth.getUser();
@@ -367,7 +367,7 @@ export default function Girokonto() {
             notizen: transaktionsNotizen,
             betrag: parseFloat(transaktionsBetrag),
             kategorie_id: transaktionsKategorie,
-            asset_id: ausgewaehltesAsset,
+            asset_id: assetId,
             assetklasse: "girokonto",
             typ: transaktionsTyp,
             wiederkehrend: wiederkehrendaktiv,
