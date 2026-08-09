@@ -89,7 +89,7 @@ export default function Girokonto() {
     };
 
     const girokontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !einzahlung_bei_eroeffnung || !waehrung || !eroeffnungsdatum) return;
+        if (!name || !bank || !iban || !waehrung || !eroeffnungsdatum) return;
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
@@ -286,7 +286,6 @@ export default function Girokonto() {
         if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
         if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
         if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
-        if (!einzahlung_bei_eroeffnung) newErrors.einzahlung = "Startguthaben ist erforderlich";
         if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
         if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
 
@@ -704,15 +703,8 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Startguthaben*</label>
-                                    <input
-                                        className={errors.einzahlung ? "input-error" : ""}
-                                        value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung: null }); }}
-                                        placeholder="0.00"
-                                        type="number"
-                                    />
-                                    {errors.einzahlung && <span className="error-text">{errors.einzahlung}</span>}
+                                    <label>Startguthaben</label>
+                                    <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
                                 </div>
 
                                 <div className="form-group">

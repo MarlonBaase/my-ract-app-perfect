@@ -211,8 +211,16 @@ export default function Tagesgeld() {
 
     const handleTagesgeldkontoSpeichern = () => {
         if (validateForm()) {
-            tagesgeldkontoHinzufuegen(); // Deine Speicherfunktion
-            setErrors({}); // Fehler zurücksetzen
+
+            if (zuBearbeiten) {
+                tagesgeldkontoSpeichern();
+                setErrors({});
+            }
+            else {
+                tagesgeldkontoHinzufuegen();
+                setErrors({});
+            }
+
         }
     };
 
@@ -720,15 +728,33 @@ export default function Tagesgeld() {
                             <div className="form-grid">
                                 <div className="form-group">
                                     <label>Asset Name*</label>
-                                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="z.B. Notgroschen ING" />
+                                    <input
+                                        className={errors.name ? "input-error" : ""}
+                                        value={name}
+                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
+                                        placeholder="z.B. Hauptkonto"
+                                    />
+                                    {errors.name && <span className="error-text">{errors.name}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Bank Name*</label>
-                                    <input value={bank} onChange={(e) => setBank(e.target.value)} placeholder="z.B. ING" />
+                                    <input
+                                        className={errors.bank ? "input-error" : ""}
+                                        value={bank}
+                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
+                                        placeholder="z.B. Sparkasse"
+                                    />
+                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>IBAN*</label>
-                                    <input value={iban} onChange={(e) => setIban(e.target.value)} placeholder="DE00 0000 0000 0000 0000 00" />
+                                    <input
+                                        className={errors.iban ? "input-error" : ""}
+                                        value={iban}
+                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
+                                        placeholder="DE00 0000 0000 0000 0000 00"
+                                    />
+                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>BIC</label>
@@ -743,12 +769,24 @@ export default function Tagesgeld() {
                                     <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Währung</label>
-                                    <input value={waehrung} onChange={(e) => setWaehrung(e.target.value)} placeholder="EUR" />
+                                    <label>Währung*</label>
+                                    <input
+                                        className={errors.waehrung ? "input-error" : ""}
+                                        value={waehrung}
+                                        onChange={(e) => { setWaehrung(e.target.value); setErrors({ ...errors, waehrung: null }); }}
+                                        placeholder="EUR"
+                                    />
+                                    {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
                                 </div>
-                                <div className="form-group">
+                                 <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
-                                    <input type="date" value={eroeffnungsdatum} onChange={(e) => setEroeffnungsdatum(e.target.value)} />
+                                    <input
+                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        type="date"
+                                        value={eroeffnungsdatum}
+                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
+                                    />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Zinssatz (% p.a.)</label>
@@ -785,11 +823,23 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group">
                                     <label>Sparziel (€)</label>
-                                    <input value={sparziel} onChange={(e) => setSparziel(e.target.value)} placeholder="5000.00" type="number" />
+                                    <input
+                                        className={errors.sparziel ? "input-error" : ""}
+                                        value={sparziel}
+                                        onChange={(e) => { setSparziel(e.target.value); setErrors({ ...errors, sparziel: null }); }}
+                                        placeholder="100.00 €"
+                                    />
+                                    {errors.sparziel && <span className="error-text">{errors.sparziel}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Sparrate (€/Monat)</label>
-                                    <input value={sparrate} onChange={(e) => setSparrate(e.target.value)} placeholder="200.00" type="number" />
+                                    <input
+                                        className={errors.sparrate ? "input-error" : ""}
+                                        value={sparrate}
+                                        onChange={(e) => { setSparrate(e.target.value); setErrors({ ...errors, sparrate: null }); }}
+                                        placeholder="200.00 €"
+                                    />
+                                    {errors.sparrate && <span className="error-text">{errors.sparrate}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Mindestbetrag (€)</label>
