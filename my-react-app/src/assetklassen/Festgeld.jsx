@@ -651,6 +651,24 @@ export default function Festgeld() {
                                     />
                                     {errors.bank && <span className="error-text">{errors.bank}</span>}
                                 </div>
+                                <div className="form-group col-span-2">
+                                    <label>IBAN*</label>
+                                    <input
+                                        className={errors.iban ? "input-error" : ""}
+                                        value={iban}
+                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
+                                        placeholder="DE00 0000 0000 0000 0000 00"
+                                    />
+                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>BIC</label>
+                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Kontoinhaber</label>
+                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
+                                </div>
                                 <div className="form-group">
                                     <label>Anlagesumme (€)*</label>
                                     <input
