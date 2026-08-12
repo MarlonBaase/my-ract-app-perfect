@@ -863,20 +863,7 @@ export default function Festgeld() {
                     </div>
                 </div>
             )}
-            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                            <button
-                                onClick={transaktionHinzufuegen}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                            >
-                                Hinzufügen
-                            </button>
-                            <button
-                                onClick={() => setModalTranskationenHinzufuegen(false)}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
-                            >
-                                Abbrechen
-                            </button>
-                        </div>
+
         </div>
     );
 }
