@@ -47,6 +47,7 @@ export default function Tagesgeld() {
     const [intervall, setIntervall] = useState("");
     const [assets, setAssets] = useState([]);
     const [errors, setErrors] = useState({});
+    const [notizen, setNotizen] = useState("")
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -268,7 +269,7 @@ export default function Tagesgeld() {
                     sparziel: parseFloat(sparziel),
                     mindestbetrag: parseFloat(mindestbetrag) || 0,
                     ist_aktiv: true,
-                    notizen: transaktionsNotizen || "",
+                    notizen: notizen || "",
                     eroeffnungsdatum: eroeffnungsdatum,
                     kontoinhaber: kontoinhaber || "",
                     bic: bic || 0,
@@ -306,7 +307,7 @@ export default function Tagesgeld() {
             setEinzahlung_bei_eroeffnung("")
             setWaehrung("EUR")
             setEroeffnungsdatum("")
-            setTransaktionsNotizen("")
+            setNotizen("")
             setKontoinhaber("")
             setIstAktiv(true)
             setBic("")
@@ -338,7 +339,7 @@ export default function Tagesgeld() {
         setSparziel(eintrag.sparziel || "")
         setMindestbetrag(eintrag.mindestbetrag || "")
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
-        setTransaktionsNotizen(eintrag.notizen || "")
+        setNotizen(eintrag.notizen || "")
         setKontoinhaber(eintrag.kontoinhaber || "")
         setIstAktiv(eintrag.ist_aktiv ?? true)
         setBic(eintrag.bic || "")
@@ -458,7 +459,7 @@ export default function Tagesgeld() {
                 sparziel: parseFloat(sparziel),
                 mindestbetrag: parseFloat(mindestbetrag) || 0,
                 ist_aktiv: ist_aktiv,
-                notizen: transaktionsNotizen || "",
+                notizen: notizen || "",
                 eroeffnungsdatum: eroeffnungsdatum,
                 kontoinhaber: kontoinhaber || "",
                 bic: bic || "",
@@ -579,7 +580,7 @@ export default function Tagesgeld() {
                     setModalOffenHinzu(true, ladeReferenzkonto());
                     setZuBearbeiten(null);
                     setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
-                    setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
+                    setWaehrung("EUR"); setEroeffnungsdatum(""); setNotizen("");
                     setKontoinhaber(""); setIstAktiv(true); setBic(""); setZinssatz("");
                     setZinssintervall("monatlich"); setAusgewaehltesReferenzkonto(""); setFreistellungsauftrag("");
                     setAktionszins(""); setAblaufdatum_aktionszins(""); setNotgroschen(false);
@@ -779,7 +780,7 @@ export default function Tagesgeld() {
                                     />
                                     {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
                                 </div>
-                                 <div className="form-group">
+                                <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
                                     <input
                                         className={errors.eroeffnungsdatum ? "input-error" : ""}
@@ -852,11 +853,11 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
+                                    <input value={notizen} onChange={(e) => setNotizen(e.target.value)} placeholder="Optionale Notiz..." />
                                 </div>
                                 <div className="form-group">
                                     <label>Freistellingsauftrag</label>
-                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000"/>
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
                                 </div>
 
                                 <div className="form-group checkbox-group col-span-2">
@@ -878,7 +879,7 @@ export default function Tagesgeld() {
                     </div>
                 </div>
             )}
-    
+
 
             {/* MODAL: Bearbeiten */}
             {modalOffen && (
@@ -942,7 +943,7 @@ export default function Tagesgeld() {
                                     />
                                     {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
                                 </div>
-                                 <div className="form-group">
+                                <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
                                     <input
                                         className={errors.eroeffnungsdatum ? "input-error" : ""}
@@ -1015,11 +1016,11 @@ export default function Tagesgeld() {
                                 </div>
                                 <div className="form-group col-span-2">
                                     <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
+                                    <input value={notizen} onChange={(e) => setNotizen(e.target.value)} placeholder="Optionale Notiz..." />
                                 </div>
                                 <div className="form-group">
                                     <label>Freistellingsauftrag</label>
-                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000"/>
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
                                 </div>
                                 <div className="form-group checkbox-group col-span-2">
                                     <label className="checkbox-label">
