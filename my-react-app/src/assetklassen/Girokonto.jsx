@@ -340,8 +340,6 @@ export default function Girokonto() {
 
         if (handleApiError(giroError, "Girokontodaten updaten")) return;
 
-
-        window.location.reload()
         setModalOffen(false);
         setZuBearbeiten(null);
         ladeGirokonto();
