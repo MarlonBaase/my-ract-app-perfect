@@ -166,6 +166,7 @@ export default function Festgeld() {
                 setErrors({});
             }
             else {
+                console.log("Test3")
                 festgeldHinzufuegen();
                 setErrors({});
             }
