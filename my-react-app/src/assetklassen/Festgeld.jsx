@@ -153,11 +153,8 @@ export default function Festgeld() {
 
 
 
-        //if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
-
-
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleFestgeldSpeichern = () => {
@@ -630,8 +627,8 @@ return (
             </div>
         )}
 
-        {/* MODAL: Hinzufügen / Bearbeiten Template */}
-        {(modalOffenHinzu || modalOffen) && (
+        {/* MODAL: Hinzufügen */}
+        {(modalOffenHinzu) && (
             <div className="modal-overlay">
                 <div className="modal-container">
                     <div className="modal-header">
@@ -785,7 +782,7 @@ return (
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button className="btn-secondary" onClick={() => { setModalOffenHinzu(false); setModalOffen(false); }}>Abbrechen</button>
+                        <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
                         <button className="btn-primary" onClick={handleFestgeldSpeichern}>Speichern</button>
                     </div>
                 </div>
