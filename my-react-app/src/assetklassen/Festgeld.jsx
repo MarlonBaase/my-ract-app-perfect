@@ -775,6 +775,10 @@ export default function Festgeld() {
                                     <label>Notizen</label>
                                     <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Anmerkungen..." />
                                 </div>
+                                <div className="form-group">
+                                    <label>Freistellingsauftrag</label>
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
+                                </div>
 
                                 <div className="form-group checkbox-group col-span-2">
                                     <label className="checkbox-label">
@@ -784,10 +788,6 @@ export default function Festgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={automatischVerlaengern} onChange={(e) => setAutomatischVerlaengern(e.target.checked)} />
                                         Automatisch verlängern (Prolongation)
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.checked)} />
-                                        Freistellungsauftrag hinterlegt
                                     </label>
                                 </div>
                             </div>
