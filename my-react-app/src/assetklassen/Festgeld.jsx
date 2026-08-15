@@ -184,10 +184,12 @@ export default function Festgeld() {
 
     const festgeldHinzufuegen = async () => {
 
-        console.log("Test2")
+        console.log("Test2 - Prüfe Pflichtfelder...");
 
-        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) return
-
+        if (!name || !bank || !anlagesumme || !zinssatz || !laufzeitMonate) {
+            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, anlagesumme, zinssatz, laufzeitMonate });
+            return;
+        }
         try {
             const { data: { user } } = await supabase.auth.getUser()
 
