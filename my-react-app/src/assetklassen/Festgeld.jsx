@@ -158,7 +158,6 @@ export default function Festgeld() {
     };
 
     const handleFestgeldSpeichern = () => {
-        console.log("Test")
         if (validateForm()) {
             console.log("Test3")
 
