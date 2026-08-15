@@ -139,23 +139,27 @@ export default function Festgeld() {
     };
 
     const validateForm = () => {
-        const newErrors = {};
+    const newErrors = {};
 
-        if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
-        if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
-        if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
-        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
-        if (!einzahlung_bei_eroeffnung.trim()) newErrors.einzahlung_bei_eroeffnung = "Anlagesumme ist erforderlich";
-        if (!zinssatz.trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
-        if (!laufzeitMonate.trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
-        if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
-        if (!referenzkonto) newErrors.referenzkonto = "Referenzkonto ist erforderlich";
+    // String-Felder mit String()-Absicherung gegen Nicht-Strings
+    if (!name || !String(name).trim()) newErrors.name = "Asset Name ist erforderlich";
+    if (!bank || !String(bank).trim()) newErrors.bank = "Bank Name ist erforderlich";
+    if (!anlagesumme || !String(anlagesumme).trim()) newErrors.anlagesumme = "Anlagesumme ist erforderlich";
+    if (!zinssatz || !String(zinssatz).trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
+    if (!laufzeitMonate || !String(laufzeitMonate).trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
+    
+    // Datum-Felder
+    if (!eroeffnungsdatum) newErrors.anlagedatum = "Anlagedatum ist erforderlich";
+    if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
+    
+    // Dropdown/Select
+    if (!ausgewaehltesReferenzkonto) newErrors.ausgewaehltesReferenzkonto = "Referenzkonto ist erforderlich";
 
-
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    setErrors(newErrors);
+    
+    // Prüfen, ob das Fehler-Objekt leer ist
+    return Object.keys(newErrors).length === 0;
+};
 
     const handleFestgeldSpeichern = () => {
         if (validateForm()) {
