@@ -704,6 +704,8 @@ return (
                                 <label>Laufzeit (Monate)*</label>
                                 <input
                                     type="number"
+                                    step="0.01"
+                                    className={errors.laufzeitMonate ? "input-error" : ""}
                                     value={laufzeitMonate}
                                     onChange={(e) => setLaufzeitMonate(e.target.value)}
                                     placeholder="12"
@@ -713,6 +715,8 @@ return (
                                 <label>Eröffnungsdatum*</label>
                                 <input
                                     type="date"
+                                    step="0.01"
+                                    className={errors.eroeffnungsdatum ? "input-error" : ""}
                                     value={eroeffnungsdatum}
                                     onChange={(e) => setEroeffnungsdatum(e.target.value)}
                                 />
@@ -721,6 +725,8 @@ return (
                                 <label>Fälligkeitsdatum*</label>
                                 <input
                                     type="date"
+                                    step="0.01"
+                                    className={errors.faelligkeitsdatum ? "input-error" : ""}
                                     value={faelligkeitsdatum}
                                     onChange={(e) => setFaelligkeitsdatum(e.target.value)}
                                 />
@@ -746,7 +752,11 @@ return (
                                 <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
                                     <option value="">Referenzkonto auswählen...</option>
                                     {listeReferenzkonto.map(konto => (
-                                        <option key={konto.id} value={konto.id}>
+                                        <option 
+                                            key={konto.id} 
+                                            value={konto.id} 
+                                            step="0.01"
+                                            className={errors.zinssatz ? "input-error" : ""}>
                                             {konto.girokonto
                                                 ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
                                                 : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
