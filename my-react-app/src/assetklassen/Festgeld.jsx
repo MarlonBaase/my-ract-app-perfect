@@ -182,7 +182,7 @@ export default function Festgeld() {
 
         console.log("Test2")
 
-        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum || !faelligkeitsdatum) return
+        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) return
 
         try {
             const { data: { user } } = await supabase.auth.getUser()
@@ -217,8 +217,8 @@ export default function Festgeld() {
                     faelligkeitsdatum: faelligkeitsdatum,
                     letzter_kuendigungstag: letzterKuendigungstag || null,
                     gekuendigt_am: gekuendigtAm || null,
-                    zinsgutschrift: parseFloat(zinsgutschrift) || 0 || "",
-                    zinseszins: parseFloat(zinseszins) || 0 || 0,
+                    zinsgutschrift: parseFloat(zinsgutschrift) || "",
+                    zinseszins: zinseszins || true,
                     freistellungsauftrag: freistellungsauftrag || 0,
                     steuersatz_abzug: steuersatzAbzug || 0,
                     referenzkonto: referenzkonto,
@@ -226,7 +226,7 @@ export default function Festgeld() {
                     ist_aktiv: ist_aktiv || true,
                     notizen: notizen || "",
                     iban: iban,
-                    bic: bic || 0,
+                    bic: bic || "",
                     kontoinhaber: kontoinhaber || ""
                 })
 
