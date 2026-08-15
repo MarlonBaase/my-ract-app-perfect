@@ -205,7 +205,7 @@ export default function Tagesgeld() {
         if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
         if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
         if (!sparziel) newErrors.sparziel = "Sparziel ist erforderlich";
-        if (!sparziel) newErrors.sparrate = "Sparrate ist erforderlich";
+        if (!sparrate) newErrors.sparrate = "Sparrate ist erforderlich";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
