@@ -221,7 +221,7 @@ export default function Festgeld() {
                     laufzeit_monate: parseFloat(laufzeitMonate) || 0,
                     anlagedatum: eroeffnungsdatum,
                     faelligkeitsdatum: faelligkeitsdatum,
-                    letzter_kuendigungstag: letzterKuendigungstag,
+                    letzter_kuendigungstag: letzterKuendigungstag || null,
                     gekuendigt_am: gekuendigtAm || null,
                     zinsgutschrift: zinsgutschrift || "",
                     zinseszins: zinseszins || true,
@@ -512,7 +512,7 @@ export default function Festgeld() {
                     setName(""); setBank(""); setAnlagesumme("");
                     setZinssatz(""); setLaufzeitMonate(""); setEroeffnungsdatum(""); setFaelligkeitsdatum("");
                     setZinsgutschrift("am_ende"); setZinseszins(false); setAusgewaehltesReferenzkonto("");
-                    setKuendigungsfrist(""); setAutomatischVerlaengern(false); setFreistellungsauftrag(false);
+                    setKuendigungsfrist(""); setAutomatischVerlaengern(false); setFreistellungsauftrag("");
                     setTransaktionsNotizen(""); setErrors({});
                 }}>
                     + Festgeldkonto hinzufügen
