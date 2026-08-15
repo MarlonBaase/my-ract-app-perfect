@@ -217,7 +217,7 @@ export default function Festgeld() {
                     faelligkeitsdatum: faelligkeitsdatum,
                     letzter_kuendigungstag: letzterKuendigungstag || null,
                     gekuendigt_am: gekuendigtAm || null,
-                    zinsgutschrift: zinsgutschrift,
+                    zinsgutschrift: zinsgutschrift || "",
                     zinseszins: zinseszins || 0,
                     freistellungsauftrag: freistellungsauftrag || 0,
                     steuersatz_abzug: steuersatzAbzug || 0,
@@ -226,7 +226,7 @@ export default function Festgeld() {
                     ist_aktiv: ist_aktiv || true,
                     notizen: notizen || "",
                     iban: iban,
-                    bic: bic,
+                    bic: bic || "",
                     kontoinhaber: kontoinhaber || ""
                 })
 
