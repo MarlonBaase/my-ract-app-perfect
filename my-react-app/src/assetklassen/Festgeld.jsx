@@ -178,7 +178,7 @@ export default function Festgeld() {
 
     const festgeldHinzufuegen = async () => {
 
-        console.log("Test")
+        console.log("Test2")
 
         if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum || !faelligkeitsdatum) return
 
