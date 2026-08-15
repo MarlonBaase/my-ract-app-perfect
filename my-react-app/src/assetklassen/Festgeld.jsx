@@ -161,6 +161,7 @@ export default function Festgeld() {
     };
 
     const handleFestgeldSpeichern = () => {
+        console.print("Test")
         if (validateForm()) {
 
             if (zuBearbeiten) {
@@ -754,9 +755,7 @@ return (
                                     {listeReferenzkonto.map(konto => (
                                         <option 
                                             key={konto.id} 
-                                            value={konto.id} 
-                                            step="0.01"
-                                            className={errors.zinssatz ? "input-error" : ""}>
+                                            value={konto.id}>
                                             {konto.girokonto
                                                 ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
                                                 : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
