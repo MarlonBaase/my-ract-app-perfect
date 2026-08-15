@@ -161,7 +161,7 @@ export default function Festgeld() {
     };
 
     const handleFestgeldSpeichern = () => {
-        console.print("Test")
+        console.log("Test")
         if (validateForm()) {
 
             if (zuBearbeiten) {
@@ -178,7 +178,7 @@ export default function Festgeld() {
 
     const festgeldHinzufuegen = async () => {
 
-        console.print("Test")
+        console.log("Test")
 
         if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum || !faelligkeitsdatum) return
 
