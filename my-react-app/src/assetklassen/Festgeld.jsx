@@ -145,9 +145,9 @@ export default function Festgeld() {
         if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
         if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
         if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
-        if (!einzahlung_bei_eroeffnung) newErrors.einzahlung_bei_eroeffnung = "Anlagesumme ist erforderlich";
-        if (!zinssatz) newErrors.zinssatz = "Zinssatz ist erforderlich";
-        if (!laufzeitMonate) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
+        if (!einzahlung_bei_eroeffnung.trim()) newErrors.einzahlung_bei_eroeffnung = "Anlagesumme ist erforderlich";
+        if (!zinssatz.trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
+        if (!laufzeitMonate.trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
         if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
         if (!referenzkonto) newErrors.referenzkonto = "Referenzkonto ist erforderlich";
 
