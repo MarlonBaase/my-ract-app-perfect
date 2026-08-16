@@ -269,8 +269,8 @@ export default function Festgeld() {
 
     const festgeldSpeichern = async () => {
 
-        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) {
-            alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
+        if (!name || !bank || !anlagesumme || !zinssatz || !laufzeitMonate) {
+            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, anlagesumme, zinssatz, laufzeitMonate });
             return;
         }
 
@@ -392,6 +392,7 @@ export default function Festgeld() {
         setBic(eintrag.bic);
         setKontoinhaber(eintrag.kontoinhaber);
         setGekuendigtAm(eintrag.gekuendigtAm || "");
+        setAutomatischVerlaengern(eintrag.automatische_verlaengerung)
         setModalOffen(true)
     }
 
@@ -911,7 +912,7 @@ export default function Festgeld() {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Gekündigt am*</label>
+                                    <label>Gekündigt am</label>
                                     <input
                                         type="date"
                                         step="0.01"
