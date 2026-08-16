@@ -5,7 +5,7 @@ export default function Daten() {
     const [inhalt, setInhalt] = useState("");
 
     useEffect(() => {
-    fetch("/daten.txt")
+    fetch("/version.txt")
       .then((res) => res.text())
       .then((text) => setInhalt(text))
       .catch((err) => console.error("Fehler:", err));
