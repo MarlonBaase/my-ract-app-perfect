@@ -41,7 +41,6 @@ export default function Festgeld() {
     const [name, setName] = useState("")
     const [notizen, setNotizen] = useState("")
     const [referenzkonto, setReferenzkonto] = useState("")
-    const [steuersatzAbzug, setSteuerssatzAbzug] = useState("")
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("")
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("")
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("")
@@ -219,7 +218,6 @@ export default function Festgeld() {
                     zinsgutschrift: zinsgutschrift || "",
                     zinseszins: zinseszins || true,
                     freistellungsauftrag: freistellungsauftrag || 0,
-                    steuersatz_abzug: steuersatzAbzug || 0,
                     referenzkonto: ausgewaehltesReferenzkonto,
                     automatische_verlaengerung: automatischVerlaengern || false,
                     ist_aktiv: ist_aktiv || true,
@@ -301,7 +299,6 @@ export default function Festgeld() {
                 zinsgutschrift: zinsgutschrift,
                 zinseszins: zinseszins || 0,
                 freistellungsauftrag: freistellungsauftrag || 0,
-                steuersatz_abzug: steuersatzAbzug || 0,
                 referenzkonto: ausgewaehltesReferenzkonto,
                 automatische_verlaengerung: automatischVerlaengern || false,
                 ist_aktiv: ist_aktiv || true,
