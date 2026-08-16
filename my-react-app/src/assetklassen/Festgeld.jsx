@@ -155,23 +155,17 @@ export default function Festgeld() {
     };
 
     const handleFestgeldSpeichern = () => {
-        console.log("1. Button geklickt");
-        console.log("Aktuelle States:", {
-            name, bank, anlagesumme, zinssatz, laufzeitMonate,
-            eroeffnungsdatum, faelligkeitsdatum, ausgewaehltesReferenzkonto, iban
-        });
+        if (validateForm()) {
 
-        const isValid = validateForm();
-        console.log("2. Validierungsergebnis:", isValid);
-
-        if (isValid) {
             if (zuBearbeiten) {
                 festgeldSpeichern();
-            } else {
-                festgeldHinzufuegen();
+                setErrors({});
             }
-        } else {
-            console.log("3. Validierungsfehler (errors):", errors);
+            else {
+                festgeldHinzufuegen();
+                setErrors({});
+            }
+
         }
     };
 
