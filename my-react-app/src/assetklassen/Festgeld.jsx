@@ -387,7 +387,6 @@ export default function Festgeld() {
         setZinsgutschrift(eintrag.zinsgutschrift);
         setZinseszins(eintrag.zinseszins);
         setFreistellungsauftrag(eintrag.freistellungsauftrag);
-        setSteuerssatzAbzug(eintrag.steuersatz_abzug);
         setReferenzkonto(eintrag.ausgewaehltesReferenzkonto);
         setAutomatischVerlaengern(eintrag.automatisch_verlaengern);
         setIstAktiv(eintrag.ist_aktiv);
