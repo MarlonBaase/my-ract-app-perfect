@@ -1014,7 +1014,7 @@ export default function Girokonto() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalTranskationenHinzufuegen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={transaktionHinzufuegen}>Hinzufügen</button>
+                            <button className="btn-primary" onClick={() => transaktionHinzufuegen}>Hinzufügen</button>
                         </div>
                     </div>
                 </div>

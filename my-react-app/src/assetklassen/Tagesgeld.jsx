@@ -1136,7 +1136,7 @@ export default function Tagesgeld() {
 
                         <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
                             <button
-                                onClick={transaktionHinzufuegen}
+                                onClick={() => transaktionHinzufuegen}
                                 style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
                             >
                                 Hinzufügen
