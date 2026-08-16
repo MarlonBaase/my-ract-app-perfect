@@ -35,7 +35,6 @@ export default function Festgeld() {
     const [listeFestgeld, setListeFestgeld] = useState([])
     const [listeReferenzkonto, setListeReferenzkonto] = useState([])
     const [listeTransaktionenFestgeld, setListeTransaktionenFestgeld] = useState([])
-    const [mindestbetrag, setMindestbetrag] = useState("")
     const [modalOffen, setModalOffen] = useState(false)
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
@@ -44,8 +43,6 @@ export default function Festgeld() {
     const [notgroschen, setNotgroschen] = useState(false)
     const [notizen, setNotizen] = useState("")
     const [referenzkonto, setReferenzkonto] = useState("")
-    const [sparrate, setSparrate] = useState("")
-    const [sparziel, setSparziel] = useState("")
     const [steuersatzAbzug, setSteuerssatzAbzug] = useState("")
     const [transaktionsBetrag, setTransaktionsBetrag] = useState("")
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("")
@@ -56,7 +53,6 @@ export default function Festgeld() {
     const [zuBearbeiten, setZuBearbeiten] = useState(null)
     const [zinsgutschrift, setZinsgutschrift] = useState("")
     const [zinssatz, setZinssatz] = useState("")
-    const [zinssintervall, setZinssintervall] = useState("")
     const [zinseszins, setZinseszins] = useState("")
 
     const { ansicht } = useContext(SettingsContext);
@@ -406,6 +402,7 @@ export default function Festgeld() {
         setIban(eintrag.iban)
         setBic(eintrag.bic)
         setKontoinhaber(eintrag.kontoinhaber)
+        setGekuendigtAm(eintrag.gekuendigtAm || "")
         setModalOffen(true)
     }
 
@@ -794,6 +791,178 @@ export default function Festgeld() {
                         </div>
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
+                            <button className="btn-primary" onClick={handleFestgeldSpeichern}>Speichern</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: Anpassen */}
+            {(modalOffen) && (
+                <div className="modal-overlay">
+                    <div className="modal-container">
+                        <div className="modal-header">
+                            <h3>Festgeldkonto bearbeiten</h3>
+                            <button className="close-btn" onClick={() => setModalOffen(false)}></button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>Bezeichnung / Asset Name*</label>
+                                    <input
+                                        className={errors.name ? "input-error" : ""}
+                                        value={name}
+                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
+                                        placeholder="z.B. Festgeld 2 Jahre"
+                                    />
+                                    {errors.name && <span className="error-text">{errors.name}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>Bank Name*</label>
+                                    <input
+                                        className={errors.bank ? "input-error" : ""}
+                                        value={bank}
+                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
+                                        placeholder="z.B. Klarna / WeltSparen"
+                                    />
+                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
+                                </div>
+                                <div className="form-group col-span-2">
+                                    <label>IBAN*</label>
+                                    <input
+                                        className={errors.iban ? "input-error" : ""}
+                                        value={iban}
+                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
+                                        placeholder="DE00 0000 0000 0000 0000 00"
+                                    />
+                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>BIC</label>
+                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Kontoinhaber</label>
+                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Anlagesumme (€)*</label>
+                                    <input
+                                        type="number"
+                                        className={errors.anlagesumme ? "input-error" : ""}
+                                        value={anlagesumme}
+                                        onChange={(e) => { setAnlagesumme(e.target.value); setErrors({ ...errors, anlagesumme: null }); }}
+                                        placeholder="5000.00"
+                                    />
+                                    {errors.anlagesumme && <span className="error-text">{errors.anlagesumme}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>Zinssatz (% p.a.)*</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        className={errors.zinssatz ? "input-error" : ""}
+                                        value={zinssatz}
+                                        onChange={(e) => { setZinssatz(e.target.value); setErrors({ ...errors, zinssatz: null }); }}
+                                        placeholder="3.50"
+                                    />
+                                    {errors.zinssatz && <span className="error-text">{errors.zinssatz}</span>}
+                                </div>
+                                <div className="form-group">
+                                    <label>Laufzeit (Monate)*</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        className={errors.laufzeitMonate ? "input-error" : ""}
+                                        value={laufzeitMonate}
+                                        onChange={(e) => setLaufzeitMonate(e.target.value)}
+                                        placeholder="12"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Eröffnungsdatum*</label>
+                                    <input
+                                        type="date"
+                                        step="0.01"
+                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        value={eroeffnungsdatum}
+                                        onChange={(e) => setEroeffnungsdatum(e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Fälligkeitsdatum*</label>
+                                    <input
+                                        type="date"
+                                        step="0.01"
+                                        className={errors.faelligkeitsdatum ? "input-error" : ""}
+                                        value={faelligkeitsdatum}
+                                        onChange={(e) => setFaelligkeitsdatum(e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Kündigungsfrist (Tage)</label>
+                                    <input
+                                        type="number"
+                                        value={kuendigungsfrist}
+                                        onChange={(e) => setKuendigungsfrist(e.target.value)}
+                                        placeholder="30"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Gekündigt am*</label>
+                                    <input
+                                        type="date"
+                                        step="0.01"
+                                        className={errors.gekuendigtAm ? "input-error" : ""}
+                                        value={gekuendigtAm}
+                                        onChange={(e) => setGekuendigtAm(e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Zinsgutschrift</label>
+                                    <select value={zinsgutschrift} onChange={(e) => setZinsgutschrift(e.target.value)}>
+                                        <option value="am_ende">Am Ende der Laufzeit</option>
+                                        <option value="jaehrlich">Jährlich</option>
+                                    </select>
+                                </div>
+                                <div className="form-group col-span-2">
+                                    <label>Referenzkonto / Auszahlungskonto*</label>
+                                    <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
+                                        <option value="">Referenzkonto auswählen...</option>
+                                        {listeReferenzkonto.map(konto => (
+                                            <option
+                                                key={konto.id}
+                                                value={konto.id}>
+                                                {konto.girokonto
+                                                    ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
+                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group col-span-2">
+                                    <label>Notizen</label>
+                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Anmerkungen..." />
+                                </div>
+                                <div className="form-group">
+                                    <label>Freistellingsauftrag</label>
+                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
+                                </div>
+
+                                <div className="form-group checkbox-group col-span-2">
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={zinseszins} onChange={(e) => setZinseszins(e.target.checked)} />
+                                        Zinseszins-Effekt (Thesaurierung)
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={automatischVerlaengern} onChange={(e) => setAutomatischVerlaengern(e.target.checked)} />
+                                        Automatisch verlängern (Prolongation)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
                             <button className="btn-primary" onClick={handleFestgeldSpeichern}>Speichern</button>
                         </div>
                     </div>
