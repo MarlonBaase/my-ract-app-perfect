@@ -373,7 +373,7 @@ export default function Festgeld() {
         setBank(eintrag.name_der_bank || "");
         setAnlagesumme(eintrag.anlagesumme || "");
         setZinssatz(eintrag.zinssatz);
-        setLaufzeitMonate(eintrag.laufzeitMonate || "12");
+        setLaufzeitMonate(eintrag.laufzeit_monate);
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
         setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
         setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
