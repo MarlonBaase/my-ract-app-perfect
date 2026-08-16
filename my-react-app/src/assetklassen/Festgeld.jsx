@@ -559,13 +559,9 @@ export default function Festgeld() {
                                         </span>
                                     </div>
 
-                                    {/* Wenn Transaktionen den Stand verändert haben */}
-                                    {aktuellerKontostand !== Number(e.einzahlung_bei_eroeffnung) && (
-                                        <p className="info-text highlight">
-                                            <strong>Aktueller Stand:</strong>{" "}
-                                            {formatEuro(aktuellerKontostand)}
-                                        </p>
-                                    )}
+                                    <div className="amount">
+                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
+                                    </div>
 
                                     {/* Errechneter Zinsertrag */}
                                     <p className="info-text Zins-gain">
