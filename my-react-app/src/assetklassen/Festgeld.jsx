@@ -141,7 +141,7 @@ export default function Festgeld() {
         if (!zinssatz || !String(zinssatz).trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
         if (!laufzeitMonate || !String(laufzeitMonate).trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
 
-        if (!eroeffnungsdatum) newErrors.anlagedatum = "Anlagedatum ist erforderlich";
+        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Anlagedatum ist erforderlich";
         if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
 
         if (!ausgewaehltesReferenzkonto) newErrors.ausgewaehltesReferenzkonto = "Referenzkonto ist erforderlich";
@@ -209,7 +209,7 @@ export default function Festgeld() {
                     anlagesumme: parseFloat(anlagesumme) || 0,
                     zinssatz: parseFloat(zinssatz) || 0,
                     laufzeit_monate: parseFloat(laufzeitMonate) || 0,
-                    anlagedatum: eroeffnungsdatum,
+                    eroeffnungsdatum: eroeffnungsdatum,
                     faelligkeitsdatum: faelligkeitsdatum,
                     gekuendigt_am: gekuendigtAm || null,
                     zinsgutschrift: zinsgutschrift || "",
@@ -290,7 +290,7 @@ export default function Festgeld() {
                 anlagesumme: parseFloat(anlagesumme) || 0,
                 zinssatz: parseFloat(zinssatz) || 0,
                 laufzeit_monate: parseFloat(laufzeitMonate) || 0,
-                anlagedatum: eroeffnungsdatum,
+                eroeffnungsdatum: eroeffnungsdatum,
                 faelligkeitsdatum: faelligkeitsdatum,
                 gekuendigt_am: gekuendigtAm || null,
                 zinsgutschrift: zinsgutschrift || "",
