@@ -464,6 +464,11 @@ export default function Festgeld() {
         ladeFestgeld()
     };
 
+    const formatEuro = (betrag) =>
+        new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
+            Number(betrag || 0)
+        );
+
     useEffect(() => {
         const init = async () => {
             try {
