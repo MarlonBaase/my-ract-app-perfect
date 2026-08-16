@@ -266,7 +266,7 @@ export default function Festgeld() {
 
     const festgeldSpeichern = async () => {
 
-        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum || !faelligkeitsdatum) {
+        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) {
             alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
             return;
         }
@@ -373,7 +373,7 @@ export default function Festgeld() {
         setBank(eintrag.name_der_bank || "");
         setAnlagesumme(eintrag.anlagesumme || "");
         setZinssatz(eintrag.zinssatz);
-        setLaufzeitMonate(eintrag.laufzeitMonate);
+        setLaufzeitMonate(eintrag.laufzeitMonate || "12");
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
         setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
         setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
