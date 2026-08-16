@@ -266,10 +266,10 @@ export default function Festgeld() {
 
     const festgeldSpeichern = async () => {
 
-        /*if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) {
+        if (!name || !bank || !iban || !eroeffnungsdatum || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate || !faelligkeitsdatum) {
             alert("Bitte fülle alle Pflichtfelder (Asset Name, Bank Name, IBAN, Eröffnungsdatum) aus!");
             return;
-        }*/
+        }
 
         if (!zuBearbeiten) return;
 
