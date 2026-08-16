@@ -215,7 +215,6 @@ export default function Festgeld() {
                     laufzeit_monate: parseFloat(laufzeitMonate) || 0,
                     anlagedatum: eroeffnungsdatum,
                     faelligkeitsdatum: faelligkeitsdatum,
-                    letzter_kuendigungstag: letzterKuendigungstag || null,
                     gekuendigt_am: gekuendigtAm || null,
                     zinsgutschrift: zinsgutschrift || "",
                     zinseszins: zinseszins || true,
@@ -298,7 +297,6 @@ export default function Festgeld() {
                 laufzeit_monate: laufzeitMonate,
                 anlagedatum: eroeffnungsdatum,
                 faelligkeitsdatum: faelligkeitsdatum,
-                letzter_kuendigungstag: letzterKuendigungstag || null,
                 gekuendigt_am: gekuendigtAm || null,
                 zinsgutschrift: zinsgutschrift,
                 zinseszins: zinseszins || 0,
@@ -502,13 +500,26 @@ export default function Festgeld() {
             <div className="header-bar">
                 <h2>Festgeld</h2>
                 <button className="btn-primary" onClick={() => {
-                    setModalOffenHinzu(true);
+                    setIban("");
+                    setBic("");
+                    setKontoinhaber("");
                     setZuBearbeiten(null);
-                    setName(""); setBank(""); setAnlagesumme("");
-                    setZinssatz(""); setLaufzeitMonate(""); setEroeffnungsdatum(""); setFaelligkeitsdatum("");
-                    setZinsgutschrift("am_ende"); setZinseszins(false); setAusgewaehltesReferenzkonto("");
-                    setKuendigungsfrist(""); setAutomatischVerlaengern(false); setFreistellungsauftrag("");
-                    setTransaktionsNotizen(""); setErrors({});
+                    setName(""); 
+                    setBank(""); 
+                    setAnlagesumme("");
+                    setZinssatz(""); 
+                    setLaufzeitMonate(""); 
+                    setEroeffnungsdatum(""); 
+                    setFaelligkeitsdatum("");
+                    setZinsgutschrift("am_ende"); 
+                    setZinseszins(false); 
+                    setAusgewaehltesReferenzkonto("");
+                    setKuendigungsfrist(""); 
+                    setAutomatischVerlaengern(false); 
+                    setFreistellungsauftrag("");
+                    setTransaktionsNotizen(""); 
+                    setErrors({});
+                    setModalOffenHinzu(true);
                 }}>
                     + Festgeldkonto hinzufügen
                 </button>
