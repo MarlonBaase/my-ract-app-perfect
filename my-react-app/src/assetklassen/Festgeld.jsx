@@ -377,7 +377,7 @@ export default function Festgeld() {
         setAnlagesumme(eintrag.anlagesumme || "");
         setZinssatz(eintrag.zinssatz);
         setLaufzeitMonate(eintrag.laufzeit_monate);
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum);
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
         setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
         setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
         setGekuendigtAm(eintrag.gekuendigtAm);
@@ -722,12 +722,12 @@ export default function Festgeld() {
                                 <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
                                     <input
-                                        type="date"
-                                        step="0.01"
                                         className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        type="date"
                                         value={eroeffnungsdatum}
-                                        onChange={(e) => setEroeffnungsdatum(e.target.value)}
+                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
                                     />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Fälligkeitsdatum*</label>
@@ -884,12 +884,12 @@ export default function Festgeld() {
                                 <div className="form-group">
                                     <label>Eröffnungsdatum*</label>
                                     <input
-                                        type="date"
-                                        step="0.01"
                                         className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        type="date"
                                         value={eroeffnungsdatum}
-                                        onChange={(e) => setEroeffnungsdatum(e.target.value)}
+                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
                                     />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Fälligkeitsdatum*</label>
