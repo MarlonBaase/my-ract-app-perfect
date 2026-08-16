@@ -383,6 +383,7 @@ export default function Festgeld() {
         setKontoinhaber(eintrag.kontoinhaber);
         setGekuendigtAm(eintrag.gekuendigtAm || "");
         setAutomatischVerlaengern(eintrag.automatische_verlaengerung)
+        setIstAktiv(eintrag.ist_aktiv)
         setModalOffen(true)
     }
 
@@ -1087,6 +1088,10 @@ export default function Festgeld() {
                                     <label className="checkbox-label">
                                         <input type="checkbox" checked={automatischVerlaengern} onChange={(e) => setAutomatischVerlaengern(e.target.checked)} />
                                         Automatisch verlängern (Prolongation)
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input type="checkbox" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
+                                        Ist Aktiv
                                     </label>
                                 </div>
                             </div>
