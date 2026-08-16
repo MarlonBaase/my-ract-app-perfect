@@ -290,21 +290,21 @@ export default function Festgeld() {
             .from("festgeld")
             .update({
                 name_der_bank: bank,
-                anlagesumme: anlagesumme,
-                zinssatz: zinssatz,
-                laufzeit_monate: laufzeitMonate,
+                anlagesumme: parseFloat(anlagesumme) || 0,
+                zinssatz: parseFloat(zinssatz) || 0,
+                laufzeit_monate: parseFloat(laufzeitMonate) || 0,
                 anlagedatum: eroeffnungsdatum,
                 faelligkeitsdatum: faelligkeitsdatum,
                 gekuendigt_am: gekuendigtAm || null,
-                zinsgutschrift: zinsgutschrift,
-                zinseszins: zinseszins || 0,
+                zinsgutschrift: zinsgutschrift || "",
+                zinseszins: zinseszins || true,
                 freistellungsauftrag: freistellungsauftrag || 0,
                 referenzkonto: ausgewaehltesReferenzkonto,
                 automatische_verlaengerung: automatischVerlaengern || false,
                 ist_aktiv: ist_aktiv || true,
                 notizen: notizen || "",
                 iban: iban,
-                bic: bic,
+                bic: bic || "",
                 kontoinhaber: kontoinhaber || ""
             })
             .eq("asset_id", zuBearbeiten.asset_id);
@@ -500,20 +500,20 @@ export default function Festgeld() {
                     setBic("");
                     setKontoinhaber("");
                     setZuBearbeiten(null);
-                    setName(""); 
-                    setBank(""); 
+                    setName("");
+                    setBank("");
                     setAnlagesumme("");
-                    setZinssatz(""); 
-                    setLaufzeitMonate(""); 
-                    setEroeffnungsdatum(""); 
+                    setZinssatz("");
+                    setLaufzeitMonate("");
+                    setEroeffnungsdatum("");
                     setFaelligkeitsdatum("");
-                    setZinsgutschrift("am_ende"); 
-                    setZinseszins(false); 
+                    setZinsgutschrift("am_ende");
+                    setZinseszins(false);
                     setAusgewaehltesReferenzkonto("");
-                    setKuendigungsfrist(""); 
-                    setAutomatischVerlaengern(false); 
+                    setKuendigungsfrist("");
+                    setAutomatischVerlaengern(false);
                     setFreistellungsauftrag("");
-                    setTransaktionsNotizen(""); 
+                    setTransaktionsNotizen("");
                     setErrors({});
                     setModalOffenHinzu(true);
                 }}>
