@@ -19,6 +19,7 @@ import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
 import Zeiterfassung from './profil/Zeiterfassung'
+import Daten from "./profil/daten"
 import AssetSidebar from './AssetSidebar'
 import './index.css'
 
