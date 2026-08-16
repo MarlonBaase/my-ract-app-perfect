@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
+import { daten } from ""
 
 export default function Daten() {
     const [inhalt, setInhalt] = useState("");

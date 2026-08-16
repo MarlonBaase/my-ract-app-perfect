@@ -141,33 +141,36 @@ export default function Festgeld() {
         if (!zinssatz || !String(zinssatz).trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
         if (!laufzeitMonate || !String(laufzeitMonate).trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
 
-        // Datum-Felder
         if (!eroeffnungsdatum) newErrors.anlagedatum = "Anlagedatum ist erforderlich";
         if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
 
-        // Dropdown/Select
         if (!ausgewaehltesReferenzkonto) newErrors.ausgewaehltesReferenzkonto = "Referenzkonto ist erforderlich";
 
         setErrors(newErrors);
 
-        // Prüfen, ob das Fehler-Objekt leer ist
         return Object.keys(newErrors).length === 0;
     };
 
     const handleFestgeldSpeichern = () => {
-        if (validateForm()) {
+    console.log("1. Button geklickt");
+    console.log("Aktuelle States:", {
+        name, bank, anlagesumme, zinssatz, laufzeitMonate, 
+        eroeffnungsdatum, faelligkeitsdatum, ausgewaehltesReferenzkonto, iban
+    });
 
-            if (zuBearbeiten) {
-                festgeldSpeichern();
-                setErrors({});
-            }
-            else {
-                festgeldHinzufuegen();
-                setErrors({});
-            }
+    const isValid = validateForm();
+    console.log("2. Validierungsergebnis:", isValid);
 
+    if (isValid) {
+        if (zuBearbeiten) {
+            festgeldSpeichern();
+        } else {
+            festgeldHinzufuegen();
         }
-    };
+    } else {
+        console.log("3. Validierungsfehler (errors):", errors);
+    }
+};
 
     const festgeldHinzufuegen = async () => {
 
@@ -374,7 +377,7 @@ export default function Festgeld() {
         setAnlagesumme(eintrag.anlagesumme || "");
         setZinssatz(eintrag.zinssatz);
         setLaufzeitMonate(eintrag.laufzeit_monate);
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum);
         setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
         setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
         setGekuendigtAm(eintrag.gekuendigtAm);
