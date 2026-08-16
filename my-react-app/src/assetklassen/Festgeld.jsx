@@ -9,7 +9,7 @@ import { data } from "react-router-dom";
 export default function Festgeld() {
     const [ablaufdatum_aktionszins, setAblaufdatum_aktionszins] = useState("")
     const [aktionszins, setAktionszins] = useState("")
-    const [anlagesumme, setAnlagesumme] = useState("")
+    const [einzahlung_bei_eroeffnung, seteinzahlung_bei_eroeffnung] = useState("")
     const [assets, setAssets] = useState([])
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("")
     const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("")
@@ -137,7 +137,7 @@ export default function Festgeld() {
         // String-Felder mit String()-Absicherung gegen Nicht-Strings
         if (!name || !String(name).trim()) newErrors.name = "Asset Name ist erforderlich";
         if (!bank || !String(bank).trim()) newErrors.bank = "Bank Name ist erforderlich";
-        if (!anlagesumme || !String(anlagesumme).trim()) newErrors.anlagesumme = "Anlagesumme ist erforderlich";
+        if (!einzahlung_bei_eroeffnung || !String(einzahlung_bei_eroeffnung).trim()) newErrors.einzahlung_bei_eroeffnung = "einzahlung_bei_eroeffnung ist erforderlich";
         if (!zinssatz || !String(zinssatz).trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
         if (!laufzeitMonate || !String(laufzeitMonate).trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
 
@@ -166,8 +166,8 @@ export default function Festgeld() {
     const festgeldHinzufuegen = async () => {
 
 
-        if (!name || !bank || !anlagesumme || !zinssatz || !laufzeitMonate) {
-            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, anlagesumme, zinssatz, laufzeitMonate });
+        if (!name || !bank || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate) {
+            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, einzahlung_bei_eroeffnung, zinssatz, laufzeitMonate });
             return;
         }
         try {
@@ -196,7 +196,7 @@ export default function Festgeld() {
                     benutzer_id: user.id,
                     asset_id: asset_id,
                     name_der_bank: bank,
-                    anlagesumme: parseFloat(anlagesumme) || 0,
+                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                     zinssatz: parseFloat(zinssatz) || 0,
                     laufzeit_monate: parseFloat(laufzeitMonate) || 0,
                     eroeffnungsdatum: eroeffnungsdatum,
@@ -259,8 +259,8 @@ export default function Festgeld() {
 
     const festgeldSpeichern = async () => {
 
-        if (!name || !bank || !anlagesumme || !zinssatz || !laufzeitMonate) {
-            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, anlagesumme, zinssatz, laufzeitMonate });
+        if (!name || !bank || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate) {
+            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, einzahlung_bei_eroeffnung, zinssatz, laufzeitMonate });
             return;
         }
 
@@ -277,7 +277,7 @@ export default function Festgeld() {
             .from("festgeld")
             .update({
                 name_der_bank: bank,
-                anlagesumme: parseFloat(anlagesumme) || 0,
+                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
                 zinssatz: parseFloat(zinssatz) || 0,
                 laufzeit_monate: parseFloat(laufzeitMonate) || 0,
                 eroeffnungsdatum: eroeffnungsdatum,
@@ -364,7 +364,7 @@ export default function Festgeld() {
         setZuBearbeiten(eintrag);
         setName(eintrag.asset?.asset_name || "");
         setBank(eintrag.name_der_bank || "");
-        setAnlagesumme(eintrag.anlagesumme || "");
+        seteinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "");
         setZinssatz(eintrag.zinssatz);
         setLaufzeitMonate(eintrag.laufzeit_monate);
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
@@ -498,7 +498,7 @@ export default function Festgeld() {
                         setZuBearbeiten(null);
                         setName("");
                         setBank("");
-                        setAnlagesumme("");
+                        seteinzahlung_bei_eroeffnung("");
                         setZinssatz("");
                         setLaufzeitMonate("");
                         setEroeffnungsdatum("");
@@ -526,11 +526,11 @@ export default function Festgeld() {
                         const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === "einnahme" ? acc + betrag : acc - betrag;
-                        }, Number(e.anlagesumme || 0));
+                        }, Number(e.einzahlung_bei_eroeffnung || 0));
 
                         // Berechnung des geschätzten Zinsertrags für die gesamte Laufzeit
                         const zinsertragGesamt =
-                            (Number(e.anlagesumme || 0) *
+                            (Number(e.einzahlung_bei_eroeffnung || 0) *
                                 Number(e.zinssatz || 0) *
                                 (Number(e.laufzeit_monate || 0) / 12)) /
                             100;
@@ -554,14 +554,14 @@ export default function Festgeld() {
                                 <div className="card-body">
                                     {/* Betragsanzeige */}
                                     <div className="amount">
-                                        <strong>{formatEuro(e.anlagesumme)}</strong>
+                                        <strong>{formatEuro(e.einzahlung_bei_eroeffnung)}</strong>
                                         <span className="subtext">
-                                            Anlagesumme @ {e.zinssatz}% p.a.
+                                            einzahlung_bei_eroeffnung @ {e.zinssatz}% p.a.
                                         </span>
                                     </div>
 
                                     {/* Wenn Transaktionen den Stand verändert haben */}
-                                    {aktuellerKontostand !== Number(e.anlagesumme) && (
+                                    {aktuellerKontostand !== Number(e.einzahlung_bei_eroeffnung) && (
                                         <p className="info-text highlight">
                                             <strong>Aktueller Stand:</strong>{" "}
                                             {formatEuro(aktuellerKontostand)}
@@ -653,7 +653,7 @@ export default function Festgeld() {
                         <thead>
                             <tr>
                                 <th>Asset / Bank</th>
-                                <th>Anlagesumme</th>
+                                <th>einzahlung_bei_eroeffnung</th>
                                 <th>Zinssatz</th>
                                 <th>Ertrag (geschätzt)</th>
                                 <th>Laufzeit</th>
@@ -665,7 +665,7 @@ export default function Festgeld() {
                         <tbody>
                             {listeFestgeld.map((e) => {
                                 const zinsertragGesamt =
-                                    (Number(e.anlagesumme || 0) *
+                                    (Number(e.einzahlung_bei_eroeffnung || 0) *
                                         Number(e.zinssatz || 0) *
                                         (Number(e.laufzeit_monate || 0) / 12)) /
                                     100;
@@ -681,7 +681,7 @@ export default function Festgeld() {
                                             </div>
                                         </td>
                                         <td>
-                                            <strong>{formatEuro(e.anlagesumme)}</strong>
+                                            <strong>{formatEuro(e.einzahlung_bei_eroeffnung)}</strong>
                                         </td>
                                         <td>{e.zinssatz}% p.a.</td>
                                         <td className="text-success">
@@ -812,15 +812,15 @@ export default function Festgeld() {
                                     <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Anlagesumme (€)*</label>
+                                    <label>einzahlung_bei_eroeffnung (€)*</label>
                                     <input
                                         type="number"
-                                        className={errors.anlagesumme ? "input-error" : ""}
-                                        value={anlagesumme}
-                                        onChange={(e) => { setAnlagesumme(e.target.value); setErrors({ ...errors, anlagesumme: null }); }}
+                                        className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
+                                        value={einzahlung_bei_eroeffnung}
+                                        onChange={(e) => { seteinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
                                         placeholder="5000.00"
                                     />
-                                    {errors.anlagesumme && <span className="error-text">{errors.anlagesumme}</span>}
+                                    {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Zinssatz (% p.a.)*</label>
@@ -974,15 +974,15 @@ export default function Festgeld() {
                                     <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
                                 </div>
                                 <div className="form-group">
-                                    <label>Anlagesumme (€)*</label>
+                                    <label>einzahlung_bei_eroeffnung (€)*</label>
                                     <input
                                         type="number"
-                                        className={errors.anlagesumme ? "input-error" : ""}
-                                        value={anlagesumme}
-                                        onChange={(e) => { setAnlagesumme(e.target.value); setErrors({ ...errors, anlagesumme: null }); }}
+                                        className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
+                                        value={einzahlung_bei_eroeffnung}
+                                        onChange={(e) => { seteinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
                                         placeholder="5000.00"
                                     />
-                                    {errors.anlagesumme && <span className="error-text">{errors.anlagesumme}</span>}
+                                    {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
                                 </div>
                                 <div className="form-group">
                                     <label>Zinssatz (% p.a.)*</label>
