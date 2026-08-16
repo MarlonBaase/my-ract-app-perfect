@@ -9,7 +9,6 @@ import { data } from "react-router-dom";
 export default function Festgeld() {
     const [ablaufdatum_aktionszins, setAblaufdatum_aktionszins] = useState("")
     const [aktionszins, setAktionszins] = useState("")
-    const [einzahlung_bei_eroeffnung, seteinzahlung_bei_eroeffnung] = useState("")
     const [assets, setAssets] = useState([])
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("")
     const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("")
@@ -17,6 +16,7 @@ export default function Festgeld() {
     const [bank, setBank] = useState("")
     const [bic, setBic] = useState("")
     const [einlagensicherung, setEinlagensicherung] = useState("")
+    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
     const [errors, setErrors] = useState({})
     const [freistellungsauftrag, setFreistellungsauftrag] = useState("")
@@ -363,7 +363,7 @@ export default function Festgeld() {
         setZuBearbeiten(eintrag);
         setName(eintrag.asset?.asset_name || "");
         setBank(eintrag.name_der_bank || "");
-        seteinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "");
+        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "");
         setZinssatz(eintrag.zinssatz);
         setLaufzeitMonate(eintrag.laufzeit_monate);
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
@@ -497,7 +497,7 @@ export default function Festgeld() {
                         setZuBearbeiten(null);
                         setName("");
                         setBank("");
-                        seteinzahlung_bei_eroeffnung("");
+                        setEinzahlung_bei_eroeffnung("");
                         setZinssatz("");
                         setLaufzeitMonate("");
                         setEroeffnungsdatum("");
@@ -816,7 +816,7 @@ export default function Festgeld() {
                                         type="number"
                                         className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
                                         value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { seteinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
+                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
                                         placeholder="5000.00"
                                     />
                                     {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
@@ -978,7 +978,7 @@ export default function Festgeld() {
                                         type="number"
                                         className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
                                         value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { seteinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
+                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
                                         placeholder="5000.00"
                                     />
                                     {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
