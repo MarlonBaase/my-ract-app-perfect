@@ -551,7 +551,7 @@ export default function Festgeld() {
 
                                 <div className="card-actions">
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "festgeldkonto", "festgeldkonto")} title="Löschen">🗑️</button>
+                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "festgeld", "festgeld")} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                 </div>
                             </div>
