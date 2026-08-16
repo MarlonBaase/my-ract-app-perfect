@@ -377,7 +377,7 @@ export default function Festgeld() {
         setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
         setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
         setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
-        setGekuendigtAm(eintrag.gekuendigt_am);
+        setGekuendigtAm(eintrag.gekuendigtAm);
         setZinsgutschrift(eintrag.zinsgutschrift);
         setZinseszins(eintrag.zinseszins);
         setFreistellungsauftrag(eintrag.freistellungsauftrag);
