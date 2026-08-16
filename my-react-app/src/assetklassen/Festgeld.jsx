@@ -25,7 +25,6 @@ export default function Festgeld() {
     const [gekuendigtAm, setGekuendigtAm] = useState("")
     const [iban, setIban] = useState("")
     const [ist_aktiv, setIstAktiv] = useState(true)
-    const [ist_referenzkonto, setIstReferenzkonto] = useState(false)
     const [intervall, setIntervall] = useState("");
     const [kategorien, setKategorien] = useState([])
     const [kontoinhaber, setKontoinhaber] = useState("")
@@ -40,7 +39,6 @@ export default function Festgeld() {
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false)
     const [name, setName] = useState("")
-    const [notgroschen, setNotgroschen] = useState(false)
     const [notizen, setNotizen] = useState("")
     const [referenzkonto, setReferenzkonto] = useState("")
     const [steuersatzAbzug, setSteuerssatzAbzug] = useState("")
@@ -223,7 +221,7 @@ export default function Festgeld() {
                     zinseszins: zinseszins || true,
                     freistellungsauftrag: freistellungsauftrag || 0,
                     steuersatz_abzug: steuersatzAbzug || 0,
-                    referenzkonto: referenzkonto,
+                    referenzkonto: ausgewaehltesReferenzkonto,
                     automatische_verlaengerung: automatischVerlaengern || false,
                     ist_aktiv: ist_aktiv || true,
                     notizen: notizen || "",
@@ -306,7 +304,7 @@ export default function Festgeld() {
                 zinseszins: zinseszins || 0,
                 freistellungsauftrag: freistellungsauftrag || 0,
                 steuersatz_abzug: steuersatzAbzug || 0,
-                referenzkonto: referenzkonto,
+                referenzkonto: ausgewaehltesReferenzkonto,
                 automatische_verlaengerung: automatischVerlaengern || false,
                 ist_aktiv: ist_aktiv || true,
                 notizen: notizen || "",
@@ -395,7 +393,7 @@ export default function Festgeld() {
         setZinseszins(eintrag.zinseszins)
         setFreistellungsauftrag(eintrag.freistellungsauftrag)
         setSteuerssatzAbzug(eintrag.steuersatz_abzug)
-        setReferenzkonto(eintrag.referenzkonto)
+        setReferenzkonto(eintrag.ausgewaehltesReferenzkonto)
         setAutomatischVerlaengern(eintrag.automatisch_verlaengern)
         setIstAktiv(eintrag.ist_aktiv)
         setNotizen(eintrag.notizen)
