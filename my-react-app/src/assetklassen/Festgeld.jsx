@@ -17,7 +17,6 @@ export default function Festgeld() {
     const [bank, setBank] = useState("")
     const [bic, setBic] = useState("")
     const [einlagensicherung, setEinlagensicherung] = useState("")
-    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
     const [errors, setErrors] = useState({})
     const [freistellungsauftrag, setFreistellungsauftrag] = useState("")
