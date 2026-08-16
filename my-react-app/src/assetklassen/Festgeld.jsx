@@ -165,7 +165,6 @@ export default function Festgeld() {
 
         const festgeldHinzufuegen = async () => {
 
-            console.log("Test2 - Prüfe Pflichtfelder...");
 
             if (!name || !bank || !anlagesumme || !zinssatz || !laufzeitMonate) {
                 console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, anlagesumme, zinssatz, laufzeitMonate });
