@@ -551,16 +551,13 @@ export default function Festgeld() {
                                 </div>
 
                                 <div className="card-body">
-                                    {/* Betragsanzeige */}
                                     <div className="amount">
-                                        <strong>{formatEuro(e.einzahlung_bei_eroeffnung)}</strong>
-                                        <span className="subtext">
-                                            einzahlung_bei_eroeffnung @ {e.zinssatz}% p.a.
-                                        </span>
+                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
                                     </div>
 
                                     <div className="amount">
-                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
+
+                                        {e.einzahlung_bei_eroeffnung} {e.waehrung}
                                     </div>
 
                                     {/* Errechneter Zinsertrag */}
