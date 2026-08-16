@@ -548,9 +548,6 @@ export default function Festgeld() {
                                         {e.automatisch_verlaengern && (
                                             <span className="badge prolongation">Prolongation</span>
                                         )}
-                                        <span className={`badge status-${e.status || "aktiv"}`}>
-                                            {e.status || "Aktiv"}
-                                        </span>
                                     </div>
                                 </div>
 
