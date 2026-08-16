@@ -19,7 +19,6 @@ import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
 import Zeiterfassung from './profil/Zeiterfassung'
-import Daten from "./profil/daten"
 import AssetSidebar from './AssetSidebar'
 import './index.css'
 
@@ -103,7 +102,6 @@ function App() {
             <Route path="/profil" element={<Profil darkMode={darkMode} />}>
               <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode} />} />
               <Route path="zeiterfassung" element={<Zeiterfassung darkMode={darkMode} setDarkMode={setDarkMode} />} />
-              <Route path="daten" element={<Daten darkMode={darkMode} setDarkMode={setDarkMode} />} />
             </Route>
             <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
             <Route path="/support" element={<Support darkMode={darkMode} />} />
