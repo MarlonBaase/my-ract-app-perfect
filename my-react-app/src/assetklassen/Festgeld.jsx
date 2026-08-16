@@ -379,28 +379,28 @@ export default function Festgeld() {
     }
 
     const bearbeitenOeffnen = (eintrag) => {
-        setZuBearbeiten(eintrag)
-        setName(eintrag.asset?.asset_name || "")
-        setBank(eintrag.name_der_bank || "")
-        setAnlagesumme(eintrag.anlagesumme || "")
-        setZinssatz(eintrag.zinssatz)
-        setLaufzeitMonate(eintrag.laufzeitMonate)
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum)
-        setFaelligkeitsdatum(eintrag.faelligkeitsdatum)
-        setLetzerKuendigungstag(eintrag.letzter_kuendigungstag)
-        setGekuendigtAm(eintrag.gekuendigt_am)
-        setZinsgutschrift(eintrag.zinsgutschrift)
-        setZinseszins(eintrag.zinseszins)
-        setFreistellungsauftrag(eintrag.freistellungsauftrag)
-        setSteuerssatzAbzug(eintrag.steuersatz_abzug)
-        setReferenzkonto(eintrag.ausgewaehltesReferenzkonto)
-        setAutomatischVerlaengern(eintrag.automatisch_verlaengern)
-        setIstAktiv(eintrag.ist_aktiv)
-        setNotizen(eintrag.notizen)
-        setIban(eintrag.iban)
-        setBic(eintrag.bic)
-        setKontoinhaber(eintrag.kontoinhaber)
-        setGekuendigtAm(eintrag.gekuendigtAm || "")
+        setZuBearbeiten(eintrag);
+        setName(eintrag.asset?.asset_name || "");
+        setBank(eintrag.name_der_bank || "");
+        setAnlagesumme(eintrag.anlagesumme || "");
+        setZinssatz(eintrag.zinssatz);
+        setLaufzeitMonate(eintrag.laufzeitMonate);
+        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "");
+        setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
+        setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
+        setGekuendigtAm(eintrag.gekuendigt_am);
+        setZinsgutschrift(eintrag.zinsgutschrift);
+        setZinseszins(eintrag.zinseszins);
+        setFreistellungsauftrag(eintrag.freistellungsauftrag);
+        setSteuerssatzAbzug(eintrag.steuersatz_abzug);
+        setReferenzkonto(eintrag.ausgewaehltesReferenzkonto);
+        setAutomatischVerlaengern(eintrag.automatisch_verlaengern);
+        setIstAktiv(eintrag.ist_aktiv);
+        setNotizen(eintrag.notizen);
+        setIban(eintrag.iban);
+        setBic(eintrag.bic);
+        setKontoinhaber(eintrag.kontoinhaber);
+        setGekuendigtAm(eintrag.gekuendigtAm || "");
         setModalOffen(true)
     }
 
