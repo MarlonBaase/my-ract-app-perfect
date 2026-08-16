@@ -525,7 +525,7 @@ export default function Festgeld() {
                         const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === "einnahme" ? acc + betrag : acc - betrag;
-                        }, Number(e.einzahlung_bei_eroeffnung || 0));
+                        });
 
                         // Berechnung des geschätzten Zinsertrags für die gesamte Laufzeit
                         const zinsertragGesamt =
@@ -811,7 +811,7 @@ export default function Festgeld() {
                                     <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
                                 </div>
                                 <div className="form-group">
-                                    <label>einzahlung_bei_eroeffnung (€)*</label>
+                                    <label>Anlagesumme (€)*</label>
                                     <input
                                         type="number"
                                         className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
