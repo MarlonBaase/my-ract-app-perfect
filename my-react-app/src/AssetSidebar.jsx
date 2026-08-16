@@ -13,7 +13,6 @@ const struktur = [
           { label: "🏦 Girokonten", path: "/assetklassen/lf/girokonto" },
           { label: "🐷 Tagesgeld", path: "/assetklassen/lf/tagesgeld" },
           { label: "🐷 Festgeld", path: "/assetklassen/lf/festgeld" },
-          { label: "💶 Geldmarktfonds", path: "/assetklassen/lf/geldmarktfonds" },
           { label: "🌐 Fremdwährungen", path: "/assetklassen/lf/fremdwaehrung" },
         ]
       },
@@ -21,7 +20,11 @@ const struktur = [
         label: "📈 Wertpapiere & Derivate",
         path: "/assetklassen/wd",
         unterseiten: [
-          { label: "📊 Aktien & ETFs", path: "/assetklassen/wd/aktien" },
+          { label: "📊 Aktien", path: "/assetklassen/wd/aktien" },
+          { label: "📊 ETFs", path: "/assetklassen/wd/etf" },
+          { label: "📊 Fonds", path: "/assetklassen/wd/fonds" },
+          { label: "📊 ELTIFS", path: "/assetklassen/wd/eltif" },
+          { label: "💶 Geldmarktfonds", path: "/assetklassen/wd/geldmarktfonds" },
           { label: "🚀 Hebelprodukte & Derivate", path: "/assetklassen/wd/derivate" },
           { label: "💼 Mitarbeiter- & Genossenschaftsanteile", path: "/assetklassen/wd/anteile" },
         ]
