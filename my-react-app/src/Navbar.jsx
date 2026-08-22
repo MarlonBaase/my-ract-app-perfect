@@ -23,7 +23,10 @@ const navStruktur = [
   {
     label: 'Assetklassen',
     path: '/assetklassen',
-    unterseiten: []
+    unterseiten: [
+      { label: 'Währungsstammdaten', path: '/assetklassen/lf/fremdwaehrung_stammaten' },
+      { label: 'Fremdwährungskonten', path: '/assetklassen/lf/fremdwaehrung_konto' },
+    ]
   },
   {
     label: 'Steuern & Risiko',
