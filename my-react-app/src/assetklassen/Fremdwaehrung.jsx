@@ -1,5 +1,6 @@
 import { Outlet, Link } from 'react-router-dom'
-import fremd_navbar from '../fremd_navbar'
+import Navbar from '../Navbar'
+
 
 export default function Fremdwaehrung() {
 
@@ -8,7 +9,7 @@ export default function Fremdwaehrung() {
         <div>
             <h2>Fremdwaehrung</h2>
 
-                <fremd_navbar />
+                <Navbar />
 
             <Outlet />
         </div>
