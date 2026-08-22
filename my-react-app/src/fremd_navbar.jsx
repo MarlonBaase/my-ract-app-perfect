@@ -15,7 +15,7 @@ const navStruktur = [
 
 ]
 
-export default function Navbar({ darkMode }) {
+export default function fremd_navbar({ darkMode }) {
   const location = useLocation()
   const [offenIndex, setOffenIndex] = useState(null)
 
