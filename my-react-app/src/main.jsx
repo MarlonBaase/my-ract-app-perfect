@@ -46,31 +46,31 @@ function App() {
   const [ansicht, setAnsicht] = useState("card")
 
   useEffect(() => {
-  const checkMfaAndSetSession = async (currentSession) => {
-    if (!currentSession) {
-      setSession(null);
-      return;
-    }
+    const checkMfaAndSetSession = async (currentSession) => {
+      if (!currentSession) {
+        setSession(null);
+        return;
+      }
 
-    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
-    if (mfaData && mfaData.currentLevel === mfaData.nextLevel) {
-      setSession(currentSession);
-    } else {
-      setSession(null);
-    }
-  };
+      if (mfaData && mfaData.currentLevel === mfaData.nextLevel) {
+        setSession(currentSession);
+      } else {
+        setSession(null);
+      }
+    };
 
-  supabase.auth.getSession().then(({ data }) => {
-    checkMfaAndSetSession(data.session);
-  });
+    supabase.auth.getSession().then(({ data }) => {
+      checkMfaAndSetSession(data.session);
+    });
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    checkMfaAndSetSession(session);
-  });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkMfaAndSetSession(session);
+    });
 
-  return () => subscription.unsubscribe();
-}, []);
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     document.body.className = darkMode ? "dark" : "light"
@@ -96,7 +96,10 @@ function App() {
                 <Route path="girokonto" element={<Girokonto darkMode={darkMode} />} />
                 <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
                 <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
-                <Route path="fremdwaehrung" element={<Fremdwaehrung darkMode={darkMode} />} />
+                <Route path="fremdwaehrung" element={<Fremdwaehrung darkMode={darkMode} />} >
+                  <Route path="fremdwaehrung_Stammdaten" element={<fremdwaehrung_Stammdaten darkMode={darkMode} />} />
+                  <Route path="fremdwaehrung_Konto" element={<fremdwaehrung_Konto darkMode={darkMode} />} />
+                </Route>
               </Route>
               <Route path='wd' element={<Wd darkMode={darkMode} />} />
             </Route>
