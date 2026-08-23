@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
 import { useEffect, useState, useContext, use } from "react";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
+import { SettingsContext } from '../SettingsContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { data } from "react-router-dom";
 
 export default function Fremdwaehrung_stammdaten() {
 
