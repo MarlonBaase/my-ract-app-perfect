@@ -56,10 +56,9 @@ export default function Fremdwaehrung_stammdaten() {
       />
       <ul>
         {filteredItems.map((item) => (
-          <li key={item.waehrungs_code}>
-            {item.name} ({item.symbol}) - {item.waehrungs_code}
-            <button onClick={() => bearbeitenOeffnen(item)} title="Bearbeiten">✏️</button>
-          </li>
+          <button onClick={() => bearbeitenOeffnen(item)} title="Bearbeiten" key={item.waehrungs_code}>
+            ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
+          </button>
         ))}
       </ul>
     </div>
