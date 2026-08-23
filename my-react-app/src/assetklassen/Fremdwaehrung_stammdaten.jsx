@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // 1. useNavigate importieren
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
-import 'react-toastify/dist/ReactToastify.css';
 
 export default function Fremdwaehrung_stammdaten() {
   const [listeWaehrung, setListeWaehrung] = useState([]);
