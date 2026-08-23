@@ -10,33 +10,33 @@ export default function Fremdwaehrung_stammdaten() {
 
   const [listeWaehrung, setListeWaehrung] = useState([])
 
-  
+
   const ladeWaehrungen = async () => {
-          const { data, error } = await supabase
-              .from("waehrungsstammdaten")
-              .select(`waehrungs_code, name, symbol`);
-  
-          if (handleApiError(error, "Festgeld laden")) return;
-          if (data) setListeWaehrung(data)
+    const { data, error } = await supabase
+      .from("waehrungsstammdaten")
+      .select(`waehrungs_code, name, symbol`);
+
+    if (handleApiError(error, "Festgeld laden")) return;
+    if (data) setListeWaehrung(data)
+  }
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await ladeWaehrungen()
+      } catch (err) {
+        console.error("Fehler in init:", err);
       }
-  
+    };
+    init();
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const items = listeWaehrung;
 
   const filteredItems = items.filter(item =>
     item.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  useEffect(() => {
-          const init = async () => {
-              try {
-                  await ladeWaehrungen()
-              } catch (err) {
-                  console.error("Fehler in init:", err);
-              }
-          };
-          init();
-      }, []);
 
   return (
     <div>
