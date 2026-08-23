@@ -37,10 +37,15 @@ export default function Fremdwaehrung_stammdaten() {
   const [searchTerm, setSearchTerm] = useState('');
   const items = listeWaehrung;
 
-  const filteredItems = items.filter(item =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = listeWaehrung.filter(item => {
+    if (!searchTerm) return true;
 
+    const name = String(item.name || '').toLowerCase();
+    const code = String(item.waehrungs_code || '').toLowerCase();
+    const search = searchTerm.toLowerCase();
+
+    return name.includes(search) || code.includes(search);
+  });
   return (
     <div>
       <input
