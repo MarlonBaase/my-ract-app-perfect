@@ -35,17 +35,17 @@ export default function Fremdwaehrung_stammdaten() {
   console.log(listeWaehrung)
 
   const [searchTerm, setSearchTerm] = useState('');
-  const items = listeWaehrung;
 
-  const filteredItems = listeWaehrung.filter(item => {
-    if (!searchTerm) return true;
+  const filteredItems = searchTerm.trim() === '' 
+    ? [] 
+    : listeWaehrung.filter(item => {
+        const name = String(item.name || '').toLowerCase();
+        const code = String(item.waehrungs_code || '').toLowerCase();
+        const search = searchTerm.toLowerCase();
 
-    const name = String(item.name || '').toLowerCase();
-    const code = String(item.waehrungs_code || '').toLowerCase();
-    const search = searchTerm.toLowerCase();
+        return name.includes(search) || code.includes(search);
+      });
 
-    return name.includes(search) || code.includes(search);
-  });
   return (
     <div>
       <input
@@ -57,6 +57,7 @@ export default function Fremdwaehrung_stammdaten() {
       <ul>
         {filteredItems.map((item) => (
           <li key={item.waehrungs_code}>
+            {item.name} ({item.symbol}) - {item.waehrungs_code}
           </li>
         ))}
       </ul>
