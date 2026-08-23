@@ -16,11 +16,10 @@ export default function Fremdwaehrung_stammdaten() {
       .from("waehrungsstammdaten")
       .select(`waehrungs_code, name, symbol`);
 
-    if (handleApiError(error, "Festgeld laden")) return;
+    if (handleApiError(error, "Waehrung laden")) return;
     if (data) setListeWaehrung(data)
   }
 
-  console.log(listeWaehrung)
 
   useEffect(() => {
     const init = async () => {
@@ -32,6 +31,8 @@ export default function Fremdwaehrung_stammdaten() {
     };
     init();
   }, []);
+
+  console.log(listeWaehrung)
 
   const [searchTerm, setSearchTerm] = useState('');
   const items = listeWaehrung;
