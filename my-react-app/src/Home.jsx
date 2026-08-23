@@ -17,6 +17,7 @@ export default function Home() {
       return alert(error.message)
     }
 
+    // Prüfen, ob 2FA erforderlich ist
     const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     if (mfaError) {
       setLoading(false)
@@ -24,7 +25,12 @@ export default function Home() {
     }
 
     if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
-      const { data: factors } = await supabase.auth.mfa.listFactors()
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors()
+      if (factorsError) {
+        setLoading(false)
+        return alert(factorsError.message)
+      }
+
       const totpFactor = factors?.totp?.find(f => f.status === 'verified')
 
       if (totpFactor) {
@@ -34,37 +40,32 @@ export default function Home() {
         return
       }
     }
+
     setLoading(false)
     alert("Erfolgreich eingeloggt!")
   }
 
   const verify = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      return alert("Bitte gib einen 6-stelligen Code ein.")
+    }
+
     setLoading(true)
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: otpCode })
+
+    // Supabase übernimmt Challenge & Verification in einem Schritt
+    const { error } = await supabase.auth.mfa.challengeAndVerify({ 
+      factorId, 
+      code: otpCode.trim() 
+    })
+
     setLoading(false)
+
     if (error) {
-      alert(error.message)
+      alert("2FA-Fehler: " + error.message)
     } else {
       alert('2FA erfolgreich!')
+      // Hier z.B. Weiterleitung zur Hauptseite
     }
-  }
-
-  // 1. Erst die Challenge erstellen
-  const { data: challengeData, error: challengeError } = async () => await supabase.auth.mfa.challenge({
-    factorId
-  });
-
-  if (challengeError) return console.error(challengeError);
-
-  // 2. Sofort danach den Code verifizieren
-  const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
-    factorId,
-    challengeId: challengeData.id,
-    code: totpCodeFromInput, // Der 6-stellige Code
-  });
-
-  if (verifyError) {
-    console.error("2FA Fehler:", verifyError.message); // Zeigt 'Invalid TOTP'
   }
 
   return (
