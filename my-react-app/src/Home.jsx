@@ -49,6 +49,24 @@ export default function Home() {
     }
   }
 
+  // 1. Erst die Challenge erstellen
+  const { data: challengeData, error: challengeError } = async () => await supabase.auth.mfa.challenge({
+    factorId
+  });
+
+  if (challengeError) return console.error(challengeError);
+
+  // 2. Sofort danach den Code verifizieren
+  const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+    factorId,
+    challengeId: challengeData.id,
+    code: totpCodeFromInput, // Der 6-stellige Code
+  });
+
+  if (verifyError) {
+    console.error("2FA Fehler:", verifyError.message); // Zeigt 'Invalid TOTP'
+  }
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -60,8 +78,8 @@ export default function Home() {
             {step === 'login' ? 'Willkommen zurück' : '2FA-Bestätigung'}
           </h2>
           <p className="login-subtitle">
-            {step === 'login' 
-              ? 'Melde dich an, um auf dein Konto zuzugreifen.' 
+            {step === 'login'
+              ? 'Melde dich an, um auf dein Konto zuzugreifen.'
               : 'Gib den 6-stelligen Code aus deiner Authenticator-App ein.'}
           </p>
         </div>
@@ -70,29 +88,29 @@ export default function Home() {
           <div className="login-form">
             <div className="input-group">
               <label className="input-label">E-Mail-Adresse</label>
-              <input 
-                placeholder="name@beispiel.de" 
+              <input
+                placeholder="name@beispiel.de"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)} 
-                className="login-input"
-              />
-            </div>
-            
-            <div className="input-group">
-              <label className="input-label">Passwort</label>
-              <input 
-                placeholder="••••••••" 
-                type="password" 
-                value={password}
-                onChange={e => setPassword(e.target.value)} 
+                onChange={e => setEmail(e.target.value)}
                 className="login-input"
               />
             </div>
 
-            <button 
-              onClick={signIn} 
-              disabled={loading} 
+            <div className="input-group">
+              <label className="input-label">Passwort</label>
+              <input
+                placeholder="••••••••"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="login-input"
+              />
+            </div>
+
+            <button
+              onClick={signIn}
+              disabled={loading}
               className="login-button"
             >
               {loading ? 'Anmelden...' : 'Einloggen'}
@@ -102,26 +120,26 @@ export default function Home() {
           <div className="login-form">
             <div className="input-group">
               <label className="input-label">Sicherheitscode</label>
-              <input 
-                placeholder="123456" 
-                type="text" 
+              <input
+                placeholder="123456"
+                type="text"
                 maxLength={6}
                 value={otpCode}
-                onChange={e => setOtpCode(e.target.value)} 
+                onChange={e => setOtpCode(e.target.value)}
                 className="login-input otp-input"
               />
             </div>
 
-            <button 
-              onClick={verify} 
-              disabled={loading} 
+            <button
+              onClick={verify}
+              disabled={loading}
               className="login-button"
             >
               {loading ? 'Prüfen...' : 'Code Bestätigen'}
             </button>
-            
-            <button 
-              onClick={() => setStep('login')} 
+
+            <button
+              onClick={() => setStep('login')}
               className="back-button"
             >
               ← Zurück zum Login
