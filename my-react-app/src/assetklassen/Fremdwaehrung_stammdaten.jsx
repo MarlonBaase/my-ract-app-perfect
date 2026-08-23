@@ -55,8 +55,10 @@ export default function Fremdwaehrung_stammdaten() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
       <ul>
-        {filteredItems.map((item, index) => (
-          <li key={index}>{item}</li>
+        {filteredItems.map((item) => (
+          <li key={item.waehrungs_code}>
+            {item.name} ({item.symbol}) - {item.waehrungs_code}
+          </li>
         ))}
       </ul>
     </div>
