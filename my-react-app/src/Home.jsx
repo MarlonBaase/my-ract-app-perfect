@@ -46,16 +46,18 @@ export default function Home() {
   }
 
   const verify = async () => {
-    if (!otpCode || otpCode.length !== 6) {
+    const cleanCode = String(otpCode).replace(/\s+/g, '').trim()
+
+    if (!cleanCode || cleanCode.length !== 6) {
       return alert("Bitte gib einen 6-stelligen Code ein.")
     }
 
     setLoading(true)
 
-    // Supabase übernimmt Challenge & Verification in einem Schritt
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ 
-      factorId, 
-      code: otpCode.trim() 
+    // Supabase führt Challenge und Verifizierung in einem Schritt aus
+    const { error } = await supabase.auth.mfa.challengeAndVerify({
+      factorId,
+      code: cleanCode
     })
 
     setLoading(false)
@@ -64,7 +66,7 @@ export default function Home() {
       alert("2FA-Fehler: " + error.message)
     } else {
       alert('2FA erfolgreich!')
-      // Hier z.B. Weiterleitung zur Hauptseite
+      // Hier z. B. Weiterleitung: navigate('/dashboard')
     }
   }
 
