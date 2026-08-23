@@ -100,6 +100,7 @@ function App() {
                 <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
                 <Route path="fremdwaehrung" element={<Fremdwaehrung darkMode={darkMode} />}>
                   <Route path="fremdwaehrung_stammdaten" element={<Fremdwaehrung_stammdaten darkMode={darkMode} />} />
+                  <Route path="fremdwaehrung_stammdaten/:code" element={<FremdwaehrungDetail darkMode={darkMode} />} />
                   <Route path="fremdwaehrung_konto" element={<Fremdwaehrung_konto darkMode={darkMode} />} />
                 </Route>
               </Route>

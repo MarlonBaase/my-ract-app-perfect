@@ -36,15 +36,15 @@ export default function Fremdwaehrung_stammdaten() {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredItems = searchTerm.trim() === '' 
-    ? [] 
+  const filteredItems = searchTerm.trim() === ''
+    ? []
     : listeWaehrung.filter(item => {
-        const name = String(item.name || '').toLowerCase();
-        const code = String(item.waehrungs_code || '').toLowerCase();
-        const search = searchTerm.toLowerCase();
+      const name = String(item.name || '').toLowerCase();
+      const code = String(item.waehrungs_code || '').toLowerCase();
+      const search = searchTerm.toLowerCase();
 
-        return name.includes(search) || code.includes(search);
-      });
+      return name.includes(search) || code.includes(search);
+    });
 
   return (
     <div>
@@ -56,7 +56,7 @@ export default function Fremdwaehrung_stammdaten() {
       />
       <ul>
         {filteredItems.map((item) => (
-          <button onClick={() => bearbeitenOeffnen(item)} title="Bearbeiten" key={item.waehrungs_code}>
+          <button onClick={(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/USD`)}>
             ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
           </button>
         ))}
