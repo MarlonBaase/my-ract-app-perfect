@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function fremdwaehrung_stammdaten() {
+export default function Fremdwaehrung_stammdaten() {
   const [searchTerm, setSearchTerm] = useState('');
   const items = ['Apfel', 'Banane', 'Kirsche', 'Dattel'];
 
