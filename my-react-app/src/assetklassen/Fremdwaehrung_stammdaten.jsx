@@ -14,7 +14,7 @@ export default function Fremdwaehrung_stammdaten() {
   const ladeWaehrungen = async () => {
           const { data, error } = await supabase
               .from("waehrungsstammdaten")
-              .select(`waehrung_code, name, symbol`);
+              .select(`waehrungs_code, name, symbol`);
   
           if (handleApiError(error, "Festgeld laden")) return;
           if (data) setListeWaehrung(data)
