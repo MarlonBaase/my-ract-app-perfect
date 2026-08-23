@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function SearchBar() {
+export default function fremdwaehrung_stammdaten() {
   const [searchTerm, setSearchTerm] = useState('');
   const items = ['Apfel', 'Banane', 'Kirsche', 'Dattel'];
 
