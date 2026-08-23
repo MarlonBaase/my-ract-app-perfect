@@ -12,12 +12,9 @@ export default function Fremdwaehrung_stammdaten() {
 
   
   const ladeWaehrungen = async () => {
-          const { data: { user } } = await supabase.auth.getUser()
           const { data, error } = await supabase
               .from("waehrungsstammdaten")
-              .select(`waehrung_code, name, symbol`)
-              .eq("asset.benutzer_id", user.id)
-              .order('asset_name', { referencedTable: 'asset', ascending: true });
+              .select(`waehrung_code, name, symbol`);
   
           if (handleApiError(error, "Festgeld laden")) return;
           if (data) setListeWaehrung(data)
