@@ -4,12 +4,12 @@ import { useState } from 'react'
 const navStruktur = [
   {
     label: 'Währungsstammdaten',
-    path: '/assetklassen/lf/fremdwaehrung_stammaten',
+    path: '/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammaten.jsx',
     unterseiten: []
   },
   {
     label: 'Fremdwährungskonto',
-    path: '/assetklassen/lf/fremdwaehrung_konto',
+    path: '/assetklassen/lf/fremdwaehrung/fremdwaehrung_konto',
     unterseiten: []
   },
   
