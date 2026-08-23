@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
 import 'react-toastify/dist/ReactToastify.css';
@@ -6,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function Fremdwaehrung_stammdaten() {
 
   const [listeWaehrung, setListeWaehrung] = useState([])
+  const navigate = useNavigate();
 
 
   const ladeWaehrungen = async () => {
@@ -53,7 +55,7 @@ export default function Fremdwaehrung_stammdaten() {
       />
       <ul>
         {filteredItems.map((item) => (
-          <button onClick={(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/USD`)}>
+          <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)}>
             ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
           </button>
         ))}
