@@ -57,7 +57,6 @@ export default function Fremdwaehrung_stammdaten() {
       <ul>
         {filteredItems.map((item) => (
           <li key={item.waehrungs_code}>
-            {item.name} ({item.symbol}) - {item.waehrungs_code}
           </li>
         ))}
       </ul>
