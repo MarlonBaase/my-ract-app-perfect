@@ -14,6 +14,7 @@ import Tagesgeld from './assetklassen/Tagesgeld'
 import Festgeld from './assetklassen/Festgeld'
 import Fremdwaehrung from './assetklassen/Fremdwaehrung'
 import Fremdwaehrung_stammdaten from './assetklassen/Fremdwaehrung_stammdaten'
+import Fremdwaehrung_konto from './assetklassen/Fremdwaehrung_konto'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Konfiguration from './profil/konfiguration'
@@ -99,7 +100,7 @@ function App() {
                 <Route path="festgeld" element={<Festgeld darkMode={darkMode} />} />
                 <Route path="fremdwaehrung" element={<Fremdwaehrung darkMode={darkMode} />} >
                   <Route path="fremdwaehrung_stammdaten" element={<Fremdwaehrung_stammdaten darkMode={darkMode} />} />
-                  <Route path="fremdwaehrung_Konto" element={<Fremdwaehrung_Konto darkMode={darkMode} />} />
+                  <Route path="Fremdwaehrung_konto" element={<Fremdwaehrung_konto darkMode={darkMode} />} />
                 </Route>
               </Route>
               <Route path='wd' element={<Wd darkMode={darkMode} />} />
