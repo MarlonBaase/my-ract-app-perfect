@@ -20,7 +20,7 @@ export default function Fremdwaehrung_stammdaten() {
     if (data) setListeWaehrung(data)
   }
 
-  console.log(data)
+  console.log(listeWaehrung)
 
   useEffect(() => {
     const init = async () => {
