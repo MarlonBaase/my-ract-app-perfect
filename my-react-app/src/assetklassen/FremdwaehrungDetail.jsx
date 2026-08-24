@@ -126,7 +126,7 @@ export default function FremdwaehrungDetail() {
 
             <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/`)}> Zurück </button>
 
-            {console.log(tageskurs)}
+            {console.log("Tageskurs: " + tageskurs)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
             <p>{aenderung}</p>
