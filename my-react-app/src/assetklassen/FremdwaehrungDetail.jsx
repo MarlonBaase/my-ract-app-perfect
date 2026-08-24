@@ -129,7 +129,7 @@ export default function FremdwaehrungDetail() {
             {console.log("Tageskurs: " + tageskurs?.tageskurs_zu_eur)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
-            <p>{aenderung}</p>
+            <p>{aenderung?.aenderungRechnung}</p>
 
 
 
