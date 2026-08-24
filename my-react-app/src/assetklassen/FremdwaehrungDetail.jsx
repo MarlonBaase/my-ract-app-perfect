@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "r
 
 export default function FremdwaehrungDetail() {
 
-    const [tageskurs, setTageskurs] = useState("")
+    const [tageskurs, setTageskurs] = useState([])
     const [vorletzterTageskurs, setVorletzterTageskurs] = useState("")
     const [aenderung, setAenderung] = useState("")
     const [diagrammDaten, setDiagrammDaten] = useState([]);
@@ -25,7 +25,6 @@ export default function FremdwaehrungDetail() {
             .select("tageskurs_zu_eur")
             .eq("waehrungs_code", code)
             .order('erstellt_am', { ascending: false })
-            .limit(1)
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setTageskurs(data);
