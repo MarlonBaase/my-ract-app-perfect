@@ -28,7 +28,7 @@ export default function FremdwaehrungDetail() {
             .limit(1)
 
         if (handleApiError(error, "Waehrung laden")) return;
-        if (data) setTageskurs(data);
+        if (data) setTageskurs(data[0]);
 
         console.log(data)
     };
