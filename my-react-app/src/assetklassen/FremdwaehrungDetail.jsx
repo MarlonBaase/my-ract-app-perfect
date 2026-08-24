@@ -110,10 +110,10 @@ export default function FremdwaehrungDetail() {
     }
 
     useEffect (() => {
-        ladeTageskurs()
-        ladeVorletzterTageskurs()
-        ladeDiagrammDaten()
-        ladeAenderung()
+        ladeTageskurs
+        ladeVorletzterTageskurs
+        ladeDiagrammDaten
+        ladeAenderung
     }, []);
 
     return (
