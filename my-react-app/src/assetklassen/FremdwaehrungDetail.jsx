@@ -22,7 +22,7 @@ export default function FremdwaehrungDetail() {
             .from("tageskurs")
             .select(`tageskurs_zu_eur`)
             .eq("waehrungs_code", code)
-            .order('created_at', { ascending: false })
+            .order('erstellt_am', { ascending: false })
             .limit(1)
             .single();
 
@@ -35,7 +35,7 @@ export default function FremdwaehrungDetail() {
             .from("tageskurs")
             .select(`tageskurs_zu_eur`)
             .eq("waehrungs_code", code)
-            .order('created_at', { ascending: false })
+            .order('erstellt_am', { ascending: false })
             .limit(2)
 
         if (handleApiError(error, "Waehrung laden")) return;
