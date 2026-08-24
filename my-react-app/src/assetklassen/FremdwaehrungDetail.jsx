@@ -27,6 +27,8 @@ export default function FremdwaehrungDetail() {
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setTageskurs(data);
+
+        console.log(tageskurs)
     };
 
     const ladeVorletzterTageskurs = async () => {
