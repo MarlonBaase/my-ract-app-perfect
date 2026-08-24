@@ -1,9 +1,9 @@
-import { useParams, Outlet, Link } from 'react-router-dom';
+import { useParams, Outlet } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 
 export default function FremdwaehrungDetail() {
 
@@ -103,14 +103,16 @@ export default function FremdwaehrungDetail() {
             });
             punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
         }
+
+        setDiagrammDaten(punkte)
     }
 
-    useEffect(() => {
-        ladeTageskurs();
-        ladeVorletzterTageskurs();
-        ladeAenderung();
-        ladeDiagrammDaten();
-    }, [eintraege]);
+    useEffect (() => {
+        ladeTageskurs
+        ladeVorletzterTageskurs
+        ladeDiagrammDaten
+        ladeAenderung
+    }, []);
 
     return (
         <div>
