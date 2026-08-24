@@ -109,12 +109,16 @@ export default function FremdwaehrungDetail() {
         setDiagrammDaten(punkte)
     }
 
-    useEffect (() => {
-        ladeTageskurs
-        ladeVorletzterTageskurs
-        ladeDiagrammDaten
-        ladeAenderung
-    }, []);
+    useEffect(() => {
+  const ladeAlleDaten = async () => {
+    await ladeTageskurs();
+    await ladeVorletzterTageskurs();
+    await ladeDiagrammDaten();
+    await ladeAenderung();
+  };
+
+  ladeAlleDaten();
+}, []);
 
     return (
         <div>
