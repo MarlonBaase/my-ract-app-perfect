@@ -60,7 +60,6 @@ export default function FremdwaehrungDetail() {
             .from("tageskurs")
             .select(`tageskurs_zu_eur`)
             .eq("waehrungs_code", code)
-            .limit(5)
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setEintraege(data);
