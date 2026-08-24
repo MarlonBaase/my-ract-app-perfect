@@ -14,13 +14,15 @@ export default function FremdwaehrungDetail() {
     const [zeitraum, setZeitraum] = useState("woche");
     const [eintraege, setEintraege] = useState([]);
 
-    const { code } = useParams(); // 'code' enthält jetzt z. B. "USD"
+    const { code } = useParams(); 
     const navigate = useNavigate();
+
+    console.log(code)
 
     const ladeTageskurs = async () => {
         const { data, error } = await supabase
             .from("tageskurs")
-            .select(`tageskurs_zu_eur`)
+            .select("tageskurs_zu_eur")
             .eq("waehrungs_code", code)
             .order('erstellt_am', { ascending: false })
             .limit(1)
