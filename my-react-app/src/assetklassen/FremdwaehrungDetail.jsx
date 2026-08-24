@@ -12,6 +12,7 @@ export default function FremdwaehrungDetail() {
     const [aenderung, setAenderung] = useState("")
     const [diagrammDaten, setDiagrammDaten] = useState([]);
     const [zeitraum, setZeitraum] = useState("woche");
+    const [eintraege, setEintraege] = useState([]);
 
     const { code } = useParams(); // 'code' enthält jetzt z. B. "USD"
     const navigate = useNavigate();
@@ -62,40 +63,45 @@ export default function FremdwaehrungDetail() {
             .single();
 
         if (handleApiError(error, "Waehrung laden")) return;
-        if (data) setDiagrammDaten(data);
+        if (data) setEintraege(data);
 
         const jetzt = new Date();
         const tag = new Date();
+        let punkte = [];
 
 
         if (zeitraum === 'woche') {
-            const eintraege = diagrammDaten
+            const diagrammDaten = eintraege
                 .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
-                    new Date(e.erstellt_am).getMonth() === tag.getMonth())
+                    new Date(e.erstellt_am).getMonth() === tag.getMonth());
+            punkte.push({ label: `${tag.getDate()}.`, diagrammDaten });
         }
 
         if (zeitraum === 'monat') {
-            const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
-            const eintraege = diagrammDaten
-                .filter(e => new Date(e.erstellt_am).getDate() === i &&
-                    new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
+            const diagrammDaten = eintraege
+                .filter(e => new Date(e.erstellt_am).getDate() &&
+                    new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
+                    punkte.push({ label: `${jetzt.getMonth()}.`, diagrammDaten});
         }
 
         if (zeitraum === 'jahr') {
             const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-            const eintraege = diagrammDaten
-                .filter(e => new Date(e.erstellt_am).getMonth() === i &&
-                    new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+            const diagrammDaten = eintraege
+                .filter(e => new Date(e.erstellt_am).getMonth() &&
+                    new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
+                punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
         }
 
         if (zeitraum === 'jahre') {
             const aktuellesJahr = jetzt.getFullYear();
             const startJahr = aktuellesJahr - 4;
 
-            const eintraege = diagrammDaten.filter(e => {
+            const diagrammDaten = eintraege
+            .filter(e => {
                 const jahr = new Date(e.erstellt_am).getFullYear();
                 return jahr >= startJahr && jahr <= aktuellesJahr;
             });
+            punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
         }
     }
 
