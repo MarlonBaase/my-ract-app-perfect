@@ -14,7 +14,7 @@ export default function FremdwaehrungDetail() {
     const [zeitraum, setZeitraum] = useState("woche");
     const [eintraege, setEintraege] = useState([]);
 
-    const { code } = useParams(); 
+    const { code } = useParams();
     const navigate = useNavigate();
 
     console.log(code)
@@ -83,7 +83,7 @@ export default function FremdwaehrungDetail() {
             const diagrammDaten = eintraege
                 .filter(e => new Date(e.erstellt_am).getDate() &&
                     new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
-                    punkte.push({ label: `${jetzt.getMonth()}.`, diagrammDaten});
+            punkte.push({ label: `${jetzt.getMonth()}.`, diagrammDaten });
         }
 
         if (zeitraum === 'jahr') {
@@ -91,7 +91,7 @@ export default function FremdwaehrungDetail() {
             const diagrammDaten = eintraege
                 .filter(e => new Date(e.erstellt_am).getMonth() &&
                     new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
-                punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
+            punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
         }
 
         if (zeitraum === 'jahre') {
@@ -99,10 +99,10 @@ export default function FremdwaehrungDetail() {
             const startJahr = aktuellesJahr - 4;
 
             const diagrammDaten = eintraege
-            .filter(e => {
-                const jahr = new Date(e.erstellt_am).getFullYear();
-                return jahr >= startJahr && jahr <= aktuellesJahr;
-            });
+                .filter(e => {
+                    const jahr = new Date(e.erstellt_am).getFullYear();
+                    return jahr >= startJahr && jahr <= aktuellesJahr;
+                });
             punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
         }
 
@@ -110,15 +110,15 @@ export default function FremdwaehrungDetail() {
     }
 
     useEffect(() => {
-  const ladeAlleDaten = async () => {
-    await ladeTageskurs();
-    await ladeVorletzterTageskurs();
-    await ladeDiagrammDaten();
-    await ladeAenderung();
-  };
+        const ladeAlleDaten = async () => {
+            await ladeTageskurs();
+            await ladeVorletzterTageskurs();
+            await ladeDiagrammDaten();
+            await ladeAenderung();
+        };
 
-  ladeAlleDaten();
-}, []);
+        ladeAlleDaten();
+    }, []);
 
     return (
         <div>
@@ -126,10 +126,11 @@ export default function FremdwaehrungDetail() {
 
             <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/`)}> Zurück </button>
 
-            <p>{tageskurs}</p>
+
+            <p>{tageskurs?.tageskurs_zu_eur}</p>
             <p>{aenderung}</p>
 
-            
+
 
 
             {/* --- 2. DIAGRAMME-GRID --- */}
