@@ -126,7 +126,7 @@ export default function FremdwaehrungDetail() {
             {console.log("Tageskurs: " + tageskurs?.tageskurs_zu_eur)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
-            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur)/100).toFixed(4)}%</p>
+            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur)/100)}%</p>
 
 
 
