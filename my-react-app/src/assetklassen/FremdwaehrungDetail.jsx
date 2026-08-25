@@ -57,12 +57,16 @@ export default function FremdwaehrungDetail() {
 
         const { data, error } = await supabase
             .from("tageskurs")
-            .select(`tageskurs_zu_eur`)
+            .select(`tageskurs_zu_eur, erstellt_am`)
             .eq("waehrungs_code", code)
             .limit(5)
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setEintraege(data);
+
+    }
+
+    const ladeDiagramm = async () => {
 
         const jetzt = new Date();
         const tag = new Date();
@@ -76,20 +80,25 @@ export default function FremdwaehrungDetail() {
             punkte.push({ label: `${tag.getDate()}.`, diagrammDaten });
         }
 
-        if (zeitraum === 'monat') {
-            const diagrammDaten = eintraege
-                .filter(e => new Date(e.erstellt_am).getDate() &&
-                    new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
-            punkte.push({ label: `${jetzt.getMonth()}.`, diagrammDaten });
+        if (zeitraum === "monat") {
+            const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
+            for (let i = 1; i <= tageImMonat; i++) {
+                const diagrammDaten = eintraege
+                    .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === i &&
+                        new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
+                punkte.push({ label: `${i}.`, diagrammDaten });
+            }
         }
 
-        if (zeitraum === 'jahr') {
-            const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-            const diagrammDaten = eintraege
-                .filter(e => new Date(e.erstellt_am).getMonth() &&
-                    new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
-            punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
-        }
+        if (zeitraum === "jahr") {
+      const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+      for (let i = 0; i < 12; i++) {
+        const diagrammDaten = eintraege
+          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getMonth() === i &&
+            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+        punkte.push({ label: monate[i], diagrammDaten });
+      }
+    }
 
         if (zeitraum === 'jahre') {
             const aktuellesJahr = jetzt.getFullYear();
@@ -111,7 +120,7 @@ export default function FremdwaehrungDetail() {
             await ladeTageskurs();
             await ladeVorletzterTageskurs();
             await ladeDiagrammDaten();
-            await ladeAenderung();
+            await ladeDiagramm();
         };
 
         ladeAlleDaten();
@@ -126,7 +135,7 @@ export default function FremdwaehrungDetail() {
             {console.log("Tageskurs: " + tageskurs?.tageskurs_zu_eur)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
-            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur)/100).toFixed(4)}%</p>
+            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur) / 100).toFixed(4)}%</p>
 
 
 
