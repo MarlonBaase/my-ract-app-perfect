@@ -68,7 +68,6 @@ export default function FremdwaehrungDetail() {
 
     const ladeDiagramm = async () => {
 
-        ladeDiagrammDaten();
 
         const jetzt = new Date();
         const tag = new Date();
@@ -79,7 +78,7 @@ export default function FremdwaehrungDetail() {
             for (let i = 6; i >= 0; i--) {
                 const tag = new Date();
                 tag.setDate(jetzt.getDate() - i);
-                const diagrammDaten = eintraege[0]
+                const diagrammDaten = eintraege.tageskurs
                     .filter(e =>new Date(e.erstellt_am).getDate() === tag.getDate() &&
                         new Date(e.erstellt_am).getMonth() === tag.getMonth())
                 punkte.push({ label: `${tag.getDate()}.`, diagrammDaten });
@@ -89,7 +88,7 @@ export default function FremdwaehrungDetail() {
         if (zeitraum === "monat") {
             const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
             for (let i = 1; i <= tageImMonat; i++) {
-                const diagrammDaten = eintraege[0]
+                const diagrammDaten = eintraege.tageskurs
                     .filter(e => new Date(e.erstellt_am).getDate() === i &&
                         new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
                 punkte.push({ label: `${i}.`, diagrammDaten });
@@ -99,7 +98,7 @@ export default function FremdwaehrungDetail() {
         if (zeitraum === "jahr") {
             const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
             for (let i = 0; i < 12; i++) {
-                const diagrammDaten = eintraege[0]
+                const diagrammDaten = eintraege.tageskurs
                     .filter(e => new Date(e.erstellt_am).getMonth() === i &&
                         new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
                 punkte.push({ label: monate[i], diagrammDaten });
@@ -112,10 +111,10 @@ export default function FremdwaehrungDetail() {
 
 
             for (let i = 0; i < 5; i++) {
-                const diagrammDaten = eintraege[0]
+                const diagrammDaten = eintraege.tageskurs
                     .filter(e => {const jahr = new Date(e.erstellt_am).getFullYear();
                     return jahr === startJahr + i})
-                punkte.push({ label: i, diagrammDaten });
+                punkte.push({ label: startJahr + i, diagrammDaten });
             }
         }
 
@@ -141,7 +140,7 @@ export default function FremdwaehrungDetail() {
             {console.log("Tageskurs: " + tageskurs?.tageskurs_zu_eur)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
-            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur) / 100).toFixed(4)}%</p>
+            <p>Änderung: {(tageskurs?.tageskurs_zu_eur - vorletzterTageskurs?.tageskurs_zu_eur).toFixed(4)} {((tageskurs?.tageskurs_zu_eur / vorletzterTageskurs?.tageskurs_zu_eur)* 100).toFixed(4)}%</p>
 
 
 
@@ -156,11 +155,11 @@ export default function FremdwaehrungDetail() {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Line type="monotone" dataKey="einnahmen" stroke="#10b981" strokeWidth={2} />
+                        <Line type="monotone" dataKey="punkte" stroke="#10b981" strokeWidth={2} />
                     </LineChart>
                 </div>
                 <div className="zeitraum">
-                    <button className={zeitraum === "woche" ? "active" : ""} onClick={() => setZeitraum("wocher")}>1 Woche</button>
+                    <button className={zeitraum === "woche" ? "active" : ""} onClick={() => setZeitraum("woche")}>1 Woche</button>
                     <button className={zeitraum === "monat" ? "active" : ""} onClick={() => setZeitraum("monat")}>1 Monat</button>
                     <button className={zeitraum === "jahr" ? "active" : ""} onClick={() => setZeitraum("jahr")}>1 Jahr</button>
                     <button className={zeitraum === "jahre" ? "active" : ""} onClick={() => setZeitraum("jahre")}>5 Jahre / max</button>
