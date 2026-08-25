@@ -53,10 +53,12 @@ export default function FremdwaehrungDetail() {
     const ladeAenderung = async () => {
         var aenderungRechnung = tageskurs - vorletzterTageskurs
 
-        console.log(aenderung)
+        
 
         setAenderung(aenderungRechnung)
     }
+
+    console.log(aenderung)
 
     const ladeDiagrammDaten = async () => {
 
