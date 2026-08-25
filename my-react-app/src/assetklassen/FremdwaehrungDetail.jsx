@@ -45,33 +45,32 @@ export default function FremdwaehrungDetail() {
         const { data, error } = await supabase
             .from("tageskurs")
             .select(`tageskurs_zu_eur, erstellt_am`)
-            .eq("waehrungs_code", code);
+            .eq("waehrungs_code", code)
+            .order('erstellt_am', { ascending: true });
 
         if (handleApiError(error, "Waehrung laden")) return [];
         return data || [];
     }, [code]);
 
     const ladeDiagramm = useCallback(async () => {
-        // Daten direkt aus der DB-Abfrage holen (vermeidet State-Asynchronität)
         const eintraege = await ladeDiagrammDaten();
-
         const jetzt = new Date();
         let punkte = [];
 
         if (zeitraum === "woche") {
             for (let i = 6; i >= 0; i--) {
-                const tag = new Date();
-                tag.setDate(jetzt.getDate() - i);
-                
+                const stichtag = new Date();
+                stichtag.setDate(jetzt.getDate() - i);
+
                 const gefiltert = eintraege.filter(e => {
                     const d = new Date(e.erstellt_am);
-                    return d.getDate() === tag.getDate() && d.getMonth() === tag.getMonth();
+                    return d.getDate() === stichtag.getDate() &&
+                           d.getMonth() === stichtag.getMonth() &&
+                           d.getFullYear() === stichtag.getFullYear();
                 });
 
-                // Letzten Kurs des Tages nehmen (oder null falls kein Eintrag existiert)
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
-                punkte.push({ label: `${tag.getDate()}.`, kurs: kursWert });
+                punkte.push({ label: `${stichtag.getDate()}.${stichtag.getMonth() + 1}.`, kurs: kursWert });
             }
         }
 
@@ -80,11 +79,12 @@ export default function FremdwaehrungDetail() {
             for (let i = 1; i <= tageImMonat; i++) {
                 const gefiltert = eintraege.filter(e => {
                     const d = new Date(e.erstellt_am);
-                    return d.getDate() === i && d.getMonth() === jetzt.getMonth();
+                    return d.getDate() === i &&
+                           d.getMonth() === jetzt.getMonth() &&
+                           d.getFullYear() === jetzt.getFullYear();
                 });
 
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
                 punkte.push({ label: `${i}.`, kurs: kursWert });
             }
         }
@@ -98,7 +98,6 @@ export default function FremdwaehrungDetail() {
                 });
 
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
                 punkte.push({ label: monate[i], kurs: kursWert });
             }
         }
@@ -110,7 +109,6 @@ export default function FremdwaehrungDetail() {
             for (let i = 0; i < 5; i++) {
                 const zielJahr = startJahr + i;
                 const gefiltert = eintraege.filter(e => new Date(e.erstellt_am).getFullYear() === zielJahr);
-
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
 
                 punkte.push({ label: `${zielJahr}`, kurs: kursWert });
@@ -130,7 +128,6 @@ export default function FremdwaehrungDetail() {
         ladeAlleDaten();
     }, [ladeTageskurs, ladeVorletzterTageskurs, ladeDiagramm]);
 
-    // Korrekte mathematische Prozenz- und Differenzberechnung
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
     const kursAlt = vorletzterTageskurs?.tageskurs_zu_eur;
     
@@ -150,7 +147,6 @@ export default function FremdwaehrungDetail() {
                 </p>
             )}
 
-            {/* --- 2. DIAGRAMME-GRID --- */}
             <div className="diagramme">
                 <div className="diagramm">
                     <LineChart width={400} height={200} data={diagrammDaten}>
@@ -159,7 +155,7 @@ export default function FremdwaehrungDetail() {
                         <YAxis domain={['auto', 'auto']} />
                         <Tooltip />
                         <Legend />
-                        <Line type="monotone" dataKey="kurs" stroke="#10b981" strokeWidth={2} connectNulls />
+                        <Line type="monotone" dataKey="kurs" stroke="#10b981" strokeWidth={2} connectNulls={true} />
                     </LineChart>
                 </div>
                 <div className="zeitraum">
