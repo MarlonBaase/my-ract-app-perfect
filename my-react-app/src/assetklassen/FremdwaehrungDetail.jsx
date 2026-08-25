@@ -51,65 +51,72 @@ export default function FremdwaehrungDetail() {
     };
 
 
-    console.log(aenderung)
-
     const ladeDiagrammDaten = async () => {
 
         const { data, error } = await supabase
             .from("tageskurs")
             .select(`tageskurs_zu_eur, erstellt_am`)
             .eq("waehrungs_code", code)
-            .limit(5)
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setEintraege(data);
 
+        return data || [];
+
     }
 
+
     const ladeDiagramm = async () => {
+
+        ladeDiagrammDaten();
 
         const jetzt = new Date();
         const tag = new Date();
         let punkte = [];
 
 
-        if (zeitraum === 'woche') {
-            const diagrammDaten = eintraege
-                .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
-                    new Date(e.erstellt_am).getMonth() === tag.getMonth());
-            punkte.push({ label: `${tag.getDate()}.`, diagrammDaten });
+        if (zeitraum === "woche") {
+            for (let i = 6; i >= 0; i--) {
+                const tag = new Date();
+                tag.setDate(jetzt.getDate() - i);
+                const diagrammDaten = eintraege[0]
+                    .filter(e =>new Date(e.erstellt_am).getDate() === tag.getDate() &&
+                        new Date(e.erstellt_am).getMonth() === tag.getMonth())
+                punkte.push({ label: `${tag.getDate()}.`, diagrammDaten });
+            }
         }
 
         if (zeitraum === "monat") {
             const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
             for (let i = 1; i <= tageImMonat; i++) {
-                const diagrammDaten = eintraege
-                    .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === i &&
+                const diagrammDaten = eintraege[0]
+                    .filter(e => new Date(e.erstellt_am).getDate() === i &&
                         new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
                 punkte.push({ label: `${i}.`, diagrammDaten });
             }
         }
 
         if (zeitraum === "jahr") {
-      const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-      for (let i = 0; i < 12; i++) {
-        const diagrammDaten = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getMonth() === i &&
-            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
-        punkte.push({ label: monate[i], diagrammDaten });
-      }
-    }
+            const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+            for (let i = 0; i < 12; i++) {
+                const diagrammDaten = eintraege[0]
+                    .filter(e => new Date(e.erstellt_am).getMonth() === i &&
+                        new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+                punkte.push({ label: monate[i], diagrammDaten });
+            }
+        }
 
         if (zeitraum === 'jahre') {
             const aktuellesJahr = jetzt.getFullYear();
             const startJahr = aktuellesJahr - 4;
 
-            const diagrammDaten = eintraege
-                .filter(e => {
-                    const jahr = new Date(e.erstellt_am).getFullYear();
-                    return jahr >= startJahr && jahr <= aktuellesJahr;
-                });
-            punkte.push({ label: `${jetzt.getFullYear()}`, diagrammDaten });
+
+            for (let i = 0; i < 5; i++) {
+                const diagrammDaten = eintraege[0]
+                    .filter(e => {const jahr = new Date(e.erstellt_am).getFullYear();
+                    return jahr === startJahr + i})
+                punkte.push({ label: i, diagrammDaten });
+            }
         }
 
         setDiagrammDaten(punkte)
@@ -119,7 +126,6 @@ export default function FremdwaehrungDetail() {
         const ladeAlleDaten = async () => {
             await ladeTageskurs();
             await ladeVorletzterTageskurs();
-            await ladeDiagrammDaten();
             await ladeDiagramm();
         };
 
