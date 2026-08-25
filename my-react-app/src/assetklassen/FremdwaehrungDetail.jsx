@@ -58,6 +58,8 @@ export default function FremdwaehrungDetail() {
         let punkte = [];
 
         if (zeitraum === "woche") {
+            let letzterKurs = null;
+
             for (let i = 6; i >= 0; i--) {
                 const stichtag = new Date();
                 stichtag.setDate(jetzt.getDate() - i);
@@ -69,13 +71,21 @@ export default function FremdwaehrungDetail() {
                            d.getFullYear() === stichtag.getFullYear();
                 });
 
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-                punkte.push({ label: `${stichtag.getDate()}.${stichtag.getMonth() + 1}.`, kurs: kursWert });
+                if (gefiltert.length > 0) {
+                    letzterKurs = gefiltert[gefiltert.length - 1].tageskurs_zu_eur;
+                }
+
+                punkte.push({ 
+                    label: `${stichtag.getDate()}.${stichtag.getMonth() + 1}.`, 
+                    kurs: letzterKurs 
+                });
             }
         }
 
         if (zeitraum === "monat") {
             const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
+            let letzterKurs = null;
+
             for (let i = 1; i <= tageImMonat; i++) {
                 const gefiltert = eintraege.filter(e => {
                     const d = new Date(e.erstellt_am);
@@ -84,34 +94,55 @@ export default function FremdwaehrungDetail() {
                            d.getFullYear() === jetzt.getFullYear();
                 });
 
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-                punkte.push({ label: `${i}.`, kurs: kursWert });
+                if (gefiltert.length > 0) {
+                    letzterKurs = gefiltert[gefiltert.length - 1].tageskurs_zu_eur;
+                }
+
+                punkte.push({ 
+                    label: `${i}.`, 
+                    kurs: letzterKurs 
+                });
             }
         }
 
         if (zeitraum === "jahr") {
             const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+            let letzterKurs = null;
+
             for (let i = 0; i < 12; i++) {
                 const gefiltert = eintraege.filter(e => {
                     const d = new Date(e.erstellt_am);
                     return d.getMonth() === i && d.getFullYear() === jetzt.getFullYear();
                 });
 
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-                punkte.push({ label: monate[i], kurs: kursWert });
+                if (gefiltert.length > 0) {
+                    letzterKurs = gefiltert[gefiltert.length - 1].tageskurs_zu_eur;
+                }
+
+                punkte.push({ 
+                    label: monate[i], 
+                    kurs: letzterKurs 
+                });
             }
         }
 
         if (zeitraum === 'jahre') {
             const aktuellesJahr = jetzt.getFullYear();
             const startJahr = aktuellesJahr - 4;
+            let letzterKurs = null;
 
             for (let i = 0; i < 5; i++) {
                 const zielJahr = startJahr + i;
                 const gefiltert = eintraege.filter(e => new Date(e.erstellt_am).getFullYear() === zielJahr);
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
 
-                punkte.push({ label: `${zielJahr}`, kurs: kursWert });
+                if (gefiltert.length > 0) {
+                    letzterKurs = gefiltert[gefiltert.length - 1].tageskurs_zu_eur;
+                }
+
+                punkte.push({ 
+                    label: `${zielJahr}`, 
+                    kurs: letzterKurs 
+                });
             }
         }
 
