@@ -50,13 +50,6 @@ export default function FremdwaehrungDetail() {
         }
     };
 
-    const ladeAenderung = async () => {
-        var aenderungRechnung = tageskurs - vorletzterTageskurs
-
-        
-
-        setAenderung(aenderungRechnung)
-    }
 
     console.log(aenderung)
 
@@ -133,7 +126,7 @@ export default function FremdwaehrungDetail() {
             {console.log("Tageskurs: " + tageskurs?.tageskurs_zu_eur)}
 
             <p>{tageskurs?.tageskurs_zu_eur}</p>
-            <p>{aenderung?.aenderungRechnung}</p>
+            <p>Änderung: {tageskurs - vorletzterTageskurs}</p>
 
 
 
