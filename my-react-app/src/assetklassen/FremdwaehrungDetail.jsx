@@ -147,7 +147,7 @@ export default function FremdwaehrungDetail() {
             }
         };
         init();
-    }, []);
+    });
 
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
