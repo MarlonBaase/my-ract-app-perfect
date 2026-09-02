@@ -57,7 +57,9 @@ export default function FremdwaehrungDetail() {
             .order('erstellt_am', { ascending: true });
 
         if (handleApiError(error, "Waehrung laden")) return [];
+        console.log(data)
         return data || [];
+        
     }, [code]);
 
     const ladeDiagramm = useCallback(async () => {
