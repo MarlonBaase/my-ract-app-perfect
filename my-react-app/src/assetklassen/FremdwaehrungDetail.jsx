@@ -58,11 +58,11 @@ export default function FremdwaehrungDetail() {
             .order('erstellt_am', { ascending: true });
 
         if (handleApiError(error, "Waehrung laden")) return [];
-        
+
         console.log(data)
         setEintraege(data || []);
         console.log(eintraege)
-        
+
     }, [code, eintraege]);
 
     const ladeDiagramm = useCallback(async () => {
@@ -131,20 +131,24 @@ export default function FremdwaehrungDetail() {
             }
         }
 
-        console.log("Generierte Diagramm-Punkte:", punkte); // Debugging im Browser-Inspector!
         setDiagrammDaten(punkte);
     }, [zeitraum, eintraege]);
 
-    useEffect(() => {
-        const ladeAlleDaten = async () => {
-            await ladeTageskurs();
-            await ladeVorletzterTageskurs();
-            await ladeDiagrammDaten();
-            await ladeDiagramm();
-        };
 
-        ladeAlleDaten();
-    }, [ladeTageskurs, ladeVorletzterTageskurs, ladeDiagramm, ladeDiagrammDaten]);
+    useEffect(() => {
+        const init = async () => {
+            try {
+                await ladeTageskurs();
+                await ladeVorletzterTageskurs();
+                await ladeDiagrammDaten();
+                await ladeDiagramm();
+            } catch (err) {
+                console.error("Fehler in init:", err);
+            }
+        };
+        init();
+    }, []);
+
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
     const kursAlt = vorletzterTageskurs?.tageskurs_zu_eur;
