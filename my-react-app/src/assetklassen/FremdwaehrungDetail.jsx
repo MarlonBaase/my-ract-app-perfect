@@ -139,6 +139,7 @@ export default function FremdwaehrungDetail() {
         const ladeAlleDaten = async () => {
             await ladeTageskurs();
             await ladeVorletzterTageskurs();
+            await ladeDiagrammDaten();
             await ladeDiagramm();
         };
 
