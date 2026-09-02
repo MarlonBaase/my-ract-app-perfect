@@ -15,13 +15,6 @@ export default function FremdwaehrungDetail() {
     const { code } = useParams();
     const navigate = useNavigate();
 
-    // Hilfsfunktion: Formatierung eines Date-Objekts zu "YYYY-MM-DD"
-    const toISODateString = (date) => {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    };
 
     const ladeTageskurs = useCallback(async () => {
         const { data, error } = await supabase
@@ -65,6 +58,7 @@ export default function FremdwaehrungDetail() {
 
     }, [code, eintraege]);
 
+
     const ladeDiagramm = useCallback(async () => {
         const jetzt = new Date();
         let punkte = [];
@@ -73,67 +67,35 @@ export default function FremdwaehrungDetail() {
             for (let i = 6; i >= 0; i--) {
                 const tag = new Date();
                 tag.setDate(jetzt.getDate() - i);
-                const kurswerte = eintraege
+                const kursdaten = eintraege
                     .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
                         new Date(e.erstellt_am).getMonth() === tag.getMonth())
-                punkte.push({ label: `${tag.getDate()}.`, kurswerte });
+                punkte.push({ label: `${tag.getDate()}.`, kursdaten });
             }
         }
 
         if (zeitraum === "monat") {
             const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
-
             for (let i = 1; i <= tageImMonat; i++) {
-                const stichtag = new Date(jetzt.getFullYear(), jetzt.getMonth(), i);
-                const targetKey = toISODateString(stichtag);
-
-                const gefiltert = eintraege.filter(e => e.erstellt_am?.startsWith(targetKey));
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
-                punkte.push({
-                    label: `${i}.`,
-                    kurs: kursWert
-                });
+                const kursdaten = eintraege
+                    .filter(e => new Date(e.erstellt_am).getDate() === i &&
+                        new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
+                punkte.push({ label: `${i}.`, kursdaten });
             }
         }
 
         if (zeitraum === "jahr") {
             const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-
             for (let i = 0; i < 12; i++) {
-                const gefiltert = eintraege.filter(e => {
-                    const d = new Date(e.erstellt_am);
-                    return d.getMonth() === i && d.getFullYear() === jetzt.getFullYear();
-                });
-
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
-                punkte.push({
-                    label: monate[i],
-                    kurs: kursWert
-                });
-            }
-        }
-
-        if (zeitraum === 'jahre') {
-            const aktuellesJahr = jetzt.getFullYear();
-            const startJahr = aktuellesJahr - 4;
-
-            for (let i = 0; i < 5; i++) {
-                const zielJahr = startJahr + i;
-                const gefiltert = eintraege.filter(e => new Date(e.erstellt_am).getFullYear() === zielJahr);
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
-                punkte.push({
-                    label: `${zielJahr}`,
-                    kurs: kursWert
-                });
+                const kursdaten = eintraege
+                    .filter(e => new Date(e.erstellt_am).getMonth() === i &&
+                        new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
+                punkte.push({ label: monate[i], kursdaten });
             }
         }
 
         setDiagrammDaten(punkte);
-    }, [zeitraum, eintraege]);
-
+    });
 
     useEffect(() => {
         const init = async () => {
@@ -147,7 +109,7 @@ export default function FremdwaehrungDetail() {
             }
         };
         init();
-    });
+    }, []);
 
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
