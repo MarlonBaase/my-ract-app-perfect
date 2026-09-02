@@ -67,18 +67,12 @@ export default function FremdwaehrungDetail() {
 
         if (zeitraum === "woche") {
             for (let i = 6; i >= 0; i--) {
-                const stichtag = new Date();
-                stichtag.setDate(jetzt.getDate() - i);
-                const targetKey = toISODateString(stichtag);
-
-                // Sucht Einträge, deren erstellt_am mit dem YYYY-MM-DD String startet
-                const gefiltert = eintraege.filter(e => e.erstellt_am?.startsWith(targetKey));
-                const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
-
-                punkte.push({ 
-                    label: `${stichtag.getDate()}.${stichtag.getMonth() + 1}.`, 
-                    kurs: kursWert 
-                });
+                const tag = new Date();
+                tag.setDate(jetzt.getDate() - i);
+                const kurswerte = eintraege
+                    .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
+                        new Date(e.erstellt_am).getMonth() === tag.getMonth())
+                punkte.push({ label: `${tag.getDate()}.`, kurswerte });
             }
         }
 
@@ -92,9 +86,9 @@ export default function FremdwaehrungDetail() {
                 const gefiltert = eintraege.filter(e => e.erstellt_am?.startsWith(targetKey));
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
 
-                punkte.push({ 
-                    label: `${i}.`, 
-                    kurs: kursWert 
+                punkte.push({
+                    label: `${i}.`,
+                    kurs: kursWert
                 });
             }
         }
@@ -110,9 +104,9 @@ export default function FremdwaehrungDetail() {
 
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
 
-                punkte.push({ 
-                    label: monate[i], 
-                    kurs: kursWert 
+                punkte.push({
+                    label: monate[i],
+                    kurs: kursWert
                 });
             }
         }
@@ -126,9 +120,9 @@ export default function FremdwaehrungDetail() {
                 const gefiltert = eintraege.filter(e => new Date(e.erstellt_am).getFullYear() === zielJahr);
                 const kursWert = gefiltert.length > 0 ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur : null;
 
-                punkte.push({ 
-                    label: `${zielJahr}`, 
-                    kurs: kursWert 
+                punkte.push({
+                    label: `${zielJahr}`,
+                    kurs: kursWert
                 });
             }
         }
@@ -149,7 +143,7 @@ export default function FremdwaehrungDetail() {
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
     const kursAlt = vorletzterTageskurs?.tageskurs_zu_eur;
-    
+
     const diff = (kursAktuell && kursAlt) ? (kursAktuell - kursAlt) : 0;
     const prozent = (kursAktuell && kursAlt) ? ((kursAktuell - kursAlt) / kursAlt) * 100 : 0;
 
@@ -174,12 +168,12 @@ export default function FremdwaehrungDetail() {
                         <YAxis domain={['dataMin - 0.005', 'dataMax + 0.005']} />
                         <Tooltip />
                         <Legend />
-                        <Line 
-                            type="monotone" 
-                            dataKey="kurs" 
-                            stroke="#10b981" 
-                            strokeWidth={2} 
-                            connectNulls={true} 
+                        <Line
+                            type="monotone"
+                            dataKey="kurs"
+                            stroke="#10b981"
+                            strokeWidth={2}
+                            connectNulls={true}
                         />
                     </LineChart>
                 </div>
