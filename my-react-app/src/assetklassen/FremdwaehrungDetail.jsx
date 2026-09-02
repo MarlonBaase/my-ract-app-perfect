@@ -10,6 +10,7 @@ export default function FremdwaehrungDetail() {
     const [vorletzterTageskurs, setVorletzterTageskurs] = useState(null);
     const [diagrammDaten, setDiagrammDaten] = useState([]);
     const [zeitraum, setZeitraum] = useState("woche");
+    const [eintraege, setEintraege] = useState([]);
 
     const { code } = useParams();
     const navigate = useNavigate();
@@ -57,13 +58,12 @@ export default function FremdwaehrungDetail() {
             .order('erstellt_am', { ascending: true });
 
         if (handleApiError(error, "Waehrung laden")) return [];
-        console.log(data)
-        return data || [];
+        
+        setEintraege(data || []);
         
     }, [code]);
 
     const ladeDiagramm = useCallback(async () => {
-        const eintraege = await ladeDiagrammDaten();
         console.log("Geladene Diagramm-Daten:", eintraege); 
         const jetzt = new Date();
         let punkte = [];
