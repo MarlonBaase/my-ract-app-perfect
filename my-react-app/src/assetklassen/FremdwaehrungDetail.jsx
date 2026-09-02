@@ -70,7 +70,7 @@ export default function FremdwaehrungDetail() {
                 );
 
                 const kursWert = gefiltert.length > 0
-                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    ? Number(gefiltert[gefiltert.length - 1].tageskurs_zu_eur)
                     : null;
 
                 punkte.push({ label: `${tag.getDate()}.`, kurs: kursWert });
@@ -87,7 +87,7 @@ export default function FremdwaehrungDetail() {
                 );
 
                 const kursWert = gefiltert.length > 0
-                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    ? Number(gefiltert[gefiltert.length - 1].tageskurs_zu_eur)
                     : null;
 
                 punkte.push({ label: `${i}.`, kurs: kursWert });
@@ -103,7 +103,7 @@ export default function FremdwaehrungDetail() {
                 );
 
                 const kursWert = gefiltert.length > 0
-                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    ? Number(gefiltert[gefiltert.length - 1].tageskurs_zu_eur)
                     : null;
 
                 punkte.push({ label: monate[i], kurs: kursWert });
