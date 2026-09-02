@@ -63,6 +63,8 @@ export default function FremdwaehrungDetail() {
                 const tag = new Date();
                 tag.setDate(jetzt.getDate() - i);
 
+                console.log("Rohdaten eintraege:", eintraege);
+
                 const gefiltert = eintraege.filter(e =>
                     new Date(e.erstellt_am).getDate() === tag.getDate() &&
                     new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
