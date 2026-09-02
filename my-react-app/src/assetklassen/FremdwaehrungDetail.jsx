@@ -2,7 +2,7 @@ import { useParams, Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../supabase";
 import { handleApiError } from "../utils/errorHandler";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 
 export default function FremdwaehrungDetail() {
 
@@ -63,7 +63,7 @@ export default function FremdwaehrungDetail() {
         setEintraege(data || []);
         console.log(eintraege)
         
-    }, [code]);
+    }, [code, eintraege]);
 
     const ladeDiagramm = useCallback(async () => {
         const jetzt = new Date();
@@ -133,7 +133,7 @@ export default function FremdwaehrungDetail() {
 
         console.log("Generierte Diagramm-Punkte:", punkte); // Debugging im Browser-Inspector!
         setDiagrammDaten(punkte);
-    }, [zeitraum, ladeDiagrammDaten]);
+    }, [zeitraum, eintraege]);
 
     useEffect(() => {
         const ladeAlleDaten = async () => {
@@ -144,7 +144,7 @@ export default function FremdwaehrungDetail() {
         };
 
         ladeAlleDaten();
-    }, [ladeTageskurs, ladeVorletzterTageskurs, ladeDiagramm]);
+    }, [ladeTageskurs, ladeVorletzterTageskurs, ladeDiagramm, ladeDiagrammDaten]);
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
     const kursAlt = vorletzterTageskurs?.tageskurs_zu_eur;
