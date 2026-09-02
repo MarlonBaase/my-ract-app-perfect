@@ -110,6 +110,7 @@ export default function FremdwaehrungDetail() {
             }
         }
 
+        console.log("Generierte Diagramm-Daten:", punkte);
         setDiagrammDaten(punkte);
     }, [zeitraum, eintraege]);
 
