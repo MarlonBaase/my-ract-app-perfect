@@ -15,7 +15,6 @@ export default function FremdwaehrungDetail() {
     const { code } = useParams();
     const navigate = useNavigate();
 
-
     const ladeTageskurs = useCallback(async () => {
         const { data, error } = await supabase
             .from("tageskurs")
@@ -53,85 +52,78 @@ export default function FremdwaehrungDetail() {
         if (handleApiError(error, "Waehrung laden")) return [];
 
         setEintraege(data || []);
-
-    }, [zeitraum, code]);
-
+    }, [code]);
 
     const ladeDiagramm = useCallback(() => {
-    const jetzt = new Date();
-    let punkte = [];
+        const jetzt = new Date();
+        let punkte = [];
 
-    if (zeitraum === "woche") {
-        for (let i = 6; i >= 0; i--) {
-            const tag = new Date();
-            tag.setDate(jetzt.getDate() - i);
+        if (zeitraum === "woche") {
+            for (let i = 6; i >= 0; i--) {
+                const tag = new Date();
+                tag.setDate(jetzt.getDate() - i);
 
-            // 1. Array filtern
-            const gefiltert = eintraege.filter(e =>
-                new Date(e.erstellt_am).getDate() === tag.getDate() &&
-                new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
-                new Date(e.erstellt_am).getFullYear() === tag.getFullYear()
-            );
+                const gefiltert = eintraege.filter(e =>
+                    new Date(e.erstellt_am).getDate() === tag.getDate() &&
+                    new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
+                    new Date(e.erstellt_am).getFullYear() === tag.getFullYear()
+                );
 
-            // 2. Den letzten Kurswert als konkrete Zahl extrahieren
-            const kursWert = gefiltert.length > 0
-                ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
-                : null;
+                const kursWert = gefiltert.length > 0
+                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    : null;
 
-            // 3. Als Objekt abspeichern
-            punkte.push({ label: `${tag.getDate()}.`, kurs: kursWert });
+                punkte.push({ label: `${tag.getDate()}.`, kurs: kursWert });
+            }
         }
-    }
 
-    if (zeitraum === "monat") {
-        const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
-        for (let i = 1; i <= tageImMonat; i++) {
-            const gefiltert = eintraege.filter(e =>
-                new Date(e.erstellt_am).getDate() === i &&
-                new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
-                new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
-            );
+        if (zeitraum === "monat") {
+            const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
+            for (let i = 1; i <= tageImMonat; i++) {
+                const gefiltert = eintraege.filter(e =>
+                    new Date(e.erstellt_am).getDate() === i &&
+                    new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
+                    new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
+                );
 
-            const kursWert = gefiltert.length > 0
-                ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
-                : null;
+                const kursWert = gefiltert.length > 0
+                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    : null;
 
-            punkte.push({ label: `${i}.`, kurs: kursWert });
+                punkte.push({ label: `${i}.`, kurs: kursWert });
+            }
         }
-    }
 
-    if (zeitraum === "jahr") {
-        const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-        for (let i = 0; i < 12; i++) {
-            const gefiltert = eintraege.filter(e =>
-                new Date(e.erstellt_am).getMonth() === i &&
-                new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
-            );
+        if (zeitraum === "jahr") {
+            const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+            for (let i = 0; i < 12; i++) {
+                const gefiltert = eintraege.filter(e =>
+                    new Date(e.erstellt_am).getMonth() === i &&
+                    new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
+                );
 
-            const kursWert = gefiltert.length > 0
-                ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
-                : null;
+                const kursWert = gefiltert.length > 0
+                    ? gefiltert[gefiltert.length - 1].tageskurs_zu_eur
+                    : null;
 
-            punkte.push({ label: monate[i], kurs: kursWert });
+                punkte.push({ label: monate[i], kurs: kursWert });
+            }
         }
-    }
 
-    setDiagrammDaten(punkte);
-}, [ eintraege]);
+        setDiagrammDaten(punkte);
+    }, [zeitraum, eintraege]);
 
     useEffect(() => {
         ladeTageskurs();
         ladeVorletzterTageskurs();
-        ladeDiagrammDaten(); // Speichert nur setEintraege(data)
-    }, [code]);
-
+        ladeDiagrammDaten();
+    }, [code, ladeTageskurs, ladeVorletzterTageskurs, ladeDiagrammDaten]);
 
     useEffect(() => {
         if (eintraege.length > 0) {
             ladeDiagramm();
         }
-    }, [zeitraum, eintraege]);
-
+    }, [zeitraum, eintraege, ladeDiagramm]);
 
     const kursAktuell = tageskurs?.tageskurs_zu_eur;
     const kursAlt = vorletzterTageskurs?.tageskurs_zu_eur;
@@ -157,7 +149,7 @@ export default function FremdwaehrungDetail() {
                     <LineChart width={500} height={250} data={diagrammDaten}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="label" />
-                        <YAxis />
+                        <YAxis domain={['auto', 'auto']} />
                         <Tooltip />
                         <Legend />
                         <Line
