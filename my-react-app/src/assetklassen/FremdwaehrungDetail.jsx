@@ -62,6 +62,7 @@ export default function FremdwaehrungDetail() {
 
     const ladeDiagramm = useCallback(async () => {
         const eintraege = await ladeDiagrammDaten();
+        console.log("Geladene Diagramm-Daten:", eintraege); 
         const jetzt = new Date();
         let punkte = [];
 
