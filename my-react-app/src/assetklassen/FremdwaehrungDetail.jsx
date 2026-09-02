@@ -59,12 +59,13 @@ export default function FremdwaehrungDetail() {
 
         if (handleApiError(error, "Waehrung laden")) return [];
         
+        console.log(data)
         setEintraege(data || []);
+        console.log(eintraege)
         
     }, [code]);
 
     const ladeDiagramm = useCallback(async () => {
-        console.log("Geladene Diagramm-Daten:", eintraege); 
         const jetzt = new Date();
         let punkte = [];
 
