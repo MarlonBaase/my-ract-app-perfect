@@ -38,6 +38,7 @@ export default function FremdwaehrungKonto() {
     const [naechsteFaelligkeit, setNaechsteFaelligkeit] = useState("");
     const [assets, setAssets] = useState([]);
     const [errors, setErrors] = useState({});
+    const [listeWaehrung, setListeWaehrung] = useState([]);
 
     const { ansicht } = useContext(SettingsContext);
 
@@ -59,6 +60,16 @@ export default function FremdwaehrungKonto() {
 
         if (handleApiError(error, "Fremdwaehrungskonto laden")) return;
         if (data) setListeFremdwaehrungskonto(data);
+    };
+
+    const ladeWaehrungen = async () => {
+        const { data, error } = await supabase
+            .from("waehrungsstammdaten")
+            .select(`waehrungs_code, name, symbol`)
+            .order("name", { ascending: true });
+
+        if (handleApiError(error, "Waehrung laden")) return;
+        if (data) setListeWaehrung(data);
     };
 
     const ladeAssets = async () => {
@@ -482,6 +493,7 @@ export default function FremdwaehrungKonto() {
                 await ladeFremdwaehrungskonto();
                 await ladeKategorien();
                 await ladeElternkontoListe();
+                await ladeWaehrungen();
             } catch (err) {
                 console.error("Fehler in init:", err);
             }
@@ -713,14 +725,20 @@ export default function FremdwaehrungKonto() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Währung*</label>
-                                    <input
-                                        className={errors.waehrung ? "input-error" : ""}
-                                        value={waehrung}
-                                        onChange={(e) => { setWaehrung(e.target.value); setErrors({ ...errors, waehrung: null }); }}
-                                        placeholder="EUR"
-                                    />
-                                    {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
+                                    {listeWaehrung.map((e) => {
+                                        const gefundeneWaehrung = listeWaehrung.find(w => w.waehrungs_code === e.waehrungs_code);
+                                        const waehrungsSymbol = gefundeneWaehrung ? gefundeneWaehrung.symbol : "";
+
+                                        return (
+                                            <div>
+                                                <label>Währung*</label>
+                                                <option key={e.waehrungs_code} value={e.waehrungs_code}>
+                                                    {waehrungsSymbol} - {e.waehrungs_name}
+                                                </option>
+                                            </div>
+
+                                        );
+                                    })}
                                 </div>
 
                                 <div className="form-group">
