@@ -1,0 +1,2 @@
+name_der_bank,iban,eroeffnungsdatum,einzahlung_bei_eroeffnung,aktuelle_summe,waehrung,notizen,erstellt_am,aktualisiert_am,asset_id,kontoinhaber,ist_aktiv,hauptkonto,elternkonto,dispo_limit,bic,zinssatz,ist_referenzkonto,benutzer_id
+test1,DE556456,2026-08-09,0.00,0.00,EUR,,2026-08-09 11:20:31.010141+02,2026-08-09 11:20:31.010141+02,a2ed28cc-5666-495d-b0d1-f9b0c73b362b,,true,false,,0,,0,true,8f150246-9f43-457b-b677-d28fcc92bc1e

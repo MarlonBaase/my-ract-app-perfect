@@ -1,0 +1,43 @@
+waehrungs_code,name,symbol,decimals,ist_aktiv
+AUD,Australischer Dollar,A$,2,true
+BGN,US-Dollar,$,2,true
+BRL,Brasilianischer Real,R$,2,true
+CAD,Kanadischer Dollar,CA$,2,true
+CHF,Schweizer Franken,CHF,2,true
+CNY,Chinesischer Yuan,¥,2,true
+CYP,US-Dollar,$,2,true
+CZK,Tschechische Krone,Kč,2,true
+DKK,Dänische Krone,kr.,2,true
+EEK,US-Dollar,$,2,true
+EUR,Euro,€,2,true
+GBP,Britisches Pfund,£,2,true
+HKD,Hongkong-Dollar,HK$,2,true
+HRK,US-Dollar,$,2,true
+HUF,Ungarischer Forint,Ft,2,true
+IDR,Indonesische Rupiah,Rp,2,true
+ILS,Israelischer Schekel,₪,2,true
+INR,Indische Rupie,₹,2,true
+ISK,Isländische Krone,kr,0,true
+JPY,Japanischer Yen,¥,0,true
+KRW,Südkoreanischer Won,₩,0,true
+LTL,US-Dollar,$,2,true
+LVL,US-Dollar,$,2,true
+MTL,US-Dollar,$,2,true
+MXN,Mexikanischer Peso,MX$,2,true
+MYR,Malaysischer Ringgit,RM,2,true
+NOK,Norwegische Krone,kr,2,true
+NZD,Neuseeland-Dollar,NZ$,2,true
+PHP,Philippinischer Peso,₱,2,true
+PLN,Polnischer Zloty,zł,2,true
+ROL,US-Dollar,$,2,true
+RON,Rumänischer Leu,lei,2,true
+RUB,US-Dollar,$,2,true
+SEK,Schwedische Krone,kr,2,true
+SGD,Singapur-Dollar,S$,2,true
+SIT,US-Dollar,$,2,true
+SKK,US-Dollar,$,2,true
+THB,Thailändischer Baht,฿,2,true
+TRL,US-Dollar,$,2,true
+TRY,Türkische Lira,₺,2,true
+USD,US-Dollar,$,2,true
+ZAR,Südafrikanischer Rand,R,2,true

@@ -1,0 +1,204 @@
+id,benutzer_id,ticket_nummer,prozess_name,beschreibung,status,dauer_sekunden,is_running,gestartet_am,erstellt_am,prioritaet,deadline,start_zeit,end_zeit,bereich,fortlaufende_notizen
+04ee865b-f64e-49e0-b901-408fde683217,8f150246-9f43-457b-b677-d28fcc92bc1e,17,Stacking,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:57:35.712904+02,niedrig,,,,Aktiva_Web3&Krypto,
+07783baf-0169-488e-b64f-1dbb5a2b24ef,8f150246-9f43-457b-b677-d28fcc92bc1e,16,Coins,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:57:27.203875+02,mittel,,,,Aktiva_Web3&Krypto,
+0ac15b85-35a1-4306-80b4-85f892233df5,8f150246-9f43-457b-b677-d28fcc92bc1e,54,Farben,"Persönliche Auswahl der Farben ",offen,0,false,,2026-08-02 15:10:17.102079+02,niedrig,,,,Hauptbereiche,
+0ad480fc-9079-4e2e-bc08-b511b3d08266,8f150246-9f43-457b-b677-d28fcc92bc1e,67,Grundriss,Grundrisse für Immobilen erstellen,offen,0,false,,2026-08-10 22:02:37.646644+02,mittel,,,,Aktiva_Immobilien&Sachwerte,
+1178915f-906f-4bf6-aa11-c6fff2394a6a,8f150246-9f43-457b-b677-d28fcc92bc1e,19,Liquidity Pools,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:57:53.056128+02,niedrig,,,,Aktiva_Web3&Krypto,
+129bceb8-086e-4a3a-a916-da74b51bade7,8f150246-9f43-457b-b677-d28fcc92bc1e,8,Hebelprodukte,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:54:53.825796+02,mittel,,,,Aktiva_Wertpapiere&Derivate,
+14a6bcd3-76e2-42c1-b5b7-7d9feeb673ac,8f150246-9f43-457b-b677-d28fcc92bc1e,48,img bei Kanban nzeigen,"- bei Banken/vergleichbaren Assets (wie Krypto) soll der Name mit der Datenbank verglichen werden. Ist eine Übereinstimmung vorhanden soll das Logo der Bank angezeigt werden
+- bei Assetklassen wie Immobilien soll der User selbst Bilder hochladen können und eines der Bilder als Hauptbild für die Anzeige auswählen können",offen,0,false,,2026-08-01 12:49:35.885602+02,niedrig,,,,alle Seiten,- Beim Girokonto ist aktuell das Logo der Deutschen Bank Hartgecodet vorhanden (dient als Vorlage)
+16a37697-21be-4b18-9e26-68a58d9b34b8,8f150246-9f43-457b-b677-d28fcc92bc1e,1,Assetklassenbereich Dashboard,"Aufbau
+Funktion damit man vom Haushaltsbuch Dashboard zum Unterdashboard klicken kann",offen,0,false,,2026-07-25 14:50:34.655694+02,mittel,,,,Hauptbereiche,
+17f7c9ef-50f1-4c34-b355-f0daba63c292,8f150246-9f43-457b-b677-d28fcc92bc1e,33,VWL,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:01:40.56584+02,niedrig,,,,Aktiva_Vorsorge&Verträge,
+1ed1946a-b12a-4d6f-bcfd-61a7d0f53714,8f150246-9f43-457b-b677-d28fcc92bc1e,42,Bereich Simulation & Berechnung,"Plannung
+",offen,0,false,,2026-07-25 15:06:20.32519+02,mittel,,,,Hauptbereiche,
+2072bdc7-7a25-4b8d-ad01-0c0923869684,8f150246-9f43-457b-b677-d28fcc92bc1e,32,Bausparverträge,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:01:34.137494+02,mittel,,,,Aktiva_Vorsorge&Verträge,
+21010cf2-bbe5-4dd3-839d-f1648273638b,8f150246-9f43-457b-b677-d28fcc92bc1e,50,Immobilienvorgänge,"Sanierung/Renovierung etc steuern, beispielsweise über einen Wizard mit Laufzeiten etc",offen,0,false,,2026-08-02 15:09:02.535013+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+23f52d5a-aa56-46a6-9a51-9294763ce874,8f150246-9f43-457b-b677-d28fcc92bc1e,5,Fremdwährungen,"Oberflächen anpassen
+Diagramme anpassen",in_bearbeitung,30793,false,,2026-07-25 14:53:49.593062+02,mittel,,2026-08-17 17:02:09.145+02,2026-08-22 15:10:09.123+02,Aktiva_Liquidität&Geldmarkt,"- Datenbank steht
+- API Werte checken
+- Oberfläche bauen"
+25c83443-ae0c-45fc-a9b4-8ad25357b455,8f150246-9f43-457b-b677-d28fcc92bc1e,70,Portfolio-Exposure & Fremdwährungsrisiko (Chart),"Gesamtsumme aller Assets nach waehrungs_code gruppieren
+
+Donut-/Pie-Chart Komponente für die prozentuale Verteilung integrieren
+
+Warn-Indikator bei Währungsklumpen (> 30% Anteile) einbauen",offen,0,false,,2026-09-03 17:39:33.092541+02,mittel,,,,Aktiva_Liquidität&Geldmarkt,
+2b94ca1f-c082-46d6-8bc1-0e48cf5214a6,8f150246-9f43-457b-b677-d28fcc92bc1e,77,Legal Disclaimer & Haftungsausschluss (UI & AGB),"Standardisierten Disclaimer-Text für Finanz-Tools formulieren (Keine Anlageberatung)
+
+Globale Footer-Komponente oder Tooltip bei allen Rechner-/Prognose-Ansichten integrieren
+
+Bestätigungs-Checkbox bei der Registrierung für AGB / Haftungsausschluss einbauen",offen,0,false,,2026-09-03 18:07:25.457374+02,hoch,,,,Aktiva_Liquidität&Geldmarkt,
+3108e6db-16c3-4ca5-8685-15cc27bfd495,8f150246-9f43-457b-b677-d28fcc92bc1e,65,Ansichtsauswahl dauerhaft speichern,,offen,0,false,,2026-08-08 12:20:44.872332+02,hoch,,,,alle Seiten,Aktuell wird der Wert nur in der Laufzeit gespeichert. Beim reload wird die ansicht wieder auf standard gesetzt
+3205dc9c-a3ac-4a63-b7da-92dc74736286,8f150246-9f43-457b-b677-d28fcc92bc1e,40,Assetklassen Sidebar,"- Aufteilung
+- Inhalt → was brauche ich noch // was brauche ich nicht",offen,0,false,,2026-07-25 15:05:01.040562+02,hoch,,,,Hauptbereiche,
+32a58817-c96a-4e28-bdf9-680b42f14103,8f150246-9f43-457b-b677-d28fcc92bc1e,13,Rohstoffe,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:56:28.116004+02,mittel,,,,Aktiva_Immobilien&Sachwerte,
+34872925-4ca2-4db6-b7eb-e249dd4ca201,8f150246-9f43-457b-b677-d28fcc92bc1e,2,Tagesgeld,"- Welche Daten sollen abgebildet werden
+- Datenbank ggb. erweitern
+- Aufbau",abgeschlossen,42987,false,,2026-07-25 14:51:31.529311+02,mittel,,2026-08-01 11:53:35.829+02,2026-08-08 14:35:58.401+02,Aktiva_Liquidität&Geldmarkt,"Löschen von Datensätzen
+ser Nachricht beim einloggen wie lange noch bisr zum Spazeil erreichen"
+38914f4f-d276-4fc5-81a6-8302f1ef2e41,8f150246-9f43-457b-b677-d28fcc92bc1e,14,Fahrzeuge,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:56:36.385944+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+3c642f0c-63c1-4460-9362-51acf2b155be,8f150246-9f43-457b-b677-d28fcc92bc1e,73,Dispo-Warnsystem & Zinsfresser-Radar,Eingabefeld für bankenspezifischen Dispo-Zinssatz im Konto-Stammdaten-View hinzufügenPrüflogik auf negativen Kontostand (kontostand < 0) einbauenTägliche Zinslast berechnen: $(\vert{}\text{Saldo}\vert{} \times \text{Zinssatz}) / 360$UI-Warnbanner bei aktivem Dispo mit aufsummierten Monatskosten anzeigen,offen,0,false,,2026-09-03 17:52:21.871714+02,mittel,,,,Aktiva_Liquidität&Geldmarkt,
+3d110234-174c-4c63-98d7-509dae6fc505,8f150246-9f43-457b-b677-d28fcc92bc1e,45,Login,"- Design anpassen
+- 2 FA",abgeschlossen,2700,false,,2026-07-25 15:07:38.275213+02,hoch,,2026-07-26 15:19:56.534+02,2026-07-26 15:19:58.62+02,Hauptbereiche,
+4135a620-a96f-4383-aa86-011df9cdea56,8f150246-9f43-457b-b677-d28fcc92bc1e,55,Chartanalyse,Analyse eines Charts durch Linien etc.,offen,0,false,,2026-08-02 15:10:32.334754+02,niedrig,,,,Aktiva_Wertpapiere&Derivate,
+42328f88-fc79-49b1-884c-2be209585720,8f150246-9f43-457b-b677-d28fcc92bc1e,4,Geldmarktfonds,"- Welche Daten sollen abgebildet werden
+- Datenbanktabelle aufbauen
+- Code anpassen",offen,0,false,,2026-07-25 14:53:40.240393+02,mittel,,,,Aktiva_Wertpapiere&Derivate,
+4478436e-f202-474b-aa9f-5196a68ef4e0,8f150246-9f43-457b-b677-d28fcc92bc1e,53,Interesse,"tmp Daten beispielsweise bei Immobilen wo ein Kaufinteresse besteht, zum rechnen etc",offen,0,false,,2026-08-02 15:10:02.58549+02,niedrig,,,,alle Seiten,
+44ec8fe1-2b99-4fc3-ae2c-a7dbdcd1fe92,8f150246-9f43-457b-b677-d28fcc92bc1e,35,KfW,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:02:48.680463+02,mittel,,,,Passiva_Kredite&Schulden,
+45471be3-7978-4a13-a6ae-bd1f0aed383c,8f150246-9f43-457b-b677-d28fcc92bc1e,34,Immobiliendarlehen,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:02:35.974294+02,mittel,,,,Passiva_Kredite&Schulden,
+4d76a9bf-9c7f-4802-b2b1-71b668806541,8f150246-9f43-457b-b677-d28fcc92bc1e,74,Intelligenter Notgroschen-Manager (Buffer Calculator),"Mittelwert-Berechnung der als ""Fixkosten"" markierten Ausgaben der letzten 3–6 Monate
+
+Konfigurierbaren Ziel-Faktor (z. B. 3 Monatsausgaben) im UI anbieten
+
+Soll/Ist-Vergleich des aktuellen Giro- bzw. Tagesgeld-Guthabens darstellen
+
+Indikator für ""Unterdeckung"" oder ""Überdeckung"" (Liquiditätsüberschuss) integrieren",offen,0,false,,2026-09-03 17:52:52.903698+02,mittel,,,,Aktiva_Liquidität&Geldmarkt,
+58cdb904-8f8d-4bdc-9279-3e0a0583680d,8f150246-9f43-457b-b677-d28fcc92bc1e,75,B2B / Privat-Splitting für Mischkonten,"Datenbank-Feld nutzungstyp (privat | gewerblich | mischung) in girokonto_transaktionen ergänzen
+
+UI-Toggle / Dropdown in der Transaktionsliste einbauen
+
+Option zur prozentualen Aufteilung einzelner Buchungen integrieren
+
+Filterlogik für Auswertungen (Nur Privat vs. Nur Gewerblich) anpassen",offen,0,false,,2026-09-03 17:53:13.754753+02,niedrig,,2026-09-03 17:53:41.048+02,2026-09-03 17:53:42.397+02,Aktiva_Liquidität&Geldmarkt,
+5c0480cb-32fb-4a92-b008-384064906d37,8f150246-9f43-457b-b677-d28fcc92bc1e,29,Lebensversicherung,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:00:59.118798+02,mittel,,,,Aktiva_Vorsorge&Verträge,
+624c52da-f1a4-465e-b288-a6e2adaaaf71,8f150246-9f43-457b-b677-d28fcc92bc1e,11,Immobilien,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:56:06.513535+02,mittel,,,,Aktiva_Immobilien&Sachwerte,
+6912f2ba-a930-4c36-b380-d20f22975930,8f150246-9f43-457b-b677-d28fcc92bc1e,66,Löschen von Daten anpassen,,abgeschlossen,1200,false,,2026-08-09 10:53:25.08037+02,hoch,,,,alle Seiten,Transaktionsprotokoll einbinden
+6a48c384-5046-413d-8fda-dbb653b8b6d7,8f150246-9f43-457b-b677-d28fcc92bc1e,78,Zins-Ablauf-Warner & Realzins-Tracker (Tagesgeld),"Eingabefelder für Aktionszins, Ablaufdatum und Folgezinssatz im Tagesgeld-Stammdaten-View erstellen
+
+Ablauf-Timer & Erinnerungs-Banner im Dashboard vor Zinsende integrieren
+
+Inflations-Gegenrechnung (Nominalzins vs. Inflation) als rein informative Kennzahl darstellen",offen,0,false,,2026-09-03 18:07:46.962167+02,mittel,,,,Aktiva_Liquidität&Geldmarkt,
+6b28dda4-f059-4688-a261-1561f20abb74,8f150246-9f43-457b-b677-d28fcc92bc1e,3,Festgeld,"- Welche Daten sollen abgebildet werden
+- Datenbanktabelle aufbauen
+- Code anpassen",abgeschlossen,14386,false,,2026-07-25 14:53:28.922821+02,mittel,,2026-08-16 10:57:40.255+02,2026-08-16 11:57:26.294+02,Aktiva_Liquidität&Geldmarkt,"- Seicherfunktion anpassen
+- Design"
+6e33600a-aa61-48ad-9afa-6845ea2bc1f7,8f150246-9f43-457b-b677-d28fcc92bc1e,69,Währungsrechner auf Detail- & Dashboard-Ebene,"UI-Komponente für Währungsumrechnung erstellen (Input Betrag, Select Quell-/Zielwährung)Stichtag-Auswahl einbauen (Standard: aktuellster EZB-Kurs)Abfrage an Supabase tageskurs mit handleApiError anbindenBidirektionale Umrechnung (EUR $\leftrightarrow$ Fremdwährung) berechnen",offen,0,false,,2026-09-03 17:38:52.61882+02,hoch,,,,Aktiva_Liquidität&Geldmarkt,
+6fecea29-f77f-41fb-bebf-2c19d708627a,8f150246-9f43-457b-b677-d28fcc92bc1e,62,Mischfonds,"falls keine spezifisches Daten vorhanden, die Fondsdaten also manuell angelegt werden auch Verteilungen der Assets (besonders beim Mischfonds) beachten",offen,0,false,,2026-08-02 15:12:34.954713+02,niedrig,,,,Aktiva_Wertpapiere&Derivate,
+730dd808-1ba0-4dfb-9989-bfb20f4524fa,8f150246-9f43-457b-b677-d28fcc92bc1e,61,Interessenten Immobilien,Vermieter/Verkäufer legen ein Interessentenprofil an. Sie erhalten einen Link für das Exposé. Mögliche Interessenten können sich darüber bewerben und können so im System schneller nach passend/nicht passend gefiltert werden (übereinstimmend zu …%),offen,0,false,,2026-08-02 15:12:08.258643+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+73c23f30-c455-498a-8721-f04493a30a1a,8f150246-9f43-457b-b677-d28fcc92bc1e,39,Privatschulden,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:03:25.739879+02,niedrig,,,,Passiva_Kredite&Schulden,
+7634e4b2-c3a2-4500-b93f-a940c9485627,8f150246-9f43-457b-b677-d28fcc92bc1e,15,Sammlerstüke,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:56:47.043432+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+7d0f56ca-514b-4a17-995d-e882d5681957,8f150246-9f43-457b-b677-d28fcc92bc1e,6,Aktien,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:54:32.990217+02,mittel,,,,Aktiva_Wertpapiere&Derivate,
+823a3a5d-8e60-4459-8554-2826b5956975,8f150246-9f43-457b-b677-d28fcc92bc1e,72,Multi-Währungs-Benchmarking (Vergleichs-Chart),"Recharts-Komponente um zweite <Line/> erweitern
+
+Prozentuale Normalisierung der Kurse (Basis 100% am Starttag) berechnen
+
+Dropdown zur Auswahl einer zweiten Vergleichswährung hinzufügen",offen,0,false,,2026-09-03 17:40:16.857209+02,niedrig,,,,Aktiva_Liquidität&Geldmarkt,
+838c9c69-f3b5-4f23-b2be-1a87b19943e3,8f150246-9f43-457b-b677-d28fcc92bc1e,58,Rückzahlung,Benachrichtigungen wenn die Rückzahlungen nicht wie geplant kamen,offen,0,false,,2026-08-02 15:11:18.104119+02,niedrig,,,,Aktiva_Liquidität&Geldmarkt,
+83bc8398-e0f5-4e85-bfd7-bff99c7dd27f,8f150246-9f43-457b-b677-d28fcc92bc1e,41,Bereich Steuern & Risiko,Plannung,offen,0,false,,2026-07-25 15:05:59.302825+02,mittel,,,,Hauptbereiche,
+8bb3b442-6190-4b42-af0e-09d9182ad7eb,8f150246-9f43-457b-b677-d28fcc92bc1e,21,Unternehmen,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:58:50.572431+02,niedrig,,,,Aktiva_Buisness&forderungen,
+8c883506-e862-4072-a496-ef3d82d5188d,8f150246-9f43-457b-b677-d28fcc92bc1e,44,Zeiterfassung,- Funktionserweiterungen,abgeschlossen,900,false,,2026-07-25 15:07:12.115824+02,niedrig,,,,Hauptbereiche,
+8d3be476-069b-48b5-aa7d-0aabf6d2412d,8f150246-9f43-457b-b677-d28fcc92bc1e,59,Miete,Benachrichtigungen wenn die Miete nicht gezahlt wurde,offen,1,false,,2026-08-02 15:11:33.369829+02,niedrig,,2026-08-02 15:14:15.7+02,2026-08-02 15:14:17.028+02,Aktiva_Immobilien&Sachwerte,
+912a99c1-2e4c-46e9-bdaf-ba6cbd4adec3,8f150246-9f43-457b-b677-d28fcc92bc1e,76,Bankgebühren- & Kontomodell-Analyst,"Filter-Abfrage für Buchungen mit Kategorien wie ""Kontoführung"", ""Kartengebühr"", ""Geldautomat""
+
+Jährliche Gesamtsumme aller Bankgebühren berechnen und im Konto-Dashboard anzeigen
+
+Vergleichsansicht bei mehreren verknüpften Konten erstellen",offen,0,false,,2026-09-03 17:54:25.37897+02,niedrig,,,,Aktiva_Liquidität&Geldmarkt,
+949789bf-950e-4707-a30d-17e1007d6645,8f150246-9f43-457b-b677-d28fcc92bc1e,60,Listen,"Checklisten für Käufer, Besichtigungen, etc",offen,0,false,,2026-08-02 15:11:49.78835+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+94e2f9cd-38da-44a4-bd25-b25e58765f9f,8f150246-9f43-457b-b677-d28fcc92bc1e,7,ETFs,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:54:41.00069+02,mittel,,,,Aktiva_Wertpapiere&Derivate,
+98c8140b-4238-4981-b74e-b4e0e149ba5c,8f150246-9f43-457b-b677-d28fcc92bc1e,27,Gutscheine,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:00:01.001494+02,niedrig,,,,Aktiva_Buisness&forderungen,
+9bbbeb7b-57e5-4564-bdfb-61390c157265,8f150246-9f43-457b-b677-d28fcc92bc1e,71,Kurs-Alerts & Schwellenwerte,"Tabelle kurs_alerts in Supabase anlegen (User-ID, Code, Zielkurs, Condition)
+
+Trigger / Prüfung nach täglichem EZB-Import aufsetzen
+
+UI zur Verwaltung eigener Alerts im Frontend bauen
+
+In-App-Benachrichtigung bei Erreichen auslösen",offen,0,false,,2026-09-03 17:39:52.387027+02,niedrig,,,,Aktiva_Liquidität&Geldmarkt,
+9ffeb0a2-eb12-4bbf-857e-27b22dc49cb7,8f150246-9f43-457b-b677-d28fcc92bc1e,43,Bereich Support,"- Design
+- senden einer Mail beim abschicken",in_bearbeitung,0,false,,2026-07-25 15:06:48.454035+02,hoch,,,,Hauptbereiche,
+a62262c3-0d9a-48ce-b1e8-5757547d6121,8f150246-9f43-457b-b677-d28fcc92bc1e,46,Admin Seite,Plannung,offen,0,false,,2026-07-25 15:07:59.032711+02,niedrig,,,,Begleitende Seite,
+a7d05f2f-2299-4460-9afc-acce8eb083a9,8f150246-9f43-457b-b677-d28fcc92bc1e,52,Dokumente,Ablage von Dokumenten wie Verträge,offen,0,false,,2026-08-02 15:09:44.548116+02,niedrig,,,,alle Seiten,
+adfa90c5-d9da-4a83-8294-73721f806bd4,8f150246-9f43-457b-b677-d28fcc92bc1e,9,Mitarbeiteranteile,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:55:07.262763+02,niedrig,,,,Aktiva_Wertpapiere&Derivate,
+aeb87134-0b2a-4896-9249-3a69fae49656,8f150246-9f43-457b-b677-d28fcc92bc1e,20,Firmenbeteiligung,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:58:34.235799+02,niedrig,,,,Aktiva_Buisness&forderungen,
+b00a8187-0b55-4342-8bba-ab3b5e6fbee7,8f150246-9f43-457b-b677-d28fcc92bc1e,36,Konsumschulden,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:02:58.777467+02,mittel,,,,Passiva_Kredite&Schulden,
+b3fcb214-4235-4ddd-8b55-225883b094d1,8f150246-9f43-457b-b677-d28fcc92bc1e,12,Edelmetalle,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:56:19.704268+02,mittel,,,,Aktiva_Immobilien&Sachwerte,
+bbda6088-036f-47d1-b243-6c70b9ab5791,8f150246-9f43-457b-b677-d28fcc92bc1e,26,Private Forderungen,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:59:52.563575+02,niedrig,,,,Aktiva_Buisness&forderungen,
+c7847351-156b-4b36-8a7a-7a28f90ff233,8f150246-9f43-457b-b677-d28fcc92bc1e,38,Kreditkartenschulden,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:03:17.607235+02,mittel,,,,Passiva_Kredite&Schulden,
+c9336014-f7ea-4128-89dc-e014aca73734,8f150246-9f43-457b-b677-d28fcc92bc1e,22,IP,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:58:59.349469+02,niedrig,,,,Aktiva_Buisness&forderungen,
+c9d97ae2-6833-4807-8249-d855eeb2dd7d,8f150246-9f43-457b-b677-d28fcc92bc1e,23,Patente,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:59:11.616668+02,niedrig,,,,Aktiva_Buisness&forderungen,
+cb9339da-8ed5-4c36-aa77-5912d153b700,8f150246-9f43-457b-b677-d28fcc92bc1e,31,Staatliche Vorsorge,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:01:24.98904+02,mittel,,,,Aktiva_Vorsorge&Verträge,
+cc849b20-a91a-4a50-af1c-83e2ceb0cf22,8f150246-9f43-457b-b677-d28fcc92bc1e,51,Definitionen,Jedes Feld bekommt eine Definition die durch Hovern sichtbar wird,offen,0,false,,2026-08-02 15:09:30.097262+02,niedrig,,,,alle Seiten,
+db50520a-f85b-45eb-9242-eb0a1ec86fe5,8f150246-9f43-457b-b677-d28fcc92bc1e,56,Verträge,Benachrichtigungen vor Vertragsende oder Vertragsanpassungen,offen,0,false,,2026-08-02 15:10:48.230042+02,niedrig,,,,alle Seiten,
+dcef4376-15b1-4c67-9a32-501d44eee90f,8f150246-9f43-457b-b677-d28fcc92bc1e,28,Bonuspunkte,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:00:09.645381+02,niedrig,,,,Aktiva_Buisness&forderungen,
+dfc733cc-a3f5-46df-a1f0-31188bea703b,8f150246-9f43-457b-b677-d28fcc92bc1e,18,NFTs,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:57:43.007178+02,mittel,,,,Aktiva_Web3&Krypto,
+e0825377-6b75-4a29-aa89-7dc6d208f6dc,8f150246-9f43-457b-b677-d28fcc92bc1e,57,Sicherheit,Benachrichtigungen bei großen Abbuchungen,offen,0,false,,2026-08-02 15:11:05.670735+02,niedrig,,,,Aktiva_Liquidität&Geldmarkt,
+e79c1e96-46e1-460d-be12-a64b99c15524,8f150246-9f43-457b-b677-d28fcc92bc1e,37,Autoschulden,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:03:08.354701+02,mittel,,,,Passiva_Kredite&Schulden,
+e8d25d19-4c0b-4bc2-8cb8-7dc91fcd1326,8f150246-9f43-457b-b677-d28fcc92bc1e,24,Digitale Besitztümer,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:59:24.9809+02,niedrig,,,,Aktiva_Buisness&forderungen,
+ec26c818-a716-4dfc-a268-fd062e17cce7,8f150246-9f43-457b-b677-d28fcc92bc1e,30,Rentenversicherung,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 15:01:15.170039+02,mittel,,,,Aktiva_Vorsorge&Verträge,
+f3d2296c-f547-4dba-b965-2e530a709dfe,8f150246-9f43-457b-b677-d28fcc92bc1e,63,Girokonto,- wiederkehrend prüfen,in_bearbeitung,13600,false,,2026-08-05 18:01:38.979049+02,dringend,,,,Aktiva_Liquidität&Geldmarkt,
+f60ca76e-9b18-4652-b07a-bc8d78ddbfea,8f150246-9f43-457b-b677-d28fcc92bc1e,10,Genossenschaftsanteile,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:55:27.599906+02,niedrig,,,,Aktiva_Wertpapiere&Derivate,
+f6a87fdb-f042-412a-bbf8-0e533f968dd0,8f150246-9f43-457b-b677-d28fcc92bc1e,49,Weltkarte,Zum Anfang wird eine Weltkarte angezeigt. Auf dieser werden alle Länder in denen der User Immobilen hat durch eine Pinnadel markiert. Klickt der User diese an wird auf das Land reingezoomt. Hier werden dann alle Städte markiert wo Immos in Besitz sind. Klickt der User dann auf eine von diesen wird auf die Stadt gezoomt. Hier werden dann alle Immos makiert. Der User kann also wie bei Maps bis auf das Haus zoomen,offen,0,false,,2026-08-02 15:08:29.138356+02,niedrig,,,,Aktiva_Immobilien&Sachwerte,
+f6d8ebe3-5cc9-43e1-8b31-a5e930080fa0,8f150246-9f43-457b-b677-d28fcc92bc1e,25,Private Darlehen,"- Welche Daten sollen abgebildet werden 
+- Datenbanktabelle aufbauen 
+- Code anpassen",offen,0,false,,2026-07-25 14:59:39.338663+02,niedrig,,,,Aktiva_Buisness&forderungen,
+fa5f6fe4-2a63-4873-ac1f-135d6d000066,8f150246-9f43-457b-b677-d28fcc92bc1e,47,Info Seite,Planung,offen,0,false,,2026-07-25 16:23:25.992344+02,niedrig,,,,Begleitende Seite,
+fb393451-8d96-49a3-bad3-904b4379986d,8f150246-9f43-457b-b677-d28fcc92bc1e,64,Redesign,"- jede Seite/unterseiteprüfen, ggb. Felder hinzufügen/rausnehmen
+- Design Farben etc anpassen",offen,0,false,,2026-08-05 18:02:48.061092+02,hoch,,,,alle Seiten,
+fcf58b73-2e6e-4670-826f-a37c7ae8dc42,8f150246-9f43-457b-b677-d28fcc92bc1e,68,Dokumente erstellen,"Exposés und weitere Dokumente über die Webseite erstellen. 
+Farben sollen anpassbar sein",offen,0,false,,2026-08-10 22:03:41.095938+02,hoch,,,,Aktiva_Immobilien&Sachwerte,

@@ -1,0 +1,4 @@
+id,benutzer_id,name,typ,eltern_kategoire_id,farbe,symbol,erstellt_am,ist_vordefiniert,sichtbar
+1229007e-2b2b-4b50-878e-741eb0fd68e7,8f150246-9f43-457b-b677-d28fcc92bc1e,test2,,,,,2026-07-15 18:11:53.778+02,false,true
+b6810413-4ada-4e34-8e8a-79c450bc3226,8f150246-9f43-457b-b677-d28fcc92bc1e,test,,,,,2026-07-04 17:26:14.675+02,false,true
+d5473c35-2e52-41ef-82a2-3eef5aff038f,8f150246-9f43-457b-b677-d28fcc92bc1e,Einzahlung bei Eröffnung,,,,,2026-07-23 17:59:58+02,true,false
