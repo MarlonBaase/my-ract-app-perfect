@@ -1,3 +1,5 @@
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -7,4 +9,4 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase URL oder Anon Key fehlen in den Umgebungsvariablen!')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+window.supabase = supabase
