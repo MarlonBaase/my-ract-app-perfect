@@ -9,7 +9,7 @@ const navStruktur = [
   },
   {
     label: 'Fremdwährungskonto',
-    path: '/assetklassen/lf/fremdwaehrung/fremdwaehrung_konto',
+    path: '/assetklassen/lf/fremdwaehrung/Fremdwaehrung_konto',
     unterseiten: []
   },
   
