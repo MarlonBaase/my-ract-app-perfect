@@ -39,7 +39,8 @@ export default function Zeiterfassung() {
     "Passiva_Kredite&Schulden",
     "Hauptbereiche",
     "Begleitende Seite",
-    "alle Seiten"
+    "alle Seiten",
+    "infrastruktur"
   ];
 
   const verfuegbareBereiche = Array.from(
