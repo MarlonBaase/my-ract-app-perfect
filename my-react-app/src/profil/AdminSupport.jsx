@@ -46,7 +46,7 @@ export default function AdminSupport() {
   const handleStatusChange = async (ticketId, newStatus) => {
     const { error } = await supabase
       .from('support_tickets')
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .update({ status: newStatus, aktualisiert_am: new Date().toISOString() })
       .eq('id', ticketId);
 
     if (error) {
