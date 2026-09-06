@@ -70,6 +70,10 @@ export default function FremdwaehrungKonto() {
 
         if (handleApiError(error, "Waehrung laden")) return;
         if (data) setListeWaehrung(data);
+
+        if (data === null || data.length === 0) {
+            console.warn("Keine Währungen in der Datenbank gefunden.");
+        }
     };
 
     const ladeAssets = async () => {
