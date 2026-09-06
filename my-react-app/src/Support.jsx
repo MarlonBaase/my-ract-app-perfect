@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { supabase } from '../supabaseClient'; 
+import { supabase } from "../supabase";
 
 export default function Support() {
   const [titel, setTitel] = useState('');
