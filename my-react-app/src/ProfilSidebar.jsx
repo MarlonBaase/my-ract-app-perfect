@@ -39,12 +39,12 @@ const struktur = [
     ]
   },
   {
-    block: "Ticket-Dashboard",
+    block: "Admin-Support",
     farbe: "#c02ba5",
     bereiche: [
       {
-        label: "Ticket-Dashboard",
-        path: "/profil/ticket-dashboard",
+        label: "Admin-Support",
+        path: "/profil/admin-support",
         unterseiten: [
         ]
       },
