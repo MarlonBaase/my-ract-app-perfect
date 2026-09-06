@@ -29,7 +29,7 @@ export default function Support() {
         .from('support_tickets')
         .insert([
           {
-            user_id: user.id,
+            benutzer_id: user.id,
             titel: titel,
             kategorie: kategorie,
             status: 'offen',
