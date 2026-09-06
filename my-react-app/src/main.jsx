@@ -19,6 +19,8 @@ import Fremdwaehrung_konto from './assetklassen/Fremdwaehrung_konto'
 import Haushaltsbuch from './haushaltsbuch'
 import Profil from './Profil'
 import Konfiguration from './profil/konfiguration'
+import Zeiterfassung from './profil/Zeiterfassung'
+import TicketDashboard from './profil/TicketDashboard'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
@@ -111,6 +113,7 @@ function App() {
             <Route path="/profil" element={<Profil darkMode={darkMode} />}>
               <Route path="konfiguration" element={<Konfiguration darkMode={darkMode} setDarkMode={setDarkMode} />} />
               <Route path="zeiterfassung" element={<Zeiterfassung darkMode={darkMode} setDarkMode={setDarkMode} />} />
+              <Route path="ticket-dashboard" element={<TicketDashboard darkMode={darkMode} setDarkMode={setDarkMode} />} />
             </Route>
             <Route path="/simulation" element={<Simulation darkMode={darkMode} />} />
             <Route path="/support" element={<Support darkMode={darkMode} />} />

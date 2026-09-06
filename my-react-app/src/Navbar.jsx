@@ -55,7 +55,8 @@ const navStruktur = [
     unterseiten: [
       { label: 'Einstellungen', path: '/profil/einstellungen' },
       { label: 'Konfiguration', path: '/profil/konfiguration' },
-      { label: 'Zeiterfassung', path: '/profil/zeiterfassung'}
+      { label: 'Zeiterfassung', path: '/profil/zeiterfassung' },
+      { label: 'Ticket-Dashboard', path: '/profil/ticket-dashboard' }
     ]
   },
 

@@ -37,6 +37,18 @@ const struktur = [
         ]
       },
     ]
+  },
+  {
+    block: "Ticket-Dashboard",
+    farbe: "#c02ba5",
+    bereiche: [
+      {
+        label: "Ticket-Dashboard",
+        path: "/profil/ticket-dashboard",
+        unterseiten: [
+        ]
+      },
+    ]
   }
 ]
  
