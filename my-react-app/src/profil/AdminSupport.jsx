@@ -149,7 +149,7 @@ export default function AdminSupport() {
                   Kat: {t.kategorie} | Status: <strong>{t.status}</strong>
                 </div>
                 <div style={{ fontSize: '0.75em', color: '#666', marginTop: '4px' }}>
-                  User: {t.user_id.substring(0, 8)}...
+                  User: {t.erstellt_am.substring(0, 8)}...
                 </div>
               </div>
             ))
@@ -163,7 +163,7 @@ export default function AdminSupport() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
                 <div>
                   <h3 style={{ margin: 0 }}>{selectedTicket.titel}</h3>
-                  <span style={{ fontSize: '0.8em', color: '#888' }}>User-ID: {selectedTicket.user_id}</span>
+                  <span style={{ fontSize: '0.8em', color: '#888' }}>User-ID: {selectedTicket.erstellt_am}</span>
                 </div>
                 <div>
                   <label style={{ marginRight: '8px' }}>Status:</label>
