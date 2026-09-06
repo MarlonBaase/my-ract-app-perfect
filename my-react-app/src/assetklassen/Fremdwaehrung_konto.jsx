@@ -732,11 +732,12 @@ export default function FremdwaehrungKonto() {
                                     <label>Währung*</label>
                                     <select value={waehrung} onChange={(e) => setWaehrung(e.target.value)}>
                                         <option value="">Wählen Sie eine Währung</option>
-                                        {console.log("Liste der Währungen:", listeWaehrung)}
                                         {listeWaehrung.map((e) => {
-                                           <option key={e.waehrungs_code} value={e.waehrungs_code}>
-                                            {e.name} ({e.symbol})
-                                           </option>
+                                           return (
+                                               <option key={e.waehrungs_code} value={e.waehrungs_code}>
+                                                   {e.name} ({e.symbol})
+                                               </option>
+                                           );
                                         })}
                                     </select>
                                 </div>
