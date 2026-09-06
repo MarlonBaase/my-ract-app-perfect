@@ -724,21 +724,16 @@ export default function FremdwaehrungKonto() {
                                     <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
                                 </div>
 
-                                <div className="form-group">
-                                    {listeWaehrung.map((e) => {
-                                        const gefundeneWaehrung = listeWaehrung.find(w => w.waehrungs_code === e.waehrungs_code);
-                                        const waehrungsSymbol = gefundeneWaehrung ? gefundeneWaehrung.symbol : "";
-
-                                        return (
-                                            <div>
-                                                <label>Währung*</label>
-                                                <option key={e.waehrungs_code} value={e.waehrungs_code}>
-                                                    {waehrungsSymbol} - {e.waehrungs_name}
-                                                </option>
-                                            </div>
-
-                                        );
-                                    })}
+                                <div className="form-group col-span-2">
+                                    <label>Währung*</label>
+                                    <select value={waehrung} onChange={(e) => setWaehrung(e.target.value)}>
+                                        <option value="">Wählen Sie eine Währung</option>
+                                        {listeWaehrung.map((e) => {
+                                           <option key={e.waehrungs_code} value={e.waehrungs_code}>
+                                            {e.name} ({e.symbol})
+                                           </option>
+                                        })}
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
