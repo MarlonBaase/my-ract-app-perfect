@@ -17,7 +17,7 @@ export default function AdminSupport() {
     let query = supabase
       .from('support_tickets')
       .select('*, support_nachrichten(*)')
-      .order('created_at', { ascending: false });
+      .order('erstellt_am', { ascending: false });
 
     if (statusFilter !== 'alle') {
       query = query.eq('status', statusFilter);
@@ -94,7 +94,7 @@ export default function AdminSupport() {
   // Nachrichten innerhalb des ausgewählten Tickets chronologisch sortieren
   const sortedMessages = selectedTicket?.support_nachrichten
     ? [...selectedTicket.support_nachrichten].sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        (a, b) => new Date(a.erstellt_am) - new Date(b.erstellt_am)
       )
     : [];
 
@@ -193,7 +193,7 @@ export default function AdminSupport() {
                     }}
                   >
                     <div style={{ fontSize: '0.75em', opacity: 0.8, marginBottom: '4px' }}>
-                      {n.ist_admin ? 'Admin (Du)' : 'Kunde'} • {new Date(n.created_at).toLocaleString('de-DE')}
+                      {n.ist_admin ? 'Admin (Du)' : 'Kunde'} • {new Date(n.erstellt_am).toLocaleString('de-DE')}
                     </div>
                     <div>{n.nachricht}</div>
                   </div>
