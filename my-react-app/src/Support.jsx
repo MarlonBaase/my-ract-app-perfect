@@ -33,7 +33,7 @@ export default function Support() {
       const { data, error } = await supabase
         .from('support_tickets')
         .select('*, support_nachrichten(*)')
-        .order('created_at', { ascending: false });
+        .order('erstellt_am', { ascending: false });
 
       if (error) throw error;
 
@@ -75,7 +75,7 @@ export default function Support() {
         .from('support_tickets')
         .insert([
           {
-            user_id: user.id, // Falls deine Spalte in Supabase 'user_id' heißt
+            benutzer_id: user.id, // Falls deine Spalte in Supabase 'benutzer_id' heißt
             titel: titel,
             kategorie: kategorie,
             status: 'offen',
@@ -146,7 +146,7 @@ export default function Support() {
   // Sortierung der Nachrichten für den Chatverlauf
   const sortedMessages = selectedTicket?.support_nachrichten
     ? [...selectedTicket.support_nachrichten].sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        (a, b) => new Date(a.erstellt_am) - new Date(b.erstellt_am)
       )
     : [];
 
@@ -296,7 +296,7 @@ export default function Support() {
                             }}
                           >
                             <div style={{ fontSize: '0.7em', opacity: 0.7, marginBottom: '2px' }}>
-                              {m.ist_admin ? 'Support Team' : 'Du'} • {new Date(m.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                              {m.ist_admin ? 'Support Team' : 'Du'} • {new Date(m.erstellt_am).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                             </div>
                             <div style={{ fontSize: '0.9em', color: '#fff' }}>{m.nachricht}</div>
                           </div>
