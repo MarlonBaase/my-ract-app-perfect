@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAdminTickets, updateTicketStatus, sendAdminReply } from './adminSupportService'; 
+import { getAdminTickets, updateTicketStatus, sendAdminReply } from '../service/adminSupportService'; 
 
 export default function AdminSupport() {
   const [tickets, setTickets] = useState([]);

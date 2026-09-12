@@ -7,7 +7,7 @@ import {
   startSetup2FA,
   enableMfa,
   disableMfa
-} from './services/konfigurationService';
+} from '../services/konfigurationService';
 import { SettingsContext } from "../SettingsContext";
 
 
