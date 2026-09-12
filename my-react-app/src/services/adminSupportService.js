@@ -8,7 +8,7 @@ export async function getAdminTickets(statusFilter = 'alle') {
   let query = supabase
     .from('support_tickets')
     .select('*, support_nachrichten(*)')
-    .order('created_at', { ascending: false });
+    .order('erstellt_am', { ascending: false });
 
   if (statusFilter !== 'alle') {
     query = query.eq('status', statusFilter);
