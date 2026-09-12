@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from "../supabase"; 
+import { getAdminTickets, updateTicketStatus, sendAdminReply } from './adminSupportService'; 
 
 export default function AdminSupport() {
   const [tickets, setTickets] = useState([]);
@@ -9,92 +9,69 @@ export default function AdminSupport() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // 1. Tickets aus Supabase laden
+  // 1. Tickets über den Service laden
   const loadAdminTickets = async () => {
     setLoading(true);
     setErrorMsg('');
 
-    let query = supabase
-      .from('support_tickets')
-      .select('*, support_nachrichten(*)')
-      .order('erstellt_am', { ascending: false });
-
-    if (statusFilter !== 'alle') {
-      query = query.eq('status', statusFilter);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setTickets(data || []);
+    try {
+      const data = await getAdminTickets(statusFilter);
+      setTickets(data);
+      
       // Aktualisiertes selektiertes Ticket im State behalten
       if (selectedTicket) {
         const updated = data.find((t) => t.id === selectedTicket.id);
         setSelectedTicket(updated || null);
       }
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     loadAdminTickets();
   }, [statusFilter]);
 
-  // 2. Status des Tickets aktualisieren
+  // 2. Status des Tickets über den Service aktualisieren
   const handleStatusChange = async (ticketId, newStatus) => {
-    const { error } = await supabase
-      .from('support_tickets')
-      .update({ status: newStatus, aktualisiert_am: new Date().toISOString() })
-      .eq('id', ticketId);
-
-    if (error) {
-      alert('Fehler beim Ändern des Status: ' + error.message);
-    } else {
+    try {
+      await updateTicketStatus(ticketId, newStatus);
       loadAdminTickets();
+    } catch (error) {
+      alert('Fehler beim Ändern des Status: ' + error.message);
     }
   };
 
-  // 3. Als Admin auf Nachricht antworten
+  // 3. Als Admin auf Nachricht antworten über den Service
   const handleSendReply = async (e) => {
     e.preventDefault();
     if (!replyText.trim() || !selectedTicket) return;
 
-    const { data: userData } = await supabase.auth.getUser();
-    const adminUser = userData?.user;
-
-    if (!adminUser) {
-      alert('Nicht als Admin eingeloggt!');
-      return;
-    }
-
-    const { error } = await supabase.from('support_nachrichten').insert([
-      {
-        ticket_id: selectedTicket.id,
-        sender_id: adminUser.id,
+    try {
+      await sendAdminReply({
+        ticketId: selectedTicket.id,
         nachricht: replyText,
-        ist_admin: true,
-      },
-    ]);
+      });
 
-    if (error) {
-      alert('Fehler beim Senden: ' + error.message);
-    } else {
       setReplyText('');
+      
       // Status automatisch auf 'in_bearbeitung' setzen, falls er 'offen' war
       if (selectedTicket.status === 'offen') {
         await handleStatusChange(selectedTicket.id, 'in_bearbeitung');
       } else {
         loadAdminTickets();
       }
+    } catch (error) {
+      alert('Fehler beim Senden: ' + error.message);
     }
   };
 
   // Nachrichten innerhalb des ausgewählten Tickets chronologisch sortieren
   const sortedMessages = selectedTicket?.support_nachrichten
     ? [...selectedTicket.support_nachrichten].sort(
-        (a, b) => new Date(a.erstellt_am) - new Date(b.erstellt_am)
+        (a, b) => new Date(a.created_at || a.erstellt_am) - new Date(b.created_at || b.erstellt_am)
       )
     : [];
 
@@ -149,7 +126,7 @@ export default function AdminSupport() {
                   Kat: {t.kategorie} | Status: <strong>{t.status}</strong>
                 </div>
                 <div style={{ fontSize: '0.75em', color: '#666', marginTop: '4px' }}>
-                  User: {t.erstellt_am.substring(0, 8)}...
+                  Erstellt: {new Date(t.created_at || t.erstellt_am).toLocaleDateString('de-DE')}
                 </div>
               </div>
             ))
@@ -163,7 +140,9 @@ export default function AdminSupport() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
                 <div>
                   <h3 style={{ margin: 0 }}>{selectedTicket.titel}</h3>
-                  <span style={{ fontSize: '0.8em', color: '#888' }}>User-ID: {selectedTicket.erstellt_am}</span>
+                  <span style={{ fontSize: '0.8em', color: '#888' }}>
+                    Erstellt am: {new Date(selectedTicket.created_at || selectedTicket.erstellt_am).toLocaleString('de-DE')}
+                  </span>
                 </div>
                 <div>
                   <label style={{ marginRight: '8px' }}>Status:</label>
@@ -193,7 +172,7 @@ export default function AdminSupport() {
                     }}
                   >
                     <div style={{ fontSize: '0.75em', opacity: 0.8, marginBottom: '4px' }}>
-                      {n.ist_admin ? 'Admin (Du)' : 'Kunde'} • {new Date(n.erstellt_am).toLocaleString('de-DE')}
+                      {n.ist_admin ? 'Admin (Du)' : 'Kunde'} • {new Date(n.created_at || n.erstellt_am).toLocaleString('de-DE')}
                     </div>
                     <div>{n.nachricht}</div>
                   </div>

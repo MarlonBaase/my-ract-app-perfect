@@ -1,11 +1,13 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet } from 'react-router-dom';
+import { getLfLayoutTitle } from './services/lfService';
 
 export default function Lf() {
+  const pageTitle = getLfLayoutTitle();
+
   return (
     <div>
-      <h2>Liquidität & Forderungen</h2>
-      
+      <h2>{pageTitle}</h2>
       <Outlet />
     </div>
-  )
+  );
 }

@@ -1,9 +1,13 @@
-import { Outlet } from 'react-router-dom'
-import ProfilSidebar from './ProfilSidebar'
-import { useState } from 'react'
+import { Outlet } from 'react-router-dom';
+import { useState } from 'react';
+import ProfilSidebar from './ProfilSidebar';
+import { 
+  PROFIL_LAYOUT_CONFIG, 
+  getSidebarToggleLeft 
+} from './services/profilService';
 
 export default function Profil({ darkMode }) {
-  const [sidebarOffen, setSidebarOffen] = useState(true)
+  const [sidebarOffen, setSidebarOffen] = useState(true);
 
   return (
     <div style={{ display: "flex" }}>
@@ -13,10 +17,10 @@ export default function Profil({ darkMode }) {
         onClick={() => setSidebarOffen(!sidebarOffen)}
         style={{
           position: "fixed",
-          bottom: "70px",
-          left: sidebarOffen ? "248px" : "0px",
+          bottom: PROFIL_LAYOUT_CONFIG.toggleButtonBottom,
+          left: getSidebarToggleLeft(sidebarOffen),
           zIndex: 999,
-          backgroundColor: "#4F6EF7",
+          backgroundColor: PROFIL_LAYOUT_CONFIG.toggleButtonColor,
           color: "white",
           border: "none",
           borderRadius: "0 8px 8px 0",
@@ -33,9 +37,16 @@ export default function Profil({ darkMode }) {
       {sidebarOffen && <ProfilSidebar darkMode={darkMode} />}
 
       {/* Inhalt */}
-      <div style={{ flex: 1, overflowY: "auto" , paddingLeft: "50px" , paddingTop: "50px"}}>
+      <div 
+        style={{ 
+          flex: 1, 
+          overflowY: "auto", 
+          paddingLeft: PROFIL_LAYOUT_CONFIG.contentPaddingLeft, 
+          paddingTop: PROFIL_LAYOUT_CONFIG.contentPaddingTop 
+        }}
+      >
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
-import { supabase } from "./supabase";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
+import {
+  ladeTransaktionsProtokoll,
+  ladeKategorien,
+  ladeAssets,
+  transaktionHinzufuegen,
+  eintragLoeschen,
+  eintragSpeichern,
+  ladeWiederkehrende,
+  pruefeWiederkehrende,
+  berechneZeitraumSummen,
+  erstelleLiniendiagrammData,
+  erstelleKreisdiagrammData
+} from "./services/haushaltsbuchService";
 
 export default function Haushaltsbuch() {
   const [kapital, setKapital] = useState(0);
@@ -13,13 +25,14 @@ export default function Haushaltsbuch() {
   const [assets, setAssets] = useState([]);
   const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
   const [kategorien, setKategorien] = useState([]);
+  
   const [modalOffen, setModalOffen] = useState(false);
   const [modalTransaktion, setModalTransaktion] = useState(false);
   const [zuBearbeiten, setZuBearbeiten] = useState(null);
   const [editBeschreibung, setEditBeschreibung] = useState("");
   const [editBetrag, setEditBetrag] = useState("");
   const [editKategorie, setEditKategorie] = useState("");
-  const [wiederkehrende, setWiederkehrende] = useState([]);
+  
   const [intervall, setIntervall] = useState("");
   const [zeitraum, setZeitraum] = useState("monat");
   const [summeEinnahmen, setSummeEinnahmen] = useState(0);
@@ -27,19 +40,28 @@ export default function Haushaltsbuch() {
   const [diagrammDaten, setDiagrammDaten] = useState([]);
   const [kreisDatenAusgaben, setKreisDatenAusgaben] = useState([]);
   const [kreisDatenEinnahmen, setKreisDatenEinnahmen] = useState([]);
+  
   const [tabellenZeitraum, setTabellenZeitraum] = useState("monat");
   const [tabellenMonat, setTabellenMonat] = useState(new Date().getMonth());
   const [tabellenJahr, setTabellenJahr] = useState(new Date().getFullYear());
+
+  const ladeAlles = async () => {
+    const res = await ladeTransaktionsProtokoll();
+    setKapital(res.kapital);
+    setEintraege(res.alle);
+  };
 
   useEffect(() => {
     const init = async () => {
       try {
         await ladeAlles();
-        await ladeKategorien();
-        await ladeAssets();
-        const daten = await ladeWiederkehrende();
-        console.log("Daten:", daten);
-        await pruefeWiederkehrende(daten);
+        const katData = await ladeKategorien();
+        const assetData = await ladeAssets();
+        setKategorien(katData);
+        setAssets(assetData);
+
+        const wiederkehrendeDaten = await ladeWiederkehrende();
+        await pruefeWiederkehrende(wiederkehrendeDaten);
         await ladeAlles();
       } catch (err) {
         console.error("Fehler in init:", err);
@@ -49,100 +71,42 @@ export default function Haushaltsbuch() {
   }, []);
 
   useEffect(() => {
-    berechneZeitraum();
-    berechneDiagrammDaten();
-    berechneKreisDaten();
+    const summen = berechneZeitraumSummen(eintraege, zeitraum);
+    setSummeAusgaben(summen.summeAusgaben);
+    setSummeEinnahmen(summen.summeEinnahmen);
+
+    setDiagrammDaten(erstelleLiniendiagrammData(eintraege, zeitraum));
+
+    const kreisData = erstelleKreisdiagrammData(eintraege, zeitraum);
+    setKreisDatenAusgaben(kreisData.ausgaben);
+    setKreisDatenEinnahmen(kreisData.einnahmen);
   }, [zeitraum, eintraege]);
 
-  const ladeAlles = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    // 1. Ausgaben mit Joins laden
-    const { data: ausgaben, error: ausgabenError } = await supabase
-      .from("transaktionsprotokoll")
-      .select(`
-        *,
-        asset!asset_id (asset_name, asset_typ),
-        transaktionskategorie!kategorie_id (name)
-      `)
-      .eq("benutzer_id", user.id)
-      .eq("typ", "ausgabe")
-      .order("erstellt_am", { ascending: false });
-
-    if (ausgabenError) {
-      console.error("Supabase-Fehler Details:", ausgabenError.message, ausgabenError.details, ausgabenError.hint);
-    }
-
-    // 2. Einnahmen mit Joins laden
-    const { data: einnahmen } = await supabase
-      .from("transaktionsprotokoll")
-      .select(`
-        *,
-        asset!asset_id (asset_name, asset_typ),
-        transaktionskategorie!kategorie_id (name)
-      `)
-      .eq("benutzer_id", user.id)
-      .eq("typ", "einnahme")
-      .order("erstellt_am", { ascending: false });
-
-    const gesamtAusgaben = ausgaben?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    const gesamtEinnahmen = einnahmen?.reduce((sum, e) => sum + e.betrag, 0) ?? 0;
-    setKapital(gesamtEinnahmen - gesamtAusgaben);
-
-    const alle = [
-      ...(ausgaben ?? []).map((e) => ({ ...e, typ: "ausgabe" })),
-      ...(einnahmen ?? []).map((e) => ({ ...e, typ: "einnahme" })),
-    ].sort((a, b) => new Date(b.erstellt_am) - new Date(a.erstellt_am));
-
-    setEintraege(alle);
-  };
-
-  const transaktionHinzufuegen = async () => {
+  const handleTransaktionHinzufuegen = async () => {
     if (!transaktionsBeschreibung || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
-    const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("transaktionsprotokoll").insert({
-      benutzer_id: user.id,
-      notizen: transaktionsBeschreibung,
-      betrag: parseFloat(transaktionsBetrag),
-      kategorie_id: transaktionsKategorie,
-      asset_id: ausgewaehltesAsset || null,
+    const success = await transaktionHinzufuegen({
+      beschreibung: transaktionsBeschreibung,
+      betrag: transaktionsBetrag,
+      kategorie: transaktionsKategorie,
+      assetId: ausgewaehltesAsset,
       typ: transaktionsTyp
     });
 
-    setTransaktionsBeschreibung("");
-    setTransaktionsBetrag("");
-    setTransaktionsKategorie("");
-    setAusgewaehltesAsset("");
-    setTransaktionsTyp("");
-    setModalTransaktion(false);
-    ladeAlles();
+    if (success) {
+      setTransaktionsBeschreibung("");
+      setTransaktionsBetrag("");
+      setTransaktionsKategorie("");
+      setAusgewaehltesAsset("");
+      setTransaktionsTyp("");
+      setModalTransaktion(false);
+      ladeAlles();
+    }
   };
 
-  const ladeKategorien = async () => {
-    const { data } = await supabase
-      .from("transaktionskategorie")
-      .select("*")
-      .eq("sichtbar", true)
-      .order("name", { ascending: true });
-
-    if (data) setKategorien(data);
-  };
-
-  const ladeAssets = async () => {
-    const { data } = await supabase
-      .from("asset")
-      .select("*")
-      .order("asset_name", { ascending: true });
-
-    if (data) setAssets(data);
-  };
-
-  const eintragLoeschen = async (id, typ) => {
-    await supabase.from("transaktionsprotokoll").delete().eq("id", id);
-    ladeAlles();
+  const handleEintragLoeschen = async (id) => {
+    const success = await eintragLoeschen(id);
+    if (success) ladeAlles();
   };
 
   const bearbeitenOeffnen = (eintrag) => {
@@ -161,236 +125,19 @@ export default function Haushaltsbuch() {
     setEditKategorie("");
   };
 
-  const transaktionSchließen = () => {
-    setModalTransaktion(false);
-    ladeAlles();
-  };
+  const handleEintragSpeichern = async () => {
+    if (!zuBearbeiten) return;
 
-  const eintragSpeichern = async (id, typ) => {
-    await supabase.from("transaktionsprotokoll").update({
-      notizen: editBeschreibung,
-      betrag: parseFloat(editBetrag),
-      kategorie_id: editKategorie,
-    }).eq("id", id);
-
-    bearbeitenSchliessen();
-    ladeAlles();
-  };
-
-  const ladeWiederkehrende = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data } = await supabase
-      .from("transaktionsprotokoll")
-      .select("*")
-      .eq("benutzer_id", user.id)
-      .eq("wiederkehrend", true)
-      .order("erstellt_am", { ascending: false });
-
-    if (data) setWiederkehrende(data);
-    return data ?? [];
-  };
-
-  const pruefeWiederkehrende = async (liste) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const now = new Date();
-    const heute = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-    for (const eintrag of liste) {
-      if (eintrag.naechste_faelligkeit <= heute) {
-        await supabase.from("transaktionsprotokoll").insert({
-          benutzer_id: user.id,
-          notizen: eintrag.notizen,
-          betrag: parseFloat(eintrag.betrag),
-          kategorie_id: eintrag.kategorie_id,
-          asset_id: eintrag.asset_id,
-          typ: eintrag.typ
-        });
-
-        const parts = eintrag.naechste_faelligkeit.split("-");
-        const naechsteDatum = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-
-        if (eintrag.intervall === "täglich") naechsteDatum.setDate(naechsteDatum.getDate() + 1);
-        if (eintrag.intervall === "wöchentlich") naechsteDatum.setDate(naechsteDatum.getDate() + 7);
-        if (eintrag.intervall === "monatlich") naechsteDatum.setMonth(naechsteDatum.getMonth() + 1);
-        if (eintrag.intervall === "jährlich") naechsteDatum.setFullYear(naechsteDatum.getFullYear() + 1);
-
-        const neuesFaelligkeitsDatum = `${naechsteDatum.getFullYear()}-${String(naechsteDatum.getMonth() + 1).padStart(2, '0')}-${String(naechsteDatum.getDate()).padStart(2, '0')}`;
-
-        await supabase.from("transaktionsprotokoll")
-          .update({ naechste_faelligkeit: neuesFaelligkeitsDatum })
-          .eq("id", eintrag.id)
-          .eq("wiederkehrend", true);
-      }
-    }
-  };
-
-  const berechneZeitraum = () => {
-    const jetzt = new Date();
-
-    const gefilterteAusgaben = eintraege.filter(e => {
-      if (e.typ !== "ausgabe") return false;
-      const datum = new Date(e.erstellt_am);
-
-      if (zeitraum === "heute") {
-        return (
-          datum.getFullYear() === jetzt.getFullYear() &&
-          datum.getMonth() === jetzt.getMonth() &&
-          datum.getDate() === jetzt.getDate()
-        );
-      }
-      if (zeitraum === "woche") {
-        const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24);
-        return diffInTagen <= 7;
-      }
-      if (zeitraum === "monat") {
-        return (
-          datum.getMonth() === jetzt.getMonth() &&
-          datum.getFullYear() === jetzt.getFullYear()
-        );
-      }
-      if (zeitraum === "jahr") {
-        return datum.getFullYear() === jetzt.getFullYear();
-      }
+    const success = await eintragSpeichern(zuBearbeiten.id, {
+      beschreibung: editBeschreibung,
+      betrag: editBetrag,
+      kategorie: editKategorie
     });
 
-    const gefilterteEinnahmen = eintraege.filter(e => {
-      if (e.typ !== "einnahme") return false;
-      const datum = new Date(e.erstellt_am);
-
-      if (zeitraum === "heute") {
-        return (
-          datum.getFullYear() === jetzt.getFullYear() &&
-          datum.getMonth() === jetzt.getMonth() &&
-          datum.getDate() === jetzt.getDate()
-        );
-      }
-      if (zeitraum === "woche") {
-        const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24);
-        return diffInTagen <= 7;
-      }
-      if (zeitraum === "monat") {
-        return (
-          datum.getMonth() === jetzt.getMonth() &&
-          datum.getFullYear() === jetzt.getFullYear()
-        );
-      }
-      if (zeitraum === "jahr") {
-        return datum.getFullYear() === jetzt.getFullYear();
-      }
-    });
-
-    setSummeAusgaben(gefilterteAusgaben.reduce((sum, e) => sum + e.betrag, 0));
-    setSummeEinnahmen(gefilterteEinnahmen.reduce((sum, e) => sum + e.betrag, 0));
-  };
-
-  const berechneDiagrammDaten = () => {
-    const jetzt = new Date();
-    let punkte = [];
-
-    if (zeitraum === "heute") {
-      for (let i = 0; i < 24; i++) {
-        const einnahmen = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am.replace(" ", "T")).getHours() === i &&
-            new Date(e.erstellt_am.replace(" ", "T")).getDate() === jetzt.getDate())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        const ausgaben = eintraege
-          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am.replace(" ", "T")).getHours() === i &&
-            new Date(e.erstellt_am.replace(" ", "T")).getDate() === jetzt.getDate())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        punkte.push({ label: `${i}:00`, einnahmen, ausgaben });
-      }
+    if (success) {
+      bearbeitenSchliessen();
+      ladeAlles();
     }
-
-    if (zeitraum === "woche") {
-      for (let i = 6; i >= 0; i--) {
-        const tag = new Date();
-        tag.setDate(jetzt.getDate() - i);
-        const einnahmen = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === tag.getDate() &&
-            new Date(e.erstellt_am).getMonth() === tag.getMonth())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        const ausgaben = eintraege
-          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getDate() === tag.getDate() &&
-            new Date(e.erstellt_am).getMonth() === tag.getMonth())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        punkte.push({ label: `${tag.getDate()}.`, einnahmen, ausgaben });
-      }
-    }
-
-    if (zeitraum === "monat") {
-      const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
-      for (let i = 1; i <= tageImMonat; i++) {
-        const einnahmen = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getDate() === i &&
-            new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        const ausgaben = eintraege
-          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getDate() === i &&
-            new Date(e.erstellt_am).getMonth() === jetzt.getMonth())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        punkte.push({ label: `${i}.`, einnahmen, ausgaben });
-      }
-    }
-
-    if (zeitraum === "jahr") {
-      const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-      for (let i = 0; i < 12; i++) {
-        const einnahmen = eintraege
-          .filter(e => e.typ === "einnahme" && new Date(e.erstellt_am).getMonth() === i &&
-            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        const ausgaben = eintraege
-          .filter(e => e.typ === "ausgabe" && new Date(e.erstellt_am).getMonth() === i &&
-            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear())
-          .reduce((sum, e) => sum + e.betrag, 0);
-        punkte.push({ label: monate[i], einnahmen, ausgaben });
-      }
-    }
-
-    setDiagrammDaten(punkte);
-  };
-
-  const berechneKreisDaten = () => {
-    const jetzt = new Date();
-
-    const zeitraumFilter = (e) => {
-      const datum = new Date(e.erstellt_am);
-      if (zeitraum === "heute") {
-        return datum.getFullYear() === jetzt.getFullYear() &&
-          datum.getMonth() === jetzt.getMonth() &&
-          datum.getDate() === jetzt.getDate();
-      }
-      if (zeitraum === "woche") {
-        const diffInTagen = (jetzt - datum) / (1000 * 60 * 60 * 24);
-        return diffInTagen <= 7;
-      }
-      if (zeitraum === "monat") {
-        return datum.getMonth() === jetzt.getMonth() &&
-          datum.getFullYear() === jetzt.getFullYear();
-      }
-      if (zeitraum === "jahr") {
-        return datum.getFullYear() === jetzt.getFullYear();
-      }
-    };
-
-    // Ausgaben pro Assetklasse (asset_typ)
-    const gefilterteAusgaben = eintraege.filter(e => e.typ === "ausgabe" && zeitraumFilter(e));
-    const ausgabenProAsset = gefilterteAusgaben.reduce((acc, e) => {
-      // Greift auf den Typen des Assets zu (z. B. "Girokonto", "Depot", etc.)
-      const assetKlasse = e.asset?.asset_typ || "Keine Assetklasse";
-      acc[assetKlasse] = (acc[assetKlasse] ?? 0) + e.betrag;
-      return acc;
-    }, {});
-    setKreisDatenAusgaben(Object.entries(ausgabenProAsset).map(([name, value]) => ({ name, value })));
-
-    // Einnahmen pro Assetklasse (asset_typ)
-    const gefilterteEinnahmen = eintraege.filter(e => e.typ === "einnahme" && zeitraumFilter(e));
-    const einnahmenProAsset = gefilterteEinnahmen.reduce((acc, e) => {
-      const assetKlasse = e.asset?.asset_typ || "Keine Assetklasse";
-      acc[assetKlasse] = (acc[assetKlasse] ?? 0) + e.betrag;
-      return acc;
-    }, {});
-    setKreisDatenEinnahmen(Object.entries(einnahmenProAsset).map(([name, value]) => ({ name, value })));
   };
 
   return (
@@ -398,7 +145,6 @@ export default function Haushaltsbuch() {
       <h1 className="Haushaltsbuch-title">Haushaltsbuch</h1>
 
       <div className="uebersicht">
-
         {/* --- 1. KARTEN-GRID (ZAHLEN) --- */}
         <div className="zahlen">
           <div className="zahl">
@@ -573,7 +319,7 @@ export default function Haushaltsbuch() {
                   <td>{e.asset ? `[${e.asset.asset_typ}: ${e.asset.asset_name}]` : "—"}</td>
                   <td style={{ textAlign: 'center' }}>
                     <button onClick={() => bearbeitenOeffnen(e)} style={{ border: 'none', background: 'none', cursor: 'pointer', marginRight: '8px' }}>✏️</button>
-                    <button onClick={() => eintragLoeschen(e.id, e.typ)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>🗑️</button>
+                    <button onClick={() => handleEintragLoeschen(e.id)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>🗑️</button>
                   </td>
                 </tr>
               ))
@@ -674,13 +420,13 @@ export default function Haushaltsbuch() {
 
             <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
               <button
-                onClick={transaktionHinzufuegen}
+                onClick={handleTransaktionHinzufuegen}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 Hinzufügen
               </button>
               <button
-                onClick={transaktionSchließen}
+                onClick={() => setModalTransaktion(false)}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 Abbrechen
@@ -737,7 +483,7 @@ export default function Haushaltsbuch() {
 
             <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
               <button
-                onClick={() => eintragSpeichern(zuBearbeiten.id, zuBearbeiten.typ)}
+                onClick={handleEintragSpeichern}
                 style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 Speichern

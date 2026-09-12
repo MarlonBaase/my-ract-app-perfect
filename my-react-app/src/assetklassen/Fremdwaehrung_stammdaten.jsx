@@ -1,36 +1,23 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // 1. useNavigate importieren
-import { supabase } from "../supabase";
-import { handleApiError } from "../utils/errorHandler";
+import { useNavigate } from "react-router-dom";
+import { ladeWaehrungen, filterWaehrungen } from "./services/fremdwaehrung_stammdatenService";
 
-export default function Fremdwaehrung_stammdaten() {
+export default function FremdwaehrungStammdaten() {
   const [listeWaehrung, setListeWaehrung] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const navigate = useNavigate(); // 2. Hook aufrufen
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const ladeWaehrungen = async () => {
-    const { data, error } = await supabase
-      .from("waehrungsstammdaten")
-      .select(`waehrungs_code, name, symbol`);
-
-    if (handleApiError(error, "Waehrung laden")) return;
-    if (data) setListeWaehrung(data);
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    ladeWaehrungen();
+    const fetchWaehrungen = async () => {
+      const data = await ladeWaehrungen();
+      setListeWaehrung(data);
+    };
+
+    fetchWaehrungen();
   }, []);
 
-  const filteredItems = searchTerm.trim() === ''
-    ? []
-    : listeWaehrung.filter(item => {
-        const name = String(item.name || '').toLowerCase();
-        const code = String(item.waehrungs_code || '').toLowerCase();
-        const search = searchTerm.toLowerCase();
-
-        return name.includes(search) || code.includes(search);
-      });
+  const filteredItems = filterWaehrungen(listeWaehrung, searchTerm);
 
   return (
     <div>
@@ -42,10 +29,11 @@ export default function Fremdwaehrung_stammdaten() {
       />
       <ul>
         {filteredItems.map((item) => (
-          // 3. Eindeutigen key hinzufügen und Arrow-Function im onClick nutzen
           <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
-            <button 
-              onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)}
+            <button
+              onClick={() =>
+                navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
+              }
             >
               ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
             </button>

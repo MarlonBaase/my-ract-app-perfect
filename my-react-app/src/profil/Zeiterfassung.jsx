@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabase";
+import {
+  ladeZeiterfassungen,
+  ladeNaechsteTicketNummer,
+  prozessErstellenApi,
+  toggleTimerApi,
+  zeitHinzufuegenApi,
+  eintragSpeichernApi,
+  eintragLoeschenApi,
+  updateKanbanStatusApi
+} from "../services/zeiterfassungService";
 
 export default function Zeiterfassung() {
   const [eintraege, setEintraege] = useState([]);
@@ -50,9 +59,19 @@ export default function Zeiterfassung() {
     ])
   );
 
+  const ladeDaten = async () => {
+    const data = await ladeZeiterfassungen();
+    setEintraege(data);
+  };
+
+  const ladeTicketNummer = async () => {
+    const nr = await ladeNaechsteTicketNummer();
+    setTicketNummer(nr);
+  };
+
   useEffect(() => {
-    ladeZeiterfassungen();
-    ladeNaechsteTicketNummer();
+    ladeDaten();
+    ladeTicketNummer();
   }, []);
 
   // Live-Timer Ticker für aktive Zeitmessung
@@ -71,61 +90,22 @@ export default function Zeiterfassung() {
     return () => clearInterval(interval);
   }, []);
 
-  const ladeZeiterfassungen = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("zeiterfassung")
-      .select("*")
-      .eq("benutzer_id", user.id)
-      .order("erstellt_am", { ascending: false });
-
-    if (error) {
-      console.error("Fehler beim Laden der Zeiterfassungen:", error.message);
-    } else {
-      setEintraege(data || []);
-    }
-  };
-
-  const ladeNaechsteTicketNummer = async () => {
-    const { data } = await supabase
-      .from("zeiterfassung")
-      .select("ticket_nummer")
-      .order("ticket_nummer", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (data && data.ticket_nummer !== undefined && data.ticket_nummer !== null) {
-      const nummer = Number(data.ticket_nummer);
-      setTicketNummer(isNaN(nummer) ? 1 : nummer + 1);
-    } else {
-      setTicketNummer(1);
-    }
-  };
-
   const prozessErstellen = async (e) => {
     e.preventDefault();
     if (!ticketNummer || !prozessName) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase.from("zeiterfassung").insert({
-      benutzer_id: user.id,
-      ticket_nummer: Number(ticketNummer),
-      prozess_name: prozessName,
-      beschreibung: beschreibung || "",
-      prioritaet: prioritaet || "mittel",
-      deadline: deadline || null,
-      bereich: bereich || "Hauptbereiche",
-      fortlaufende_notizen: notizen || "",
-      status: "offen"
+    const res = await prozessErstellenApi({
+      ticketNummer,
+      prozessName,
+      beschreibung,
+      prioritaet,
+      deadline,
+      bereich,
+      notizen
     });
 
-    if (error) {
-      console.error("Fehler beim Erstellen des Prozesses:", error.message, error.details);
-      alert(`Fehler beim Speichern: ${error.message}`);
+    if (!res.success) {
+      alert(`Fehler beim Speichern: ${res.error}`);
       return;
     }
 
@@ -133,88 +113,34 @@ export default function Zeiterfassung() {
     setBeschreibung("");
     setDeadline("");
     setNotizen("");
-    ladeZeiterfassungen();
-    ladeNaechsteTicketNummer();
+    ladeDaten();
+    ladeTicketNummer();
   };
 
   const toggleTimer = async (eintrag) => {
-    const jetzt = new Date().toISOString();
-
-    if (eintrag.is_running) {
-      const zusaetzlicheSekunden = Math.floor((new Date() - new Date(eintrag.gestartet_am)) / 1000);
-      const neueDauer = (eintrag.dauer_sekunden || 0) + zusaetzlicheSekunden;
-
-      await supabase
-        .from("zeiterfassung")
-        .update({
-          is_running: false,
-          dauer_sekunden: neueDauer,
-          gestartet_am: null,
-          end_zeit: jetzt,
-          status: eintrag.status || "in_bearbeitung"
-        })
-        .eq("id", eintrag.id);
-    } else {
-      await supabase
-        .from("zeiterfassung")
-        .update({
-          is_running: true,
-          gestartet_am: jetzt,
-          start_zeit: eintrag.start_zeit || jetzt,
-          status: eintrag.status || "in_bearbeitung"
-        })
-        .eq("id", eintrag.id);
-    }
-    ladeZeiterfassungen();
+    await toggleTimerApi(eintrag);
+    ladeDaten();
   };
 
-  // Funktion zum manuellen Addieren fixer Zeiten (in Minuten)
   const zeitHinzufuegen = async (eintrag, minuten) => {
-    const zusaetzlicheSekunden = minuten * 60;
-    const neueDauer = (eintrag.dauer_sekunden || 0) + zusaetzlicheSekunden;
-
-    const { error } = await supabase
-      .from("zeiterfassung")
-      .update({ dauer_sekunden: neueDauer })
-      .eq("id", eintrag.id);
-
-    if (error) {
-      console.error("Fehler beim Hinzufügen der Zeit:", error.message);
-    } else {
-      ladeZeiterfassungen();
-    }
+    await zeitHinzufuegenApi(eintrag.id, eintrag.dauer_sekunden, minuten);
+    ladeDaten();
   };
 
-  const eintragSpeichern = async () => {
+  const handleEintragSpeichern = async () => {
     if (!bearbeitenEintrag) return;
-
-    const { error } = await supabase
-      .from("zeiterfassung")
-      .update({
-        ticket_nummer: Number(bearbeitenEintrag.ticket_nummer),
-        prozess_name: bearbeitenEintrag.prozess_name,
-        beschreibung: bearbeitenEintrag.beschreibung,
-        prioritaet: bearbeitenEintrag.prioritaet,
-        bereich: bearbeitenEintrag.bereich,
-        deadline: bearbeitenEintrag.deadline || null,
-        status: bearbeitenEintrag.status || "offen",
-        fortlaufende_notizen: bearbeitenEintrag.fortlaufende_notizen,
-        dauer_sekunden: Number(bearbeitenEintrag.dauer_sekunden || 0)
-      })
-      .eq("id", bearbeitenEintrag.id);
-
-    if (error) {
-      console.error("Fehler beim Aktualisieren des Eintrags:", error.message);
-      alert(`Fehler beim Aktualisieren: ${error.message}`);
-    } else {
+    const success = await eintragSpeichernApi(bearbeitenEintrag);
+    if (success) {
       setBearbeitenEintrag(null);
-      ladeZeiterfassungen();
+      ladeDaten();
+    } else {
+      alert("Fehler beim Aktualisieren.");
     }
   };
 
   const eintragLoeschen = async (id) => {
-    await supabase.from("zeiterfassung").delete().eq("id", id);
-    ladeZeiterfassungen();
+    await eintragLoeschenApi(id);
+    ladeDaten();
   };
 
   // DRAG & DROP LOGIK
@@ -232,7 +158,7 @@ export default function Zeiterfassung() {
     const itemId = draggedItemId || e.dataTransfer.getData("text/plain");
     if (!itemId) return;
 
-    const eintrag = eintraege.find((e) => String(e.id) === String(itemId));
+    const eintrag = eintraege.find((item) => String(item.id) === String(itemId));
     if (!eintrag) return;
 
     let updateData = {};
@@ -250,16 +176,9 @@ export default function Zeiterfassung() {
       )
     );
 
-    const targetId = isNaN(Number(itemId)) ? itemId : Number(itemId);
-
-    const { error } = await supabase.from("zeiterfassung").update(updateData).eq("id", targetId);
-
-    if (error) {
-      console.error("Fehler bei Drag&Drop Update:", error.message, error.details);
-    }
-
+    await updateKanbanStatusApi(itemId, updateData);
     setDraggedItemId(null);
-    ladeZeiterfassungen();
+    ladeDaten();
   };
 
   const formatierteZeit = (sekundenGesamt) => {
@@ -610,7 +529,6 @@ export default function Zeiterfassung() {
                           </div>
                         )}
 
-                        {/* Quick-Add Leiste im Kanban Board */}
                         <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f8fafc", padding: "4px 8px", borderRadius: "6px", border: "1px solid #f1f5f9" }}>
                           <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>+ Zeit:</span>
                           <button onClick={() => zeitHinzufuegen(item, 15)} style={{ padding: "2px 6px", fontSize: "10px", borderRadius: "4px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}>15m</button>
@@ -633,12 +551,6 @@ export default function Zeiterfassung() {
                       </div>
                     );
                   })}
-
-                  {spaltenEintraege.length === 0 && (
-                    <div style={{ textAlign: "center", color: "#94a3b8", fontSize: "13px", padding: "24px 12px", background: "#ffffff", borderRadius: "10px", border: "1px dashed #cbd5e1" }}>
-                      Keine Aufgaben
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -646,52 +558,39 @@ export default function Zeiterfassung() {
         </div>
       )}
 
-      {/* MODAL: EINTRAG BEARBEITEN */}
+      {/* BEARBEITEN MODAL */}
       {bearbeitenEintrag && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
-          <div style={{ background: "#ffffff", padding: "28px", borderRadius: "16px", width: "480px", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
-            <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700" }}>Eintrag bearbeiten</h3>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div style={{ background: "#ffffff", padding: "24px", borderRadius: "14px", width: "500px", maxWidth: "90%", display: "grid", gap: "16px" }}>
+            <h3 style={{ margin: 0, fontSize: "18px" }}>Prozess bearbeiten (#ID: {bearbeitenEintrag.id})</h3>
             
-            <div style={{ display: "flex", gap: "10px" }}>
-              <input 
-                type="number"
-                value={bearbeitenEintrag.ticket_nummer || ""} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, ticket_nummer: Number(e.target.value)})} 
-                placeholder="Ticket Nr." 
-                style={{ width: "110px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} 
-              />
-              <input 
-                value={bearbeitenEintrag.prozess_name || ""} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, prozess_name: e.target.value})} 
-                placeholder="Name"
-                style={{ flex: 1, padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              />
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: "600", display: "block", marginBottom: "4px" }}>Prozess Name</label>
+              <input value={bearbeitenEintrag.prozess_name || ""} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, prozess_name: e.target.value })} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Erfasste Zeit (in Sekunden):</label>
-              <input 
-                type="number"
-                value={bearbeitenEintrag.dauer_sekunden || 0} 
-                onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, dauer_sekunden: Number(e.target.value)})} 
-                style={{ padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-              />
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: "600", display: "block", marginBottom: "4px" }}>Status</label>
+              <select value={bearbeitenEintrag.status || "offen"} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, status: e.target.value })} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                <option value="offen">Offen</option>
+                <option value="in_bearbeitung">In Bearbeitung</option>
+                <option value="abgeschlossen">Abgeschlossen</option>
+              </select>
             </div>
 
-            <textarea 
-              value={bearbeitenEintrag.beschreibung || ""} 
-              onChange={(e) => setBearbeitenEintrag({...bearbeitenEintrag, beschreibung: e.target.value})} 
-              placeholder="Beschreibung"
-              style={{ width: "100%", height: "60px", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", boxSizing: "border-box" }}
-            />
+            <div>
+              <label style={{ fontSize: "12px", fontWeight: "600", display: "block", marginBottom: "4px" }}>Fortschritts-Notizen</label>
+              <textarea value={bearbeitenEintrag.fortlaufende_notizen || ""} onChange={(e) => setBearbeitenEintrag({ ...bearbeitenEintrag, fortlaufende_notizen: e.target.value })} style={{ width: "100%", height: "80px", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+            </div>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
               <button onClick={() => setBearbeitenEintrag(null)} style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}>Abbrechen</button>
-              <button onClick={eintragSpeichern} style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#2563eb", color: "#fff", fontWeight: "600", cursor: "pointer" }}>Speichern</button>
+              <button onClick={handleEintragSpeichern} style={{ padding: "8px 16px", borderRadius: "6px", border: "none", background: "#2563eb", color: "#fff", cursor: "pointer", fontWeight: "600" }}>Speichern</button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

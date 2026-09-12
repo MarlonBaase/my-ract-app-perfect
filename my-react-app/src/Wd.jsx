@@ -1,19 +1,18 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, Link } from 'react-router-dom';
+import { WD_TITLE, WD_NAV_ITEMS } from './services/wdService';
 
 export default function Wd() {
   return (
     <div>
-      <h2>Wertpapier</h2>
+      <h2>{WD_TITLE}</h2>
       <nav>
-        <Link to="wd_Daschboard">Dashboard</Link>
-        <Link to="aktien">Aktien</Link>
-        <Link to="etf">ETFs</Link>
-        <Link to="publikumfonds">aktive Publikumsfonds</Link>
-        <Link to="anleihen">Anleihen</Link>
-        <Link to="mitarbeiteraktien">Mitarbeiteraktien</Link>
-        <Link to="genossenschaft">Genossenschaftsanteile</Link>
+        {WD_NAV_ITEMS.map((item) => (
+          <Link key={item.path} to={item.path}>
+            {item.label}
+          </Link>
+        ))}
       </nav>
       <Outlet />
     </div>
-  )
+  );
 }

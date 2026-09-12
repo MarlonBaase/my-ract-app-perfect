@@ -1,7 +1,18 @@
 import { useEffect, useState, useContext } from "react";
-import { supabase } from "../supabase";
-import { handleApiError } from "../utils/errorHandler";
 import { SettingsContext } from '../SettingsContext';
+import {
+    ladeFremdwaehrungskonto,
+    ladeWaehrungen,
+    ladeAssets,
+    ladeElternkontoListe,
+    ladeKategorien,
+    ladeTransaktionenFuerAsset,
+    fremdwaehrungskontoHinzufuegen,
+    fremdwaehrungskontoSpeichern,
+    transaktionHinzufuegen,
+    pruefeWiederkehren,
+    assetLoeschenMitLog
+} from './services/fremdwaehrung_kontoService';
 
 export default function FremdwaehrungKonto() {
     const [listeFremdwaehrungskonto, setListeFremdwaehrungskonto] = useState([]);
@@ -20,9 +31,11 @@ export default function FremdwaehrungKonto() {
     const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("");
     const [waehrung, setWaehrung] = useState("EUR");
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("");
+    
     const [modalOffen, setModalOffen] = useState(false);
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false);
     const [zuBearbeiten, setZuBearbeiten] = useState(null);
+    
     const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false);
     const [listeTransaktionenFremdwaehrungskonto, setListeTransaktionenFremdwaehrungskonto] = useState([]);
     const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false);
@@ -31,6 +44,7 @@ export default function FremdwaehrungKonto() {
     const [transaktionsKategorie, setTransaktionsKategorie] = useState("");
     const [transaktionsTyp, setTransaktionsTyp] = useState("");
     const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
+    
     const [kategorien, setKategorien] = useState([]);
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
@@ -42,156 +56,89 @@ export default function FremdwaehrungKonto() {
 
     const { ansicht } = useContext(SettingsContext);
 
-    const ladeFremdwaehrungskonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data, error } = await supabase
-            .from("fremdwaehrungskonto")
-            .select(`*, 
-                asset(
-                    benutzer_id,
-                    asset_name,
-                    asset_id,
-                    transaktionsprotokoll(betrag, typ)
-                )
-            `)
-            .eq("benutzer_id", user.id);
-
-        if (handleApiError(error, "Fremdwaehrungskonto laden")) return;
-        if (data) setListeFremdwaehrungskonto(data);
+    const refreshFremdwaehrungskonten = async () => {
+        const data = await ladeFremdwaehrungskonto();
+        setListeFremdwaehrungskonto(data);
     };
 
-    const ladeWaehrungen = async () => {
-        const { data, error } = await supabase
-            .from("waehrungsstammdaten")
-            .select(`waehrungs_code, name, symbol`)
-            .order("name", { ascending: true });
+    useEffect(() => {
+        const init = async () => {
+            try {
+                await pruefeWiederkehren();
+                const [assetData, kontoData, katData, elternData, waehrungsData] = await Promise.all([
+                    ladeAssets(),
+                    ladeFremdwaehrungskonto(),
+                    ladeKategorien(),
+                    ladeElternkontoListe(),
+                    ladeWaehrungen()
+                ]);
 
-        if (handleApiError(error, "Waehrung laden")) return;
-        if (data) setListeWaehrung(data);
-
-        if (data === null || data.length === 0) {
-            console.warn("Keine Währungen in der Datenbank gefunden.");
-        }
-    };
-
-    const ladeAssets = async () => {
-        const { data } = await supabase
-            .from("asset")
-            .select("*")
-            .order("asset_name", { ascending: true });
-
-        if (data) setAssets(data);
-    };
+                setAssets(assetData);
+                setListeFremdwaehrungskonto(kontoData);
+                setKategorien(katData);
+                setElternkontoListe(elternData);
+                setListeWaehrung(waehrungsData);
+            } catch (err) {
+                console.error("Fehler in init:", err);
+            }
+        };
+        init();
+    }, []);
 
     const transaktionenOeffnen = async (assetId) => {
         if (!assetId) {
             console.warn("Keine Asset-ID vorhanden!");
             return;
         }
-
-        setModalOffenTransaktionen(true);
         setAusgewaehltesAsset(assetId);
-
-        const { data, error } = await supabase
-            .from("transaktionsprotokoll")
-            .select("*")
-            .eq("asset_id", assetId)
-            .order('datum', { ascending: false });
-
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenFremdwaehrungskonto(data);
+        const data = await ladeTransaktionenFuerAsset(assetId);
+        setListeTransaktionenFremdwaehrungskonto(data);
+        setModalOffenTransaktionen(true);
     };
 
-    const fremdwaehrungskontoHinzufuegen = async () => {
-        if (!name || !bank || !iban || !waehrung || !eroeffnungsdatum || !waehrungs_code) return;
+    const resetForm = () => {
+        setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
+        setWaehrung("EUR"); setWaehrungsCode(""); setEroeffnungsdatum(""); setTransaktionsNotizen("");
+        setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto("");
+        setDispoLimit(""); setBic(""); setZinssatz(""); setIstReferenzkonto(false); setErrors({});
+    };
 
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
+    const validateForm = () => {
+        const newErrors = {};
+        if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
+        if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
+        if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
+        if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
+        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
+        if (!waehrungs_code.trim()) newErrors.waehrungs_code = "Währungscode ist erforderlich";
 
-            const { data: assetData, error: assetError } = await supabase
-                .from("asset")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_name: name,
-                    asset_typ: "fremdwaehrungskonto",
-                })
-                .select();
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-            if (assetError || !assetData || assetData.length === 0) {
-                console.error("Fehler beim Erstellen des Assets:", assetError?.message || JSON.stringify(assetError));
-                alert("Fehler beim Erstellen des übergeordneten Assets.");
-                return;
+    const handleFremdwaehrungskontoSpeichern = async () => {
+        if (!validateForm()) return;
+
+        const formData = {
+            name, bank, iban, einzahlung_bei_eroeffnung, waehrung, waehrungs_code,
+            eroeffnungsdatum, transaktionsNotizen, kontoinhaber, ist_aktiv,
+            hauptkonto, ausgewaehltesElternkonto, dispo_limit, bic, zinssatz, ist_referenzkonto
+        };
+
+        if (zuBearbeiten) {
+            const success = await fremdwaehrungskontoSpeichern(zuBearbeiten.asset_id, formData);
+            if (success) {
+                setModalOffen(false);
+                setZuBearbeiten(null);
+                refreshFremdwaehrungskonten();
             }
-
-            const asset_id = assetData[0].asset_id;
-
-            const { error: giroError } = await supabase
-                .from("fremdwaehrungskonto")
-                .insert({
-                    asset_id: asset_id,
-                    benutzer_id: user.id, // Direct user ID binding
-                    name_der_bank: bank,
-                    iban: iban,
-                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    waehrung: waehrung,
-                    waehrungs_code: waehrungs_code,
-                    eroeffnungsdatum: eroeffnungsdatum,
-                    notizen: transaktionsNotizen,
-                    kontoinhaber: kontoinhaber,
-                    ist_aktiv: true,
-                    hauptkonto: hauptkonto,
-                    elternkonto: ausgewaehltesElternkonto || null,
-                    dispo_limit: parseFloat(dispo_limit) || 0,
-                    bic: bic,
-                    zinssatz: parseFloat(zinssatz) || 0,
-                    ist_referenzkonto: ist_referenzkonto || false
-                });
-
-            if (giroError) {
-                console.error("Fehler beim Erstellen des Fremdwaehrungskontos:", giroError);
-                alert("Fehler beim Fremdwaehrungskonto-Insert.");
-                return;
+        } else {
+            const success = await fremdwaehrungskontoHinzufuegen(formData);
+            if (success) {
+                setModalOffenHinzu(false);
+                resetForm();
+                refreshFremdwaehrungskonten();
             }
-
-            const { error: transError } = await supabase
-                .from("transaktionsprotokoll")
-                .insert({
-                    benutzer_id: user.id,
-                    notizen: "Einzahlung bei Eröffnung",
-                    betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
-                    asset_id: asset_id,
-                    assetklasse: "fremdwaehrungskonto",
-                    typ: "einnahme"
-                });
-
-            if (transError) {
-                console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError);
-                alert("Fehler beim Fremdwaehrungskonto-Insert.");
-                return;
-            }
-
-            setName("");
-            setBank("");
-            setIban("");
-            setEinzahlung_bei_eroeffnung("");
-            setWaehrung("EUR");
-            setEroeffnungsdatum("");
-            setTransaktionsNotizen("");
-            setKontoinhaber("");
-            setIstAktiv(true);
-            setHauptkonto(false);
-            setAusgewaehltesElternkonto("");
-            setDispoLimit("");
-            setBic("");
-            setZinssatz("");
-            setModalOffenHinzu(false);
-
-            ladeFremdwaehrungskonto();
-        } catch (err) {
-            console.error("Unerwarteter Fehler:", err);
         }
     };
 
@@ -216,306 +163,44 @@ export default function FremdwaehrungKonto() {
         setModalOffen(true);
     };
 
-
-    const assetLoeschenMitLog = async (assetId, assetTyp, tabelleName) => {
-        if (!assetId) return;
-
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-
-            const { data: werte, error: tlogError } = await supabase
-                .from("transaktionsprotokoll")
-                .select("*")
-                .eq("asset_id", assetId)
-
-            if (handleApiError(tlogError, "Asset vor dem Löschen abrufen")) return;
-
-            const { error: ttlogError } = await supabase
-                .from("geloeschte_transaktionen_log")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_id: assetId,
-                    asset_typ: assetTyp, // z.B. "tagesgeldkonto"
-                    daten: werte,
-                });
-
-            if (handleApiError(ttlogError, "Globale Log-Tabelle befüllen")) return;
-
-            const { error: tDeleteError } = await supabase
-                .from("transaktionsprotokoll")
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(tDeleteError, `${assetTyp} löschen`)) return;
-
-
-
-            // 1. Daten des spezifischen Assets laden (egal aus welcher Tabelle)
-            const { data: eintrag, error: fetchError } = await supabase
-                .from(tabelleName)
-                .select("*")
-                .eq("asset_id", assetId)
-                .single();
-
-            if (handleApiError(fetchError, "Asset vor dem Löschen abrufen")) return;
-
-            // 2. In die GLOBALE Log-Tabelle schreiben
-            const { error: logError } = await supabase
-                .from("geloeschte_assets_log")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_id: assetId,
-                    asset_typ: assetTyp, // z.B. "tagesgeldkonto"
-                    asset_name: eintrag?.name || eintrag?.name_der_bank || "Unbenannt",
-                    daten: eintrag,      // Speichert alle spezifischen Spalten als JSON
-                });
-
-            if (handleApiError(logError, "Globale Log-Tabelle befüllen")) return;
-
-            // 3. Aus der spezifischen Tabelle löschen
-            const { error: subDeleteError } = await supabase
-                .from(tabelleName)
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(subDeleteError, `${assetTyp} löschen`)) return;
-
-            // 4. Aus der übergeordneten Asset-Haupttabelle löschen
-            const { error: mainDeleteError } = await supabase
-                .from("asset")
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
-
-
-
-        } catch (err) {
-            console.error("Unerwarteter Fehler beim Löschen:", err);
-        }
-
-        ladeFremdwaehrungskonto()
-    };
-
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!name.trim()) newErrors.name = "Asset Name ist erforderlich";
-        if (!bank.trim()) newErrors.bank = "Bank Name ist erforderlich";
-        if (!iban.trim()) newErrors.iban = "IBAN ist erforderlich";
-        if (!waehrung.trim()) newErrors.waehrung = "Währung ist erforderlich";
-        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Eröffnungsdatum ist erforderlich";
-        if (!waehrungs_code.trim()) newErrors.waehrungs_code = "Währungscode ist erforderlich";
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // true, wenn keine Fehler vorhanden
-    };
-
-    const handleFremdwaehrungskontoSpeichern = () => {
-        if (validateForm()) {
-
-            if (zuBearbeiten) {
-                fremdwaehrungskontoSpeichern();
-                setErrors({});
-            }
-            else {
-                fremdwaehrungskontoHinzufuegen();
-                setErrors({});
-            }
-
+    const handleDelete = async (assetId) => {
+        const success = await assetLoeschenMitLog(assetId, "fremdwaehrungskonto", "fremdwaehrungskonto");
+        if (success) {
+            refreshFremdwaehrungskonten();
         }
     };
 
-    const fremdwaehrungskontoSpeichern = async () => {
-        if (!zuBearbeiten) return;
-
-        const { error: assetError } = await supabase
-            .from("asset")
-            .update({ asset_name: name })
-            .eq("asset_id", zuBearbeiten.asset_id);
-
-        if (handleApiError(assetError, "Asset Name updaten")) return;
-
-        const { error: giroError } = await supabase
-            .from("fremdwaehrungskonto")
-            .update({
-                name_der_bank: bank,
-                iban: iban,
-                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                waehrung: waehrung,
-                eroeffnungsdatum: eroeffnungsdatum,
-                notizen: transaktionsNotizen,
-                kontoinhaber: kontoinhaber,
-                ist_aktiv: ist_aktiv,
-                hauptkonto: hauptkonto,
-                elternkonto: ausgewaehltesElternkonto || null,
-                dispo_limit: parseFloat(dispo_limit) || 0,
-                bic: bic,
-                zinssatz: parseFloat(zinssatz) || 0,
-                ist_referenzkonto: ist_referenzkonto || false,
-                waehrungs_code: waehrungs_code
-            })
-            .eq("asset_id", zuBearbeiten.asset_id);
-
-        if (handleApiError(giroError, "Fremdwaehrungskontodaten updaten")) return;
-
-        setModalOffen(false);
-        setZuBearbeiten(null);
-        ladeFremdwaehrungskonto();
-    };
-
-    const transaktionHinzufuegen = async (assetId) => {
+    const handleAddTransaktion = async () => {
         if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        let berechneteFaelligkeit = null;
-
-        if (wiederkehrendaktiv) {
-            const heute = new Date();
-
-            switch (intervall) {
-                case "täglich":
-                    heute.setDate(heute.getDate() + 1);
-                    break;
-                case "wöchentlich":
-                    heute.setDate(heute.getDate() + 7);
-                    break;
-                case "monatlich":
-                    heute.setMonth(heute.getMonth() + 1);
-                    break;
-                case "jährlich":
-                    heute.setFullYear(heute.getFullYear() + 1);
-                    break;
-                default:
-                    break;
-            }
-
-            berechneteFaelligkeit = heute.toISOString();
-        }
-
-        const { error } = await supabase.from("transaktionsprotokoll").insert({
-            benutzer_id: user.id,
-            notizen: transaktionsNotizen,
-            betrag: parseFloat(transaktionsBetrag),
-            kategorie_id: transaktionsKategorie,
-            asset_id: assetId,
-            assetklasse: "fremdwaehrungskonto",
-            typ: transaktionsTyp,
-            wiederkehrend: wiederkehrendaktiv,
-            naechste_faelligkeit: berechneteFaelligkeit,
-            intervall: wiederkehrendaktiv ? intervall : null
+        const success = await transaktionHinzufuegen({
+            transaktionsNotizen, transaktionsBetrag, transaktionsKategorie,
+            transaktionsTyp, assetId: ausgewaehltesAsset, wiederkehrendaktiv, intervall
         });
 
-        if (handleApiError(error, "Transaktion hinzufügen")) return;
-
-        // State zurücksetzen
-        setTransaktionsNotizen("");
-        setTransaktionsBetrag("");
-        setTransaktionsKategorie("");
-        setTransaktionsTyp("");
-        setWiederkehrendaktiv(false);
-        setIntervall("");
-        setNaechsteFaelligkeit("");
-
-        ladeFremdwaehrungskonto();
-        transaktionenOeffnen(ausgewaehltesAsset);
-        setModalTranskationenHinzufuegen(false);
-    };
-
-    const pruefeWiederkehren = async () => {
-
-        const heute = new Date().toISOString();
-
-
-        const { data: faellige, error } = await supabase
-            .from("transaktionsprotokoll")
-            .select("*")
-            .eq("wiederkehrend", true)
-            .lte("naechste_faelligkeit", heute);
-
-        if (error || !faellige || faellige.length === 0) return;
-
-        for (const t of faellige) {
-            await supabase.from("transaktionsprotokoll").insert({
-                benutzer_id: t.benutzer_id,
-                notizen: `${t.notizen} (Automatisch)`,
-                betrag: t.betrag,
-                kategorie_id: t.kategorie_id,
-                asset_id: t.asset_id,
-                assetklasse: t.assetklasse,
-                typ: t.typ,
-                datum: heute,
-                wiederkehrend: false
-            });
-
-            const naechstesDatum = new Date(t.naechste_faelligkeit);
-            if (t.intervall === "täglich") naechstesDatum.setDate(naechstesDatum.getDate() + 1);
-            if (t.intervall === "wöchentlich") naechstesDatum.setDate(naechstesDatum.getDate() + 7);
-            if (t.intervall === "monatlich") naechstesDatum.setMonth(naechstesDatum.getMonth() + 1);
-            if (t.intervall === "jährlich") naechstesDatum.setFullYear(naechstesDatum.getFullYear() + 1);
-
-
-            await supabase
-                .from("transaktionsprotokoll")
-                .update({ naechste_faelligkeit: naechstesDatum.toISOString().split('T')[0] })
-                .eq("id", t.id);
+        if (success) {
+            setTransaktionsNotizen("");
+            setTransaktionsBetrag("");
+            setTransaktionsKategorie("");
+            setTransaktionsTyp("");
+            setWiederkehrendaktiv(false);
+            setIntervall("");
+            setModalTranskationenHinzufuegen(false);
+            
+            const updatedTx = await ladeTransaktionenFuerAsset(ausgewaehltesAsset);
+            setListeTransaktionenFremdwaehrungskonto(updatedTx);
+            refreshFremdwaehrungskonten();
         }
     };
-
-    const ladeKategorien = async () => {
-        const { data, error } = await supabase
-            .from("transaktionskategorie")
-            .select("*")
-            .eq("sichtbar", true)
-            .order("name", { ascending: true });
-
-        if (data) setKategorien(data);
-        if (handleApiError(error, "Kategorie laden")) return;
-    };
-
-    const ladeElternkontoListe = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const { data } = await supabase
-            .from("fremdwaehrungskonto")
-            .select("*")
-            .eq("benutzer_id", user.id)
-            .eq("hauptkonto", true);
-
-        if (data) setElternkontoListe(data);
-    };
-
-    useEffect(() => {
-        const init = async () => {
-            try {
-                await pruefeWiederkehren();
-                await ladeAssets();
-                await ladeFremdwaehrungskonto();
-                await ladeKategorien();
-                await ladeElternkontoListe();
-                await ladeWaehrungen();
-            } catch (err) {
-                console.error("Fehler in init:", err);
-            }
-        };
-        init();
-    }, []);
 
     return (
         <div className="fremdwaehrungskonto-container">
             <div className="header-bar">
                 <h2>Fremdwaehrungskonto</h2>
                 <button className="btn-primary" onClick={() => {
-                    setModalOffenHinzu(true);
+                    resetForm();
                     setZuBearbeiten(null);
-                    setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
-                    setWaehrung("EUR"); setEroeffnungsdatum(""); setTransaktionsNotizen("");
-                    setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto(""); setDispoLimit("");
-                    setBic(""); setZinssatz("");
+                    setModalOffenHinzu(true);
                 }}>
                     + Fremdwaehrungskonto hinzufügen
                 </button>
@@ -528,13 +213,10 @@ export default function FremdwaehrungKonto() {
                         const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
 
                         const transaktionen = e.asset?.transaktionsprotokoll || [];
-                        const summeTransaktionen = transaktionen.reduce((acc, t) => {
+                        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                             const betrag = Number(t.betrag || 0);
                             return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                         }, 0);
-
-                        // 💡 KORREKTUR: Startguthaben + Transaktionssumme
-                        const aktuellerKontostand = summeTransaktionen;
 
                         return (
                             <div className="account-card" key={e.id}>
@@ -559,7 +241,6 @@ export default function FremdwaehrungKonto() {
                                     {e.bic && <p className="sub-text"><strong>BIC:</strong> {e.bic}</p>}
                                     {e.kontoinhaber && <p className="sub-text"><strong>Inhaber:</strong> {e.kontoinhaber}</p>}
 
-                                    {/* 💡 ERGÄNZUNG: Zusätzliche nützliche Finanzdetails */}
                                     <div className="account-details-grid">
                                         {Number(e.dispo_limit) > 0 && (
                                             <p className="detail-item"><strong>Dispo:</strong> {Number(e.dispo_limit).toFixed(2)} {e.waehrung}</p>
@@ -575,7 +256,7 @@ export default function FremdwaehrungKonto() {
 
                                 <div className="card-actions">
                                     <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "fremdwaehrungskonto", "fremdwaehrungskonto")} title="Löschen">🗑️</button>
+                                    <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                     <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                 </div>
                             </div>
@@ -602,13 +283,10 @@ export default function FremdwaehrungKonto() {
                                 const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : "—";
 
                                 const transaktionen = e.asset?.transaktionsprotokoll || [];
-                                const summe = transaktionen.reduce((acc, t) => {
+                                const aktuellerKontostand = transaktionen.reduce((acc, t) => {
                                     const betrag = Number(t.betrag || 0);
                                     return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
                                 }, 0);
-
-
-                                const aktuellerKontostand = Number(e.einzahlung_bei_eroeffnung || 0) + summe;
 
                                 return (
                                     <tr key={e.id} className={e.ist_aktiv === false ? 'row-inactive' : ''}>
@@ -624,7 +302,6 @@ export default function FremdwaehrungKonto() {
                                         <td>
                                             <strong>{aktuellerKontostand.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {e.waehrung}</strong>
                                         </td>
-                                        {/* 💡 ERGÄNZUNG: Dispo und Zinsen übersichtlich in der Tabelle */}
                                         <td className="subtext">
                                             {Number(e.dispo_limit) > 0 && <div>Dispo: {e.dispo_limit} {e.waehrung}</div>}
                                             {Number(e.zinssatz) > 0 && <div>Zins: {e.zinssatz}%</div>}
@@ -634,7 +311,7 @@ export default function FremdwaehrungKonto() {
                                         <td>{elternkontoName}</td>
                                         <td className="table-actions">
                                             <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                            <button onClick={() => assetLoeschenMitLog(e.asset?.asset_id, "fremdwaehrungskonto", "fremdwaehrungskonto")} title="Löschen">🗑️</button>
+                                            <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
                                             <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                                         </td>
                                     </tr>
@@ -680,13 +357,13 @@ export default function FremdwaehrungKonto() {
                 </div>
             )}
 
-            {/* MODAL: Hinzufügen */}
-            {modalOffenHinzu && (
+            {/* MODAL: Hinzufügen / Bearbeiten */}
+            {(modalOffenHinzu || modalOffen) && (
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
-                            <h3>Neues Fremdwaehrungskonto hinzufügen</h3>
-                            <button className="close-btn" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>✕</button>
+                            <h3>{zuBearbeiten ? "Fremdwaehrungskonto bearbeiten" : "Neues Fremdwaehrungskonto hinzufügen"}</h3>
+                            <button className="close-btn" onClick={() => { setErrors({}); setModalOffenHinzu(false); setModalOffen(false); }}>✕</button>
                         </div>
                         <div className="modal-body">
                             <div className="form-grid">
@@ -712,7 +389,7 @@ export default function FremdwaehrungKonto() {
                                     {errors.bank && <span className="error-text">{errors.bank}</span>}
                                 </div>
 
-                                <div className="form-group col-span-2">
+                                <div className="form-group">
                                     <label>IBAN*</label>
                                     <input
                                         className={errors.iban ? "input-error" : ""}
@@ -724,321 +401,141 @@ export default function FremdwaehrungKonto() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Startguthaben</label>
-                                    <input value={einzahlung_bei_eroeffnung} onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)} placeholder="0.00" type="number" />
-                                </div>
-
-                                <div className="form-group col-span-2">
-                                    <label>Währung*</label>
-                                    <select value={waehrung} onChange={(e) => setWaehrung(e.target.value)}>
-                                        <option value="">Wählen Sie eine Währung</option>
-                                        {listeWaehrung.map((e) => {
-                                           return (
-                                               <option key={e.waehrungs_code} value={e.waehrungs_code}>
-                                                   {e.name} ({e.symbol})
-                                               </option>
-                                           );
-                                        })}
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Eröffnungsdatum*</label>
-                                    <input
-                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
-                                        type="date"
-                                        value={eroeffnungsdatum}
-                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
-                                    />
-                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
-                                </div>
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Dispo-Limit</label>
-                                    <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="0.00" type="number" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinssatz (%)</label>
-                                    <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="0.00" type="number" step="0.01" />
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
-                                        Als Hauptkonto festlegen
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
-                                        Als Referenzkonto festlegen
-                                    </label>
-                                </div>
-
-                                {!hauptkonto && (
-                                    <div className="form-group col-span-2">
-                                        <label>Elternkonto auswählen</label>
-                                        <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
-                                            <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeFremdwaehrungskonto.map((e) => (
-                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                    {e.asset?.asset_name} ({e.name_der_bank})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>Abbrechen</button>
-                            <button className="btn-primary" onClick={handleFremdwaehrungskontoSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL: Bearbeiten */}
-            {modalOffen && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>Fremdwaehrungskonto bearbeiten</h3>
-                            <button className="close-btn" onClick={() => setModalOffen(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label>Asset Name*</label>
-                                    <input
-                                        className={errors.name ? "input-error" : ""}
-                                        value={name}
-                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
-                                        placeholder="z.B. Hauptkonto"
-                                    />
-                                    {errors.name && <span className="error-text">{errors.name}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Bank Name*</label>
-                                    <input
-                                        className={errors.bank ? "input-error" : ""}
-                                        value={bank}
-                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
-                                        placeholder="z.B. Sparkasse"
-                                    />
-                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
-                                </div>
-
-                                <div className="form-group col-span-2">
-                                    <label>IBAN*</label>
-                                    <input
-                                        className={errors.iban ? "input-error" : ""}
-                                        value={iban}
-                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
-                                        placeholder="DE00 0000 0000 0000 0000 00"
-                                    />
-                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Startguthaben</label>
-                                    <input
-                                        className={errors.einzahlung ? "input-error" : ""}
-                                        value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung: null }); }}
-                                        placeholder="0.00"
-                                        type="number"
-                                    />
-                                    {errors.einzahlung && <span className="error-text">{errors.einzahlung}</span>}
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Währung*</label>
-                                    <input
-                                        className={errors.waehrung ? "input-error" : ""}
-                                        value={waehrung}
-                                        onChange={(e) => { setWaehrung(e.target.value); setErrors({ ...errors, waehrung: null }); }}
-                                        placeholder="EUR"
-                                    />
-                                    {errors.waehrung && <span className="error-text">{errors.waehrung}</span>}
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Eröffnungsdatum*</label>
-                                    <input
-                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
-                                        type="date"
-                                        value={eroeffnungsdatum}
-                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
-                                    />
-                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
-                                </div>
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Dispo-Limit</label>
-                                    <input value={dispo_limit} onChange={(e) => setDispoLimit(e.target.value)} placeholder="0.00" type="number" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinssatz (%)</label>
-                                    <input value={zinssatz} onChange={(e) => setZinssatz(e.target.value)} placeholder="0.00" type="number" step="0.01" />
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Notiz..." />
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
-                                        Konto ist Aktiv
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={hauptkonto} onChange={(e) => setHauptkonto(e.target.checked)} />
-                                        Hauptkonto
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={ist_referenzkonto} onChange={(e) => setIstReferenzkonto(e.target.checked)} />
-                                        Referenzkonto
-                                    </label>
-                                </div>
-
-                                {!hauptkonto && (
-                                    <div className="form-group col-span-2">
-                                        <label>Elternkonto wählen</label>
-                                        <select value={ausgewaehltesElternkonto} onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}>
-                                            <option value="">Kein Elternkonto (Optional)</option>
-                                            {listeFremdwaehrungskonto.map((e) => (
-                                                <option key={e.asset?.asset_id} value={e.asset?.asset_id}>
-                                                    {e.asset?.asset_name} ({e.name_der_bank})
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={handleFremdwaehrungskontoSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* 💡 KORREKTUR: Transaktion hinzufügen Modal an das CSS-Klassendesign angepasst */}
-            {modalTranskationenHinzufuegen && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>Transaktion hinzufügen</h3>
-                            <button className="close-btn" onClick={() => setModalTranskationenHinzufuegen(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input
-                                        value={transaktionsNotizen}
-                                        onChange={(e) => setTransaktionsNotizen(e.target.value)}
-                                        placeholder="Beschreibung der Transaktion"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Betrag</label>
-                                    <input
-                                        value={transaktionsBetrag}
-                                        onChange={(e) => setTransaktionsBetrag(e.target.value)}
-                                        placeholder="0.00"
-                                        type="number"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Typ</label>
+                                    <label>Währungscode*</label>
                                     <select
-                                        value={transaktionsTyp}
-                                        onChange={(e) => setTransaktionsTyp(e.target.value)}
+                                        className={errors.waehrungs_code ? "input-error" : ""}
+                                        value={waehrungs_code}
+                                        onChange={(e) => {
+                                            setWaehrungsCode(e.target.value);
+                                            setWaehrung(e.target.value);
+                                            setErrors({ ...errors, waehrungs_code: null, waehrung: null });
+                                        }}
                                     >
-                                        <option value="">Typ wählen</option>
-                                        <option value="ausgabe">Ausgabe</option>
-                                        <option value="einnahme">Einnahme</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Kategorie</label>
-                                    <select
-                                        value={transaktionsKategorie}
-                                        onChange={(e) => setTransaktionsKategorie(e.target.value)}
-                                    >
-                                        <option value="">Kategorie wählen</option>
-                                        {kategorien.map((k) => (
-                                            <option key={k.id} value={k.id}>{k.name}</option>
+                                        <option value="">Währung wählen...</option>
+                                        {listeWaehrung.map((w) => (
+                                            <option key={w.waehrungs_code} value={w.waehrungs_code}>
+                                                {w.name} ({w.symbol || w.waehrungs_code})
+                                            </option>
                                         ))}
                                     </select>
+                                    {errors.waehrungs_code && <span className="error-text">{errors.waehrungs_code}</span>}
                                 </div>
+
                                 <div className="form-group">
-                                    <label>Asset</label>
+                                    <label>Eröffnungsdatum*</label>
+                                    <input
+                                        type="date"
+                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
+                                        value={eroeffnungsdatum}
+                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
+                                    />
+                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Einzahlung bei Eröffnung</label>
+                                    <input
+                                        type="number"
+                                        value={einzahlung_bei_eroeffnung}
+                                        onChange={(e) => setEinzahlung_bei_eroeffnung(e.target.value)}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Kontoinhaber</label>
+                                    <input
+                                        value={kontoinhaber}
+                                        onChange={(e) => setKontoinhaber(e.target.value)}
+                                        placeholder="Max Mustermann"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>BIC</label>
+                                    <input
+                                        value={bic}
+                                        onChange={(e) => setBic(e.target.value)}
+                                        placeholder="BIC Code"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Dispo-Limit</label>
+                                    <input
+                                        type="number"
+                                        value={dispo_limit}
+                                        onChange={(e) => setDispoLimit(e.target.value)}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Zinssatz (%)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        value={zinssatz}
+                                        onChange={(e) => setZinssatz(e.target.value)}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Elternkonto</label>
                                     <select
-                                        value={ausgewaehltesAsset}
-                                        onChange={(e) => setAusgewaehltesAsset(e.target.value)}
+                                        value={ausgewaehltesElternkonto}
+                                        onChange={(e) => setAusgewaehltesElternkonto(e.target.value)}
                                     >
-                                        <option value="">Asset wählen</option>
-                                        {assets.map((a) => (
-                                            <option key={a.asset_id} value={a.asset_id}>
-                                                {a.asset_typ} | {a.asset_name}
+                                        <option value="">Kein Elternkonto</option>
+                                        {elternkontoListe.map((k) => (
+                                            <option key={k.id} value={k.asset_id}>
+                                                {k.name_der_bank} ({k.iban})
                                             </option>
                                         ))}
                                     </select>
                                 </div>
 
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={wiederkehrendaktiv}
-                                            onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-                                        />
-                                        Wiederkehrende Transaktion
-                                    </label>
+                                <div className="form-group col-span-2">
+                                    <label>Notizen</label>
+                                    <input
+                                        value={transaktionsNotizen}
+                                        onChange={(e) => setTransaktionsNotizen(e.target.value)}
+                                        placeholder="Optionale Notizen..."
+                                    />
                                 </div>
 
-                                {wiederkehrendaktiv && (
-                                    <div className="form-group col-span-2">
-                                        <label>Intervall</label>
-                                        <select
-                                            value={intervall}
-                                            onChange={(e) => setIntervall(e.target.value)}
-                                        >
-                                            <option value="">Intervall wählen</option>
-                                            <option value="täglich">Täglich</option>
-                                            <option value="wöchentlich">Wöchentlich</option>
-                                            <option value="monatlich">Monatlich</option>
-                                            <option value="jährlich">Jährlich</option>
-                                        </select>
-                                    </div>
-                                )}
+                                <div className="form-group checkbox-group col-span-2">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={hauptkonto}
+                                            onChange={(e) => setHauptkonto(e.target.checked)}
+                                        />
+                                        Hauptkonto
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={ist_referenzkonto}
+                                            onChange={(e) => setIstReferenzkonto(e.target.checked)}
+                                        />
+                                        Referenzkonto
+                                    </label>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={ist_aktiv}
+                                            onChange={(e) => setIstAktiv(e.target.checked)}
+                                        />
+                                        Konto ist aktiv
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalTranskationenHinzufuegen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={() => transaktionHinzufuegen}>Hinzufügen</button>
+                            <button className="btn-secondary" onClick={() => { setErrors({}); setModalOffenHinzu(false); setModalOffen(false); }}>Abbrechen</button>
+                            <button className="btn-primary" onClick={handleFremdwaehrungskontoSpeichern}>Speichern</button>
                         </div>
                     </div>
                 </div>

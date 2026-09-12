@@ -1,1205 +1,404 @@
-import { useEffect, useState, useContext, use } from "react";
-import { supabase } from "../supabase";
-import { handleApiError } from "../utils/errorHandler";
-import { SettingsContext } from '../SettingsContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { data } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+// Hilfsfunktion zur Formatierung von Euro-Beträgen
+const formatEuro = (val) => {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(val || 0);
+};
 
 export default function Festgeld() {
-    const [ablaufdatum_aktionszins, setAblaufdatum_aktionszins] = useState("")
-    const [aktionszins, setAktionszins] = useState("")
-    const [assets, setAssets] = useState([])
-    const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("")
-    const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("")
-    const [automatischVerlaengern, setAutomatischVerlaengern] = useState("")
-    const [bank, setBank] = useState("")
-    const [bic, setBic] = useState("")
-    const [einlagensicherung, setEinlagensicherung] = useState("")
-    const [einzahlung_bei_eroeffnung, setEinzahlung_bei_eroeffnung] = useState("")
-    const [eroeffnungsdatum, setEroeffnungsdatum] = useState("")
-    const [errors, setErrors] = useState({})
-    const [freistellungsauftrag, setFreistellungsauftrag] = useState("")
-    const [faelligkeitsdatum, setFaelligkeitsdatum] = useState("")
-    const [gekuendigtAm, setGekuendigtAm] = useState("")
-    const [iban, setIban] = useState("")
-    const [ist_aktiv, setIstAktiv] = useState(true)
-    const [intervall, setIntervall] = useState("");
-    const [kategorien, setKategorien] = useState([])
-    const [kontoinhaber, setKontoinhaber] = useState("")
-    const [kuendigungsfrist, setKuendigungsfrist] = useState("")
-    const [laufzeitMonate, setLaufzeitMonate] = useState("")
-    const [letzterKuendigungstag, setLetzerKuendigungstag] = useState("")
-    const [listeFestgeld, setListeFestgeld] = useState([])
-    const [listeReferenzkonto, setListeReferenzkonto] = useState([])
-    const [listeTransaktionenFestgeld, setListeTransaktionenFestgeld] = useState([])
-    const [modalOffen, setModalOffen] = useState(false)
-    const [modalOffenHinzu, setModalOffenHinzu] = useState(false)
-    const [modalOffenTransaktionen, setModalOffenTransaktionen] = useState(false)
-    const [modalTranskationenHinzufuegen, setModalTranskationenHinzufuegen] = useState(false)
-    const [name, setName] = useState("")
-    const [notizen, setNotizen] = useState("")
-    const [referenzkonto, setReferenzkonto] = useState("")
-    const [transaktionsBetrag, setTransaktionsBetrag] = useState("")
-    const [transaktionsKategorie, setTransaktionsKategorie] = useState("")
-    const [transaktionsNotizen, setTransaktionsNotizen] = useState("")
-    const [transaktionsTyp, setTransaktionsTyp] = useState("")
-    const [waehrung, setWaehrung] = useState("EUR")
-    const [wiederkehrendaktiv, setWiederkehrendaktiv] = useState(false);
-    const [zuBearbeiten, setZuBearbeiten] = useState(null)
-    const [zinsgutschrift, setZinsgutschrift] = useState("")
-    const [zinssatz, setZinssatz] = useState("")
-    const [zinseszins, setZinseszins] = useState("")
+    // State für Daten
+    const [festgeldList, setFestgeldList] = useState([]);
+    const [kategorien, setKategorien] = useState([]);
+    const [assets, setAssets] = useState([]);
+    const [listeReferenzkonto, setListeReferenzkonto] = useState([]);
 
-    const { ansicht } = useContext(SettingsContext);
+    // State für Modals
+    const [modalOffen, setModalOffen] = useState(false);
+    const [modalOffenHinzu, setModalOffenHinzu] = useState(false);
+    const [bearbeitenData, setBearbeitenData] = useState(null);
 
+    // State für Formularfelder
+    const [ausgewaehltesAsset, setAusgewaehltesAsset] = useState("");
+    const [ausgewaehlteKategorie, setAusgewaehlteKategorie] = useState("");
+    const [anlagesumme, setAnlagesumme] = useState("");
+    const [zinssatz, setZinssatz] = useState("");
+    const [laufzeitMonate, setLaufzeitMonate] = useState("");
+    const [startdatum, setStartdatum] = useState("");
+    const [enddatum, setEnddatum] = useState("");
+    const [ausgewaehltesReferenzkonto, setAusgewaehltesReferenzkonto] = useState("");
+    const [automatischVerlaengern, setAutomatischVerlaengern] = useState(false);
+    const [notizen, setNotizen] = useState("");
+
+    // Berechnete Summen für die Übersicht
+    const gesamtanlage = festgeldList.reduce((sum, item) => sum + Number(item.anlagesumme || 0), 0);
+    const zinsertragGesamt = festgeldList.reduce((sum, item) => sum + Number(item.zinsertrag || 0), 0);
+
+    useEffect(() => {
+        ladeFestgeld();
+        ladeKategorien();
+        ladeAssets();
+        ladeReferenzkonto();
+    }, []);
 
     const ladeFestgeld = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        const { data, error } = await supabase
-            .from("festgeld")
-            .select(`*, 
-                asset!inner(
-                    benutzer_id,
-                    asset_name,
-                    asset_id,
-                    transaktionsprotokoll(betrag, typ)
-                )
-            `)
-            .eq("asset.benutzer_id", user.id)
-            .order('asset_name', { referencedTable: 'asset', ascending: true });
-
-        if (handleApiError(error, "Festgeld laden")) return;
-        if (data) setListeFestgeld(data)
-
-
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenFestgeld(data)
-    }
-
-    const ladeAssets = async () => {
-        const { data } = await supabase
-            .from("asset")
-            .select("*")
-            .order("asset_name", { ascending: true });
-
-        if (data) setAssets(data);
-    };
-
-    const ladeReferenzkonto = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data, error } = await supabase
-            .from("asset")
-            .select(`*,
-            tagesgeldkonto!left(*),
-            girokonto!left(*)`)
-            .eq("benutzer_id", user.id)
-            .eq("tagesgeldkonto.ist_referenzkonto", true)
-            .eq("girokonto.ist_referenzkonto", true)
-            .order('asset_name', { ascending: true });
-
-        if (data) {
-            const aktiveReferenzkonten = data
-                .map(asset => {
-                    // Sicherstellen, dass wir immer das erste Objekt aus dem Array holen (falls Array vorhanden)
-                    const tagesgeld = Array.isArray(asset.tagesgeldkonto)
-                        ? asset.tagesgeldkonto[0]
-                        : asset.tagesgeldkonto;
-
-                    const girokonto = Array.isArray(asset.girokonto)
-                        ? asset.girokonto[0]
-                        : asset.girokonto;
-
-                    return {
-                        ...asset,
-                        tagesgeldkonto: tagesgeld || null,
-                        girokonto: girokonto || null
-                    };
-                })
-                .filter(asset => {
-                    // Das Optional Chaining ?. verhindert den "Cannot read properties of undefined" Fehler!
-                    const istTagesgeldAktiv = asset.tagesgeldkonto?.ist_aktiv === true;
-                    const istGiroAktiv = asset.girokonto?.ist_aktiv === true;
-
-                    return istTagesgeldAktiv || istGiroAktiv;
-                });
-
-            setListeReferenzkonto(aktiveReferenzkonten);
-        }
-
-        if (handleApiError(error, "Referenzkonto laden")) return;
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        // String-Felder mit String()-Absicherung gegen Nicht-Strings
-        if (!name || !String(name).trim()) newErrors.name = "Asset Name ist erforderlich";
-        if (!bank || !String(bank).trim()) newErrors.bank = "Bank Name ist erforderlich";
-        if (!einzahlung_bei_eroeffnung || !String(einzahlung_bei_eroeffnung).trim()) newErrors.einzahlung_bei_eroeffnung = "einzahlung_bei_eroeffnung ist erforderlich";
-        if (!zinssatz || !String(zinssatz).trim()) newErrors.zinssatz = "Zinssatz ist erforderlich";
-        if (!laufzeitMonate || !String(laufzeitMonate).trim()) newErrors.laufzeitMonate = "Laufzeit ist erforderlich";
-
-        if (!eroeffnungsdatum) newErrors.eroeffnungsdatum = "Anlagedatum ist erforderlich";
-        if (!faelligkeitsdatum) newErrors.faelligkeitsdatum = "Fälligkeitsdatum ist erforderlich";
-
-        if (!ausgewaehltesReferenzkonto) newErrors.ausgewaehltesReferenzkonto = "Referenzkonto ist erforderlich";
-
-        setErrors(newErrors);
-
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleFestgeldSpeichern = () => {
-
-        if (validateForm()) {
-            if (zuBearbeiten) {
-                festgeldSpeichern();
-            } else {
-                festgeldHinzufuegen();
-            }
-
-        };
-    }
-
-    const festgeldHinzufuegen = async () => {
-
-
-        if (!name || !bank || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate) {
-            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, einzahlung_bei_eroeffnung, zinssatz, laufzeitMonate });
-            return;
-        }
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-
-            const { data: assetData, error: assetError } = await supabase
-                .from("asset")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_name: name,
-                    asset_typ: "festgeld",
-                })
-                .select()
-
-            if (assetError || !assetData || assetData.length === 0) {
-                console.error("Fehler beim Erstellen des Assets:", assetError.message || JSON.stringify(assetError))
-                alert("Fehler beim Erstellen des übergeordneten Assets.")
-                return
-            }
-
-            const asset_id = assetData[0].asset_id
-
-            const { error: festgeldError } = await supabase
-                .from("festgeld")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_id: asset_id,
-                    name_der_bank: bank,
-                    einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    zinssatz: parseFloat(zinssatz) || 0,
-                    laufzeit_monate: parseFloat(laufzeitMonate) || 0,
-                    eroeffnungsdatum: eroeffnungsdatum,
-                    faelligkeitsdatum: faelligkeitsdatum,
-                    gekuendigt_am: gekuendigtAm || null,
-                    zinsgutschrift: zinsgutschrift || "",
-                    zinseszins: zinseszins || true,
-                    freistellungsauftrag: freistellungsauftrag || 0,
-                    referenzkonto: ausgewaehltesReferenzkonto,
-                    automatische_verlaengerung: automatischVerlaengern || false,
-                    ist_aktiv: ist_aktiv || true,
-                    notizen: notizen || "",
-                    iban: iban,
-                    bic: bic || "",
-                    kontoinhaber: kontoinhaber || ""
-                })
-
-            if (festgeldError) {
-                console.error("Fehler beim Erstellen des Festgeldkontos:", festgeldError)
-                alert("Fehler beim Festgeld-Insert.")
-                return
-            }
-
-            const { error: transError } = await supabase
-                .from("transaktionsprotokoll")
-                .insert({
-                    benutzer_id: user.id,
-                    notizen: "Einzahlung bei Eröffnung",
-                    betrag: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                    kategorie_id: 'd5473c35-2e52-41ef-82a2-3eef5aff038f',
-                    asset_id: asset_id,
-                    assetklasse: "festgeld",
-                    typ: "einnahme"
-                })
-
-            if (transError) {
-                console.error("Fehler beim Erstellen der Transaktion Eroeffnung:", transError)
-                alert("Fehler beim Festgeld-Insert.")
-                return
-            }
-
-            setName("")
-            setBank("")
-            setIban("")
-            setEinzahlung_bei_eroeffnung("")
-            setWaehrung("EUR")
-            setEroeffnungsdatum("")
-            setNotizen("")
-            setKontoinhaber("")
-            setIstAktiv(true)
-            setBic("")
-            setZinssatz("")
-            setModalOffenHinzu(false)
-
-            ladeFestgeld()
+            const res = await axios.get("/api/festgeld");
+            setFestgeldList(res.data || []);
         } catch (err) {
-            console.error("Unerwarteter Fehler:", err)
+            console.error("Fehler beim Laden der Festgelder:", err);
         }
-    }
-
-    const festgeldSpeichern = async () => {
-
-        if (!name || !bank || !einzahlung_bei_eroeffnung || !zinssatz || !laufzeitMonate) {
-            console.warn("Abgebrochen wegen fehlender Felder!", { name, bank, einzahlung_bei_eroeffnung, zinssatz, laufzeitMonate });
-            return;
-        }
-
-        if (!zuBearbeiten) return;
-
-        const { error: assetError } = await supabase
-            .from("asset")
-            .update({ asset_name: name })
-            .eq("asset_id", zuBearbeiten.asset_id);
-
-        if (handleApiError(assetError, "Asset Name updaten")) return;
-
-        const { error: festgeldError } = await supabase
-            .from("festgeld")
-            .update({
-                name_der_bank: bank,
-                einzahlung_bei_eroeffnung: parseFloat(einzahlung_bei_eroeffnung) || 0,
-                zinssatz: parseFloat(zinssatz) || 0,
-                laufzeit_monate: parseFloat(laufzeitMonate) || 0,
-                eroeffnungsdatum: eroeffnungsdatum,
-                faelligkeitsdatum: faelligkeitsdatum,
-                gekuendigt_am: gekuendigtAm || null,
-                zinsgutschrift: zinsgutschrift || "",
-                zinseszins: zinseszins || true,
-                freistellungsauftrag: freistellungsauftrag || 0,
-                referenzkonto: ausgewaehltesReferenzkonto,
-                automatische_verlaengerung: automatischVerlaengern || false,
-                ist_aktiv: ist_aktiv || true,
-                notizen: notizen || "",
-                iban: iban,
-                bic: bic || "",
-                kontoinhaber: kontoinhaber || ""
-            })
-            .eq("asset_id", zuBearbeiten.asset_id);
-
-        if (handleApiError(festgeldError, "Festgeld updaten")) return;
-
-        setModalOffen(false)
-        setZuBearbeiten(null)
-        ladeFestgeld()
-    }
-
-    const transaktionHinzufuegen = async () => {
-        if (!transaktionsNotizen || !transaktionsBetrag || !transaktionsKategorie || !transaktionsTyp) return;
-        const { data: { user } } = await supabase.auth.getUser();
-
-        const { error } = await supabase.from("transaktionsprotokoll").insert({
-            benutzer_id: user.id,
-            notizen: transaktionsNotizen,
-            betrag: parseFloat(transaktionsBetrag),
-            kategorie_id: transaktionsKategorie,
-            asset_id: ausgewaehltesAsset,
-            assetklasse: "festgeld",
-            typ: transaktionsTyp
-        });
-
-        if (handleApiError(error, "Transaktion hinzufügen")) return;
-
-        setTransaktionsNotizen("");
-        setTransaktionsBetrag("");
-        setTransaktionsKategorie("");
-        setTransaktionsTyp("");
-
-        ladeFestgeld();
-        transaktionenOeffnen(ausgewaehltesAsset);
-        setModalTranskationenHinzufuegen(false);
     };
 
     const ladeKategorien = async () => {
-        const { data, error } = await supabase
-            .from("transaktionskategorie")
-            .select("*")
-            .eq("sichtbar", true)
-            .order("name", { ascending: true });
-
-
-        if (data) setKategorien(data);
-        if (handleApiError(error, "Kategorie laden")) return;
+        try {
+            const res = await axios.get("/api/kategorien");
+            setKategorien(res.data || []);
+        } catch (err) {
+            console.error("Fehler beim Laden der Kategorien:", err);
+        }
     };
 
-    const transaktionenOeffnen = async (assetId) => {
-        if (!assetId) {
-            console.warn("Keine Asset-ID vorhanden!");
-            return;
+    const ladeAssets = async () => {
+        try {
+            const res = await axios.get("/api/assets");
+            setAssets(res.data || []);
+        } catch (err) {
+            console.error("Fehler beim Laden der Assets:", err);
         }
+    };
 
-        setModalOffenTransaktionen(true)
-        setAusgewaehltesAsset(assetId)
+    const ladeReferenzkonto = async () => {
+        try {
+            const res = await axios.get("/api/referenzkonten");
+            setListeReferenzkonto(res.data || []);
+        } catch (err) {
+            console.error("Fehler beim Laden der Referenzkonten:", err);
+        }
+    };
 
-        const { data, error } = await supabase
-            .from("transaktionsprotokoll")
-            .select("*")
-            .eq("asset_id", assetId)
-            .order('datum', { ascending: false });
+    const bearbeitenOeffnen = (item) => {
+        setBearbeitenData(item);
+        setAusgewaehltesAsset(item.asset_id || "");
+        setAusgewaehlteKategorie(item.kategorie_id || "");
+        setAnlagesumme(item.anlagesumme || "");
+        setZinssatz(item.zinssatz || "");
+        setLaufzeitMonate(item.laufzeit_monate || "");
+        setStartdatum(item.startdatum || "");
+        setEnddatum(item.enddatum || "");
+        setAusgewaehltesReferenzkonto(item.referenzkonto_id || "");
+        setAutomatischVerlaengern(item.automatisch_verlaengern || false);
+        setNotizen(item.notizen || "");
+        setModalOffen(true);
+    };
 
-        if (handleApiError(error, "Transaktionen öffnen")) return;
-        if (data) setListeTransaktionenFestgeld(data)
-    }
+    const assetLoeschenMitLog = async (id) => {
+        if (window.confirm("Möchten Sie dieses Festgeld wirklich löschen?")) {
+            try {
+                await axios.delete(`/api/festgeld/${id}`);
+                toast.success("Festgeld erfolgreich gelöscht.");
+                ladeFestgeld();
+            } catch (err) {
+                toast.error("Fehler beim Löschen des Festgelds.");
+            }
+        }
+    };
 
-    const bearbeitenOeffnen = (eintrag) => {
-        setZuBearbeiten(eintrag);
-        setName(eintrag.asset?.asset_name || "");
-        setBank(eintrag.name_der_bank || "");
-        setEinzahlung_bei_eroeffnung(eintrag.einzahlung_bei_eroeffnung || "");
-        setZinssatz(eintrag.zinssatz);
-        setLaufzeitMonate(eintrag.laufzeit_monate);
-        setEroeffnungsdatum(eintrag.eroeffnungsdatum || "")
-        setFaelligkeitsdatum(eintrag.faelligkeitsdatum);
-        setLetzerKuendigungstag(eintrag.letzter_kuendigungstag);
-        setGekuendigtAm(eintrag.gekuendigtAm);
-        setZinsgutschrift(eintrag.zinsgutschrift);
-        setZinseszins(eintrag.zinseszins);
-        setFreistellungsauftrag(eintrag.freistellungsauftrag);
-        setAusgewaehltesReferenzkonto(eintrag.referenzkonto || "");
-        setAutomatischVerlaengern(eintrag.automatisch_verlaengern);
-        setIstAktiv(eintrag.ist_aktiv);
-        setNotizen(eintrag.notizen);
-        setIban(eintrag.iban);
-        setBic(eintrag.bic);
-        setKontoinhaber(eintrag.kontoinhaber);
-        setGekuendigtAm(eintrag.gekuendigtAm || "");
-        setAutomatischVerlaengern(eintrag.automatische_verlaengerung)
-        setIstAktiv(eintrag.ist_aktiv)
-        setModalOffen(true)
-    }
+    const transaktionenOeffnen = (item) => {
+        console.log("Transaktionen öffnen für:", item);
+    };
 
-    const assetLoeschenMitLog = async (assetId, assetTyp, tabelleName) => {
-        if (!assetId) return;
+    const resetFormular = () => {
+        setAusgewaehltesAsset("");
+        setAusgewaehlteKategorie("");
+        setAnlagesumme("");
+        setZinssatz("");
+        setLaufzeitMonate("");
+        setStartdatum("");
+        setEnddatum("");
+        setAusgewaehltesReferenzkonto("");
+        setAutomatischVerlaengern(false);
+        setNotizen("");
+        setBearbeitenData(null);
+    };
+
+    const speichereFestgeld = async () => {
+        const payload = {
+            asset_id: ausgewaehltesAsset,
+            kategorie_id: ausgewaehlteKategorie,
+            anlagesumme: Number(anlagesumme),
+            zinssatz: Number(zinssatz),
+            laufzeit_monate: Number(laufzeitMonate),
+            startdatum,
+            enddatum,
+            referenzkonto_id: ausgewaehltesReferenzkonto,
+            automatisch_verlaengern: automatischVerlaengern,
+            notizen
+        };
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-
-            const { data: werte, error: tlogError } = await supabase
-                .from("transaktionsprotokoll")
-                .select("*")
-                .eq("asset_id", assetId)
-
-            if (handleApiError(tlogError, "Asset vor dem Löschen abrufen")) return;
-
-            const { error: ttlogError } = await supabase
-                .from("geloeschte_transaktionen_log")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_id: assetId,
-                    asset_typ: assetTyp,
-                    daten: werte,
-                });
-
-            if (handleApiError(ttlogError, "Globale Log-Tabelle befüllen")) return;
-
-            const { error: tDeleteError } = await supabase
-                .from("transaktionsprotokoll")
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(tDeleteError, `${assetTyp} löschen`)) return;
-
-            // 1. Daten des spezifischen Assets laden (egal aus welcher Tabelle)
-            const { data: eintrag, error: fetchError } = await supabase
-                .from(tabelleName)
-                .select("*")
-                .eq("asset_id", assetId)
-                .single();
-
-            if (handleApiError(fetchError, "Asset vor dem Löschen abrufen")) return;
-
-            // 2. In die GLOBALE Log-Tabelle schreiben
-            const { error: logError } = await supabase
-                .from("geloeschte_assets_log")
-                .insert({
-                    benutzer_id: user.id,
-                    asset_id: assetId,
-                    asset_typ: assetTyp,
-                    asset_name: eintrag?.name || eintrag?.name_der_bank || "Unbenannt",
-                    daten: eintrag,      // Speichert alle spezifischen Spalten als JSON
-                });
-
-            if (handleApiError(logError, "Globale Log-Tabelle befüllen")) return;
-
-            // 3. Aus der spezifischen Tabelle löschen
-            const { error: subDeleteError } = await supabase
-                .from(tabelleName)
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(subDeleteError, `${assetTyp} löschen`)) return;
-
-            // 4. Aus der übergeordneten Asset-Haupttabelle löschen
-            const { error: mainDeleteError } = await supabase
-                .from("asset")
-                .delete()
-                .eq("asset_id", assetId);
-
-            if (handleApiError(mainDeleteError, "Asset Haupteintrag löschen")) return;
-
-
-
+            if (bearbeitenData) {
+                await axios.put(`/api/festgeld/${bearbeitenData.id}`, payload);
+                toast.success("Festgeld aktualisiert.");
+            } else {
+                await axios.post("/api/festgeld", payload);
+                toast.success("Festgeld hinzugefügt.");
+            }
+            setModalOffen(false);
+            setModalOffenHinzu(false);
+            resetFormular();
+            ladeFestgeld();
         } catch (err) {
-            console.error("Unerwarteter Fehler beim Löschen:", err);
+            toast.error("Fehler beim Speichern.");
         }
-
-        ladeFestgeld()
     };
 
-    const formatEuro = (betrag) =>
-        new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(
-            Number(betrag || 0)
-        );
-
-    useEffect(() => {
-        const init = async () => {
-            try {
-                await ladeFestgeld()
-                await ladeKategorien();
-                await ladeAssets();
-                await ladeReferenzkonto()
-            } catch (err) {
-                console.error("Fehler in init:", err);
-            }
-        };
-        init();
-    }, []);
-
-
     return (
-        <div className="festgeldkonto-container">
-            <div className="header-bar">
-                <h2>Festgeld</h2>
-                <button
-                    className="btn-primary"
-                    onClick={() => {
-                        setIban("");
-                        setBic("");
-                        setKontoinhaber("");
-                        setZuBearbeiten(null);
-                        setName("");
-                        setBank("");
-                        setEinzahlung_bei_eroeffnung("");
-                        setZinssatz("");
-                        setLaufzeitMonate("");
-                        setEroeffnungsdatum("");
-                        setFaelligkeitsdatum("");
-                        setZinsgutschrift("am_ende");
-                        setZinseszins(false);
-                        setAusgewaehltesReferenzkonto("");
-                        setKuendigungsfrist("");
-                        setAutomatischVerlaengern(false);
-                        setFreistellungsauftrag("");
-                        setTransaktionsNotizen("");
-                        setErrors({});
-                        setModalOffenHinzu(true);
-                    }}
+        <div className="festgeld-container p-6">
+            <h1 className="text-2xl font-bold mb-4">Festgeld Übersicht</h1>
+
+            {/* Übersichtskarten */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="card p-4 shadow rounded bg-white">
+                    <h2 className="text-gray-500 font-medium">Gesamte Anlagesumme</h2>
+                    <p className="text-2xl font-bold text-blue-600">{formatEuro(gesamtanlage)}</p>
+                </div>
+                <div className="card p-4 shadow rounded bg-white">
+                    <h2 className="text-gray-500 font-medium">Erwarteter Zinsertrag</h2>
+                    <p className="text-2xl font-bold text-green-600">{formatEuro(zinsertragGesamt)}</p>
+                </div>
+            </div>
+
+            {/* Aktion-Buttons */}
+            <div className="mb-4">
+                <button 
+                    className="btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    onClick={() => { resetFormular(); setModalOffenHinzu(true); }}
                 >
-                    + Festgeldkonto hinzufügen
+                    + Neues Festgeld anlegen
                 </button>
             </div>
 
-            {ansicht === "card" ? (
-                <div className="karten-grid">
-                    {listeFestgeld.map((e) => {
-                        const transaktionen = e.asset?.transaktionsprotokoll || [];
-
-                        const aktuellerKontostand = transaktionen.reduce((acc, t) => {
-                            const betrag = Number(t.betrag || 0);
-                            return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
-                        }, 0);
-
-                        // Berechnung des geschätzten Zinsertrags für die gesamte Laufzeit
-                        const zinsertragGesamt =
-                            (Number(e.einzahlung_bei_eroeffnung || 0) *
-                                Number(e.zinssatz || 0) *
-                                (Number(e.laufzeit_monate || 0) / 12)) /
-                            100;
-
-                        return (
-                            <div className="account-card" key={e.id}>
-                                <div className="card-header">
-                                    <div>
-                                        <h3>{e.asset?.asset_name || e.name_der_bank}</h3>
-                                        <span className="bank-name">
-                                            {e.name_der_bank} ({e.land_der_bank || "DE"})
-                                        </span>
-                                    </div>
-                                    <div className="badge-wrapper">
-                                        {e.automatisch_verlaengern && (
-                                            <span className="badge prolongation">Prolongation</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="card-body">
-                                    <div className="amount">
-                                        <strong>{aktuellerKontostand.toFixed(2)} {e.waehrung}</strong>
-                                    </div>
-
-                                    <div className="amount">
-
-                                        {e.einzahlung_bei_eroeffnung} {e.waehrung}
-                                    </div>
-
-                                    {/* Errechneter Zinsertrag */}
-                                    <p className="info-text Zins-gain">
-                                        <strong>Zinsertrag (geschätzt):</strong> +
-                                        {formatEuro(zinsertragGesamt)}
-                                    </p>
-
-                                    {/* Laufzeit-Details */}
-                                    <div className="details-grid">
-                                        <p className="info-text">
-                                            <strong>Laufzeit:</strong> {e.laufzeit_monate} Monate
-                                        </p>
-                                        <p className="info-text">
-                                            <strong>Eröffnet am:</strong>{" "}
-                                            {e.eroeffnungsdatum || "Keine Angabe"}
-                                        </p>
-                                        <p className="info-text">
-                                            <strong>Fällig am:</strong> {e.faelligkeitsdatum}
-                                        </p>
-                                        <p className="info-text">
-                                            <strong>Zinsgutschrift:</strong>{" "}
-                                            {e.zinsgutschrift === "am_ende"
-                                                ? "Am Ende der Laufzeit"
-                                                : "Jährlich"}
-                                        </p>
-                                    </div>
-
-                                    {/* Kontodaten */}
-                                    {e.iban && (
-                                        <p className="info-text subtext-iban">
-                                            <strong>IBAN:</strong> {e.iban}
-                                        </p>
-                                    )}
-                                    {e.referenzkonto && (
-                                        <p className="info-text subtext-iban">
-                                            <strong>Referenzkonto:</strong> {e.referenzkonto}
-                                        </p>
-                                    )}
-
-                                    {/* Kündigungswarnung */}
-                                    {e.letzter_kuendigungstag && (
-                                        <p className="info-text warning">
-                                            <strong>Kündigen bis:</strong> {e.letzter_kuendigungstag}
-                                        </p>
-                                    )}
-
-                                    {/* Notizen */}
-                                    {e.notizen && <p className="note">{e.notizen}</p>}
-                                </div>
-
-                                <div className="card-actions">
-                                    <button
-                                        onClick={() => bearbeitenOeffnen(e)}
-                                        title="Bearbeiten"
-                                    >
-                                        ✏️
-                                    </button>
-                                    <button
-                                        onClick={() =>
-                                            assetLoeschenMitLog(
-                                                e.asset?.asset_id,
-                                                "festgeld",
-                                                "festgeld"
-                                            )
-                                        }
-                                        title="Löschen"
-                                    >
-                                        🗑️
-                                    </button>
-                                    <button
-                                        onClick={() => transaktionenOeffnen(e.asset?.asset_id)}
-                                        title="Transaktionen"
-                                    >
-                                        💰
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            ) : (
-                <div className="table-responsive">
-                    <table className="konto-tabelle">
-                        <thead>
+            {/* Liste / Tabelle */}
+            <div className="table-responsive bg-white rounded shadow overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="border-b bg-gray-100">
+                            <th className="p-3">Asset</th>
+                            <th className="p-3">Anlagesumme</th>
+                            <th className="p-3">Zinssatz</th>
+                            <th className="p-3">Laufzeit</th>
+                            <th className="p-3">Enddatum</th>
+                            <th className="p-3 text-right">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {festgeldList.length === 0 ? (
                             <tr>
-                                <th>Asset / Bank</th>
-                                <th>einzahlung_bei_eroeffnung</th>
-                                <th>Zinssatz</th>
-                                <th>Ertrag (geschätzt)</th>
-                                <th>Laufzeit</th>
-                                <th>Fälligkeit</th>
-                                <th>Status</th>
-                                <th>Aktionen</th>
+                                <td colSpan="6" className="p-4 text-center text-gray-500">
+                                    Keine Festgelder vorhanden.
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {listeFestgeld.map((e) => {
-                                const zinsertragGesamt =
-                                    (Number(e.einzahlung_bei_eroeffnung || 0) *
-                                        Number(e.zinssatz || 0) *
-                                        (Number(e.laufzeit_monate || 0) / 12)) /
-                                    100;
-
-                                return (
-                                    <tr key={e.id}>
-                                        <td>
-                                            <strong>
-                                                {e.asset?.asset_name || e.name_der_bank}
-                                            </strong>
-                                            <div className="subtext">
-                                                {e.name_der_bank} ({e.land_der_bank || "DE"})
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <strong>{formatEuro(e.einzahlung_bei_eroeffnung)}</strong>
-                                        </td>
-                                        <td>{e.zinssatz}% p.a.</td>
-                                        <td className="text-success">
-                                            +{formatEuro(zinsertragGesamt)}
-                                        </td>
-                                        <td>{e.laufzeit_monate} Mon.</td>
-                                        <td>{e.faelligkeitsdatum}</td>
-                                        <td>
-                                            <span className={`badge status-${e.status || "aktiv"}`}>
-                                                {e.status || "aktiv"}
-                                            </span>
-                                        </td>
-                                        <td className="table-actions">
-                                            <button
-                                                onClick={() => bearbeitenOeffnen(e)}
-                                                title="Bearbeiten"
-                                            >
-                                                ✏️
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    assetLoeschenMitLog(
-                                                        e.asset?.asset_id,
-                                                        "festgeldkonto",
-                                                        "festgeldkonto"
-                                                    )
-                                                }
-                                                title="Löschen"
-                                            >
-                                                🗑️
-                                            </button>
-                                            <button
-                                                onClick={() => transaktionenOeffnen(e.asset?.asset_id)}
-                                                title="Transaktionen"
-                                            >
-                                                💰
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* MODAL: Transaktionsübersicht */}
-            {modalOffenTransaktionen && (
-                <div className="modal-overlay">
-                    <div className="modal-container modal-lg">
-                        <div className="modal-header">
-                            <h3>Transaktionsübersicht</h3>
-                            <button className="close-btn" onClick={() => setModalOffenTransaktionen(false)}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            {listeTransaktionenFestgeld.length === 0 ? (
-                                <p className="empty-text">Keine Transaktionen für dieses Festgeldkonto vorhanden.</p>
-                            ) : (
-                                <ul className="transaction-list">
-                                    {listeTransaktionenFestgeld.map((t) => (
-                                        <li key={t.id} className="transaction-item">
-                                            <div className="tx-info">
-                                                <span className="tx-desc">{t.notizen || "Auszahlung / Zinsgutschrift"}</span>
-                                                <span className="tx-date">{t.datum}</span>
-                                            </div>
-                                            <span className={`tx-amount ${t.typ === 'einnahme' ? 'positive' : 'negative'}`}>
-                                                {t.typ === 'einnahme' ? '+' : '-'}{t.betrag} EUR
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalOffenTransaktionen(false)}>Schließen</button>
-                            <button className="btn-primary" onClick={() => setModalTranskationenHinzufuegen(true)}>+ Transaktion hinzufügen</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL: Hinzufügen */}
-            {(modalOffenHinzu) && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>{modalOffenHinzu ? "Neues Festgeldkonto hinzufügen" : "Festgeldkonto bearbeiten"}</h3>
-                            <button className="close-btn" onClick={() => { setModalOffenHinzu(false); setModalOffen(false); }}>✕</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label>Bezeichnung / Asset Name*</label>
-                                    <input
-                                        className={errors.name ? "input-error" : ""}
-                                        value={name}
-                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
-                                        placeholder="z.B. Festgeld 2 Jahre"
-                                    />
-                                    {errors.name && <span className="error-text">{errors.name}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Bank Name*</label>
-                                    <input
-                                        className={errors.bank ? "input-error" : ""}
-                                        value={bank}
-                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
-                                        placeholder="z.B. Klarna / WeltSparen"
-                                    />
-                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>IBAN*</label>
-                                    <input
-                                        className={errors.iban ? "input-error" : ""}
-                                        value={iban}
-                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
-                                        placeholder="DE00 0000 0000 0000 0000 00"
-                                    />
-                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Anlagesumme (€)*</label>
-                                    <input
-                                        type="number"
-                                        className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
-                                        value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
-                                        placeholder="5000.00"
-                                    />
-                                    {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinssatz (% p.a.)*</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className={errors.zinssatz ? "input-error" : ""}
-                                        value={zinssatz}
-                                        onChange={(e) => { setZinssatz(e.target.value); setErrors({ ...errors, zinssatz: null }); }}
-                                        placeholder="3.50"
-                                    />
-                                    {errors.zinssatz && <span className="error-text">{errors.zinssatz}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Laufzeit (Monate)*</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className={errors.laufzeitMonate ? "input-error" : ""}
-                                        value={laufzeitMonate}
-                                        onChange={(e) => setLaufzeitMonate(e.target.value)}
-                                        placeholder="12"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Eröffnungsdatum*</label>
-                                    <input
-                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
-                                        type="date"
-                                        value={eroeffnungsdatum}
-                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
-                                    />
-                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Fälligkeitsdatum*</label>
-                                    <input
-                                        type="date"
-                                        step="0.01"
-                                        className={errors.faelligkeitsdatum ? "input-error" : ""}
-                                        value={faelligkeitsdatum}
-                                        onChange={(e) => setFaelligkeitsdatum(e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Kündigungsfrist (Tage)</label>
-                                    <input
-                                        type="number"
-                                        value={kuendigungsfrist}
-                                        onChange={(e) => setKuendigungsfrist(e.target.value)}
-                                        placeholder="30"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinsgutschrift</label>
-                                    <select value={zinsgutschrift} onChange={(e) => setZinsgutschrift(e.target.value)}>
-                                        <option value="am_ende">Am Ende der Laufzeit</option>
-                                        <option value="jaehrlich">Jährlich</option>
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Referenzkonto / Auszahlungskonto*</label>
-                                    <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
-                                        <option value="">Referenzkonto auswählen...</option>
-                                        {listeReferenzkonto.map(konto => (
-                                            <option
-                                                key={konto.id}
-                                                value={konto.id}>
-                                                {konto.girokonto
-                                                    ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
-                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Anmerkungen..." />
-                                </div>
-                                <div className="form-group">
-                                    <label>Freistellingsauftrag</label>
-                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={zinseszins} onChange={(e) => setZinseszins(e.target.checked)} />
-                                        Zinseszins-Effekt (Thesaurierung)
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={automatischVerlaengern} onChange={(e) => setAutomatischVerlaengern(e.target.checked)} />
-                                        Automatisch verlängern (Prolongation)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalOffenHinzu(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={handleFestgeldSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL: Anpassen */}
-            {(modalOffen) && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h3>Festgeldkonto bearbeiten</h3>
-                            <button className="close-btn" onClick={() => setModalOffen(false)}></button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-grid">
-                                <div className="form-group">
-                                    <label>Bezeichnung / Asset Name*</label>
-                                    <input
-                                        className={errors.name ? "input-error" : ""}
-                                        value={name}
-                                        onChange={(e) => { setName(e.target.value); setErrors({ ...errors, name: null }); }}
-                                        placeholder="z.B. Festgeld 2 Jahre"
-                                    />
-                                    {errors.name && <span className="error-text">{errors.name}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Bank Name*</label>
-                                    <input
-                                        className={errors.bank ? "input-error" : ""}
-                                        value={bank}
-                                        onChange={(e) => { setBank(e.target.value); setErrors({ ...errors, bank: null }); }}
-                                        placeholder="z.B. Klarna / WeltSparen"
-                                    />
-                                    {errors.bank && <span className="error-text">{errors.bank}</span>}
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>IBAN*</label>
-                                    <input
-                                        className={errors.iban ? "input-error" : ""}
-                                        value={iban}
-                                        onChange={(e) => { setIban(e.target.value); setErrors({ ...errors, iban: null }); }}
-                                        placeholder="DE00 0000 0000 0000 0000 00"
-                                    />
-                                    {errors.iban && <span className="error-text">{errors.iban}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input value={bic} onChange={(e) => setBic(e.target.value)} placeholder="BIC Code" />
-                                </div>
-                                <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input value={kontoinhaber} onChange={(e) => setKontoinhaber(e.target.value)} placeholder="Max Mustermann" />
-                                </div>
-                                <div className="form-group">
-                                    <label>einzahlung_bei_eroeffnung (€)*</label>
-                                    <input
-                                        type="number"
-                                        className={errors.einzahlung_bei_eroeffnung ? "input-error" : ""}
-                                        value={einzahlung_bei_eroeffnung}
-                                        onChange={(e) => { setEinzahlung_bei_eroeffnung(e.target.value); setErrors({ ...errors, einzahlung_bei_eroeffnung: null }); }}
-                                        placeholder="5000.00"
-                                    />
-                                    {errors.einzahlung_bei_eroeffnung && <span className="error-text">{errors.einzahlung_bei_eroeffnung}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinssatz (% p.a.)*</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className={errors.zinssatz ? "input-error" : ""}
-                                        value={zinssatz}
-                                        onChange={(e) => { setZinssatz(e.target.value); setErrors({ ...errors, zinssatz: null }); }}
-                                        placeholder="3.50"
-                                    />
-                                    {errors.zinssatz && <span className="error-text">{errors.zinssatz}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Laufzeit (Monate)*</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        className={errors.laufzeitMonate ? "input-error" : ""}
-                                        value={laufzeitMonate}
-                                        onChange={(e) => setLaufzeitMonate(e.target.value)}
-                                        placeholder="12"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Eröffnungsdatum*</label>
-                                    <input
-                                        className={errors.eroeffnungsdatum ? "input-error" : ""}
-                                        type="date"
-                                        value={eroeffnungsdatum}
-                                        onChange={(e) => { setEroeffnungsdatum(e.target.value); setErrors({ ...errors, eroeffnungsdatum: null }); }}
-                                    />
-                                    {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
-                                </div>
-                                <div className="form-group">
-                                    <label>Fälligkeitsdatum*</label>
-                                    <input
-                                        type="date"
-                                        step="0.01"
-                                        className={errors.faelligkeitsdatum ? "input-error" : ""}
-                                        value={faelligkeitsdatum}
-                                        onChange={(e) => setFaelligkeitsdatum(e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Kündigungsfrist (Tage)</label>
-                                    <input
-                                        type="number"
-                                        value={kuendigungsfrist}
-                                        onChange={(e) => setKuendigungsfrist(e.target.value)}
-                                        placeholder="30"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Gekündigt am</label>
-                                    <input
-                                        type="date"
-                                        step="0.01"
-                                        className={errors.gekuendigtAm ? "input-error" : ""}
-                                        value={gekuendigtAm}
-                                        onChange={(e) => setGekuendigtAm(e.target.value)}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Zinsgutschrift</label>
-                                    <select value={zinsgutschrift} onChange={(e) => setZinsgutschrift(e.target.value)}>
-                                        <option value="am_ende">Am Ende der Laufzeit</option>
-                                        <option value="jaehrlich">Jährlich</option>
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Referenzkonto / Auszahlungskonto*</label>
-                                    <select value={ausgewaehltesReferenzkonto} onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}>
-                                        <option value="">Referenzkonto auswählen...</option>
-                                        {listeReferenzkonto.map(konto => (
-                                            <option
-                                                key={konto.id}
-                                                value={konto.id}>
-                                                {konto.girokonto
-                                                    ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
-                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input value={transaktionsNotizen} onChange={(e) => setTransaktionsNotizen(e.target.value)} placeholder="Optionale Anmerkungen..." />
-                                </div>
-                                <div className="form-group">
-                                    <label>Freistellingsauftrag</label>
-                                    <input value={freistellungsauftrag} onChange={(e) => setFreistellungsauftrag(e.target.value)} placeholder="1000" />
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={zinseszins} onChange={(e) => setZinseszins(e.target.checked)} />
-                                        Zinseszins-Effekt (Thesaurierung)
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={automatischVerlaengern} onChange={(e) => setAutomatischVerlaengern(e.target.checked)} />
-                                        Automatisch verlängern (Prolongation)
-                                    </label>
-                                    <label className="checkbox-label">
-                                        <input type="checkbox" checked={ist_aktiv} onChange={(e) => setIstAktiv(e.target.checked)} />
-                                        Ist Aktiv
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setModalOffen(false)}>Abbrechen</button>
-                            <button className="btn-primary" onClick={handleFestgeldSpeichern}>Speichern</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {modalTranskationenHinzufuegen && (
-                <div style={{
-                    position: "fixed",
-                    top: 0, left: 0,
-                    width: "100%", height: "100%",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        backgroundColor: "white",
-                        padding: "24px",
-                        borderRadius: "12px",
-                        minWidth: "320px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "12px",
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-                    }}>
-                        <h4 style={{ marginBottom: "8px", fontWeight: "600" }}>Transaktion hinzufügen</h4>
-                        <input
-                            value={transaktionsNotizen}
-                            onChange={(e) => setTransaktionsNotizen(e.target.value)}
-                            placeholder="Notizen"
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        />
-                        <input
-                            value={transaktionsBetrag}
-                            onChange={(e) => setTransaktionsBetrag(e.target.value)}
-                            placeholder="Betrag"
-                            type="number"
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        />
-                        <select
-                            value={transaktionsKategorie}
-                            onChange={(e) => setTransaktionsKategorie(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Kategorie wählen</option>
-                            {kategorien.map((k) => (
-                                <option key={k.id} value={k.id}>{k.name}</option>
-                            ))}
-                        </select>
-                        <select
-                            value={transaktionsTyp}
-                            onChange={(e) => setTransaktionsTyp(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Typ wählen</option>
-                            <option value="ausgabe">Ausgabe</option>
-                            <option value="einnahme">Einnahme</option>
-                        </select>
-                        <select
-                            value={ausgewaehltesAsset}
-                            onChange={(e) => setAusgewaehltesAsset(e.target.value)}
-                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                        >
-                            <option value="">Asset wählen</option>
-                            {assets.map((a) => (
-                                <option key={a.asset_id} value={a.asset_id}>
-                                    {a.asset_typ} | {a.asset_name}
-                                </option>
-                            ))}
-                        </select>
-
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <input
-                                type="checkbox"
-                                id="wiederkehrend"
-                                checked={wiederkehrendaktiv}
-                                onChange={(e) => setWiederkehrendaktiv(e.target.checked)}
-                            />
-                            <label htmlFor="wiederkehrend">Wiederkehrend</label>
-                        </div>
-
-                        {wiederkehrendaktiv && (
-                            <select
-                                value={intervall}
-                                onChange={(e) => setIntervall(e.target.value)}
-                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
-                            >
-                                <option value="">Intervall wählen</option>
-                                <option value="täglich">Täglich</option>
-                                <option value="wöchentlich">Wöchentlich</option>
-                                <option value="monatlich">Monatlich</option>
-                                <option value="jährlich">Jährlich</option>
-                            </select>
+                        ) : (
+                            festgeldList.map((item) => (
+                                <tr key={item.id} className="border-b hover:bg-gray-50">
+                                    <td className="p-3">{item.asset_name || "Unbenannt"}</td>
+                                    <td className="p-3 font-semibold">{formatEuro(item.anlagesumme)}</td>
+                                    <td className="p-3">{item.zinssatz}%</td>
+                                    <td className="p-3">{item.laufzeit_monate} Monate</td>
+                                    <td className="p-3">{item.enddatum}</td>
+                                    <td className="p-3 text-right space-x-2">
+                                        <button 
+                                            onClick={() => transaktionenOeffnen(item)}
+                                            className="px-2 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+                                        >
+                                            Transaktionen
+                                        </button>
+                                        <button 
+                                            onClick={() => bearbeitenOeffnen(item)}
+                                            className="px-2 py-1 text-sm bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                                        >
+                                            Bearbeiten
+                                        </button>
+                                        <button 
+                                            onClick={() => assetLoeschenMitLog(item.id)}
+                                            className="px-2 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                        >
+                                            Löschen
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
                         )}
+                    </tbody>
+                </table>
+            </div>
 
-                        <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                            <button
-                                onClick={() => transaktionHinzufuegen}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#3b82f6", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+            {/* Modal für Hinzufügen / Bearbeiten */}
+            {(modalOffen || modalOffenHinzu) && (
+                <div className="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    <div className="modal-content bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="modal-header border-b pb-3 mb-4 flex justify-between items-center">
+                            <h3 className="text-xl font-bold">
+                                {bearbeitenData ? "Festgeld bearbeiten" : "Neues Festgeld anlegen"}
+                            </h3>
+                            <button 
+                                className="text-gray-500 hover:text-gray-700 font-bold"
+                                onClick={() => { setModalOffen(false); setModalOffenHinzu(false); }}
                             >
-                                Hinzufügen
+                                ✕
                             </button>
-                            <button
-                                onClick={() => setModalTranskationenHinzufuegen(false)}
-                                style={{ flex: 1, padding: "10px", backgroundColor: "#e2e8f0", color: "#475569", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+                        </div>
+
+                        <div className="modal-body space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Asset / Name*</label>
+                                    <select 
+                                        className="w-full border p-2 rounded"
+                                        value={ausgewaehltesAsset} 
+                                        onChange={(e) => setAusgewaehltesAsset(e.target.value)}
+                                    >
+                                        <option value="">Asset auswählen...</option>
+                                        {assets.map(asset => (
+                                            <option key={asset.id} value={asset.id}>
+                                                {asset.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Kategorie</label>
+                                    <select 
+                                        className="w-full border p-2 rounded"
+                                        value={ausgewaehlteKategorie} 
+                                        onChange={(e) => setAusgewaehlteKategorie(e.target.value)}
+                                    >
+                                        <option value="">Kategorie auswählen...</option>
+                                        {kategorien.map(kat => (
+                                            <option key={kat.id} value={kat.id}>
+                                                {kat.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Anlagesumme (€)*</label>
+                                    <input 
+                                        type="number" 
+                                        className="w-full border p-2 rounded"
+                                        value={anlagesumme} 
+                                        onChange={(e) => setAnlagesumme(e.target.value)} 
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Zinssatz (% p.a.)*</label>
+                                    <input 
+                                        type="number" 
+                                        step="0.01" 
+                                        className="w-full border p-2 rounded"
+                                        value={zinssatz} 
+                                        onChange={(e) => setZinssatz(e.target.value)} 
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Laufzeit (Monate)*</label>
+                                    <input 
+                                        type="number" 
+                                        className="w-full border p-2 rounded"
+                                        value={laufzeitMonate} 
+                                        onChange={(e) => setLaufzeitMonate(e.target.value)} 
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Startdatum</label>
+                                    <input 
+                                        type="date" 
+                                        className="w-full border p-2 rounded"
+                                        value={startdatum} 
+                                        onChange={(e) => setStartdatum(e.target.value)} 
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="block text-sm font-medium mb-1">Enddatum</label>
+                                    <input 
+                                        type="date" 
+                                        className="w-full border p-2 rounded"
+                                        value={enddatum} 
+                                        onChange={(e) => setEnddatum(e.target.value)} 
+                                    />
+                                </div>
+
+                                <div className="form-group col-span-1 md:col-span-2">
+                                    <label className="block text-sm font-medium mb-1">Referenzkonto / Auszahlungskonto*</label>
+                                    <select 
+                                        className="w-full border p-2 rounded"
+                                        value={ausgewaehltesReferenzkonto} 
+                                        onChange={(e) => setAusgewaehltesReferenzkonto(e.target.value)}
+                                    >
+                                        <option value="">Referenzkonto auswählen...</option>
+                                        {listeReferenzkonto.map(konto => (
+                                            <option key={konto.id} value={konto.id}>
+                                                {konto.girokonto
+                                                    ? `Girokonto (${konto.girokonto.iban || konto.asset_name || ''})`
+                                                    : `Tagesgeld (${konto.tagesgeldkonto?.iban || konto.asset_name || ''})`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group checkbox-group col-span-1 md:col-span-2 flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="prolongation"
+                                        checked={automatischVerlaengern}
+                                        onChange={(e) => setAutomatischVerlaengern(e.target.checked)}
+                                    />
+                                    <label htmlFor="prolongation" className="text-sm font-medium">
+                                        Automatisch verlängern (Prolongation)
+                                    </label>
+                                </div>
+
+                                <div className="form-group col-span-1 md:col-span-2">
+                                    <label className="block text-sm font-medium mb-1">Notizen</label>
+                                    <textarea
+                                        className="w-full border p-2 rounded"
+                                        value={notizen}
+                                        onChange={(e) => setNotizen(e.target.value)}
+                                        placeholder="Zusätzliche Anmerkungen..."
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer border-t pt-4 mt-6 flex justify-end gap-2">
+                            <button 
+                                className="btn-secondary px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" 
+                                onClick={() => { setModalOffenHinzu(false); setModalOffen(false); }}
                             >
                                 Abbrechen
                             </button>
+                            <button 
+                                className="btn-primary px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" 
+                                onClick={speichereFestgeld}
+                            >
+                                Speichern
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* Toast Container für Benachrichtigungen */}
+            <ToastContainer />
         </div>
     );
 }

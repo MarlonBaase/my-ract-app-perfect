@@ -1,9 +1,10 @@
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { StrictMode, useEffect, useState } from 'react'
-import { supabase } from './supabase'
 import { ErrorBoundary } from 'react-error-boundary'
 import { SettingsContext } from './SettingsContext';
+import { initialisiereAuthObserver } from './services/mainService';
+
 import Home from './Home'
 import Dashboard from './Dashboard'
 import Assetklassen from './Assetklassen'
@@ -16,7 +17,7 @@ import Fremdwaehrung from './assetklassen/Fremdwaehrung'
 import Fremdwaehrung_stammdaten from './assetklassen/Fremdwaehrung_stammdaten'
 import FremdwaehrungDetail from './assetklassen/FremdwaehrungDetail'
 import Fremdwaehrung_konto from './assetklassen/Fremdwaehrung_konto'
-import Haushaltsbuch from './haushaltsbuch'
+import Haushaltsbuch from './Haushaltsbuch'
 import Profil from './Profil'
 import Konfiguration from './profil/konfiguration'
 import Zeiterfassung from './profil/Zeiterfassung'
@@ -24,12 +25,7 @@ import AdminSupport from './profil/AdminSupport'
 import Simulation from './Simulation'
 import Support from './Support'
 import Navbar from './Navbar'
-import AssetSidebar from './AssetSidebar'
 import './index.css'
-
-
-
-
 
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
@@ -43,37 +39,17 @@ function ErrorFallback({ error, resetErrorBoundary }) {
   );
 }
 
-
 function App() {
   const [session, setSession] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
   const [ansicht, setAnsicht] = useState("card")
 
   useEffect(() => {
-    const checkMfaAndSetSession = async (currentSession) => {
-      if (!currentSession) {
-        setSession(null);
-        return;
-      }
-
-      const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-
-      if (mfaData && mfaData.currentLevel === mfaData.nextLevel) {
-        setSession(currentSession);
-      } else {
-        setSession(null);
-      }
-    };
-
-    supabase.auth.getSession().then(({ data }) => {
-      checkMfaAndSetSession(data.session);
+    const unsubscribe = initialisiereAuthObserver((validatedSession) => {
+      setSession(validatedSession);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      checkMfaAndSetSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {

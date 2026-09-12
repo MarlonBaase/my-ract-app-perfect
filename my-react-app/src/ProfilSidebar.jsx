@@ -1,71 +1,22 @@
-import { Link, useLocation } from 'react-router-dom'
-import { useState } from 'react'
- 
-const struktur = [
-  {
-    block: "Profil",
-    farbe: "#22C55E",
-    bereiche: [
-      {
-        label: "Daten",
-        path: "/profil/daten",
-        unterseiten: [
-        ]
-      },
-    ]
-  },
-  {
-    block: "Einstellungen",
-    farbe: "#c54522",
-    bereiche: [
-      {
-        label: "Einstellungen",
-        path: "/profil/konfiguration",
-        unterseiten: [
-        ]
-      },
-    ]
-  },
-  {
-    block: "Zeiterfassung",
-    farbe: "#2e2bc0",
-    bereiche: [
-      {
-        label: "Zeiterfassung",
-        path: "/profil/zeiterfassung",
-        unterseiten: [
-        ]
-      },
-    ]
-  },
-  {
-    block: "Admin-Support",
-    farbe: "#c02ba5",
-    bereiche: [
-      {
-        label: "Admin-Support",
-        path: "/profil/admin-support",
-        unterseiten: [
-        ]
-      },
-    ]
-  }
-]
- 
+import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { 
+  PROFIL_SIDEBAR_STRUKTUR, 
+  istExakterPfadAktiv, 
+  istBereichAktiv 
+} from './services/profil_sidebarService';
+
 export default function ProfilSidebar({ darkMode: dark }) {
-  const location = useLocation()
-  const [offen, setOffen] = useState({})
- 
-  const istAktiv = (path) => location.pathname === path
-  const istBereichAktiv = (path) => location.pathname.startsWith(path)
- 
+  const location = useLocation();
+  const [offen, setOffen] = useState({});
+
   const toggleBereich = (label) => {
-    setOffen(prev => ({ ...prev, [label]: !prev[label] }))
-  }
- 
+    setOffen(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
   // Sidebar nur im Profil-Bereich anzeigen
-  if (!location.pathname.startsWith("/profil")) return null
- 
+  if (!location.pathname.startsWith("/profil")) return null;
+
   return (
     <div style={{
       width: "260px",
@@ -79,9 +30,9 @@ export default function ProfilSidebar({ darkMode: dark }) {
       padding: "1rem 0",
       fontSize: "0.82rem",
     }}>
-      {struktur.map((block) => (
+      {PROFIL_SIDEBAR_STRUKTUR.map((block) => (
         <div key={block.block} style={{ marginBottom: "1.5rem" }}>
- 
+
           {/* Block Header */}
           <div style={{
             padding: "0.4rem 1rem",
@@ -94,82 +45,91 @@ export default function ProfilSidebar({ darkMode: dark }) {
           }}>
             {block.block}
           </div>
- 
-          {block.bereiche.map((bereich) => (
-            <div key={bereich.label}>
- 
-              {/* Bereichs-Dashboard Link */}
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Link
-                  to={bereich.path}
-                  style={{
-                    flex: 1,
-                    display: "block",
-                    padding: "0.45rem 1rem",
-                    textDecoration: "none",
-                    fontWeight: istBereichAktiv(bereich.path) ? "600" : "500",
-                    color: istBereichAktiv(bereich.path)
-                      ? "#4F6EF7"
-                      : dark ? "#c9d1e0" : "#374151",
-                    backgroundColor: istAktiv(bereich.path)
-                      ? dark ? "#1e2235" : "#f0f4ff"
-                      : "transparent",
-                    borderLeft: istBereichAktiv(bereich.path)
-                      ? "3px solid #4F6EF7"
-                      : "3px solid transparent",
-                    transition: "all 0.1s",
-                  }}
-                >
-                  {bereich.label}
-                </Link>
- 
-                {/* Toggle Button */}
-                {bereich.unterseiten.length > 0 && (
-                  <button
-                    onClick={() => toggleBereich(bereich.label)}
+
+          {block.bereiche.map((bereich) => {
+            const bereichAktiv = istBereichAktiv(location.pathname, bereich.path);
+            const aktiv = istExakterPfadAktiv(location.pathname, bereich.path);
+
+            return (
+              <div key={bereich.label}>
+
+                {/* Bereichs-Dashboard Link */}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Link
+                    to={bereich.path}
                     style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: dark ? "#8B92A5" : "#6B7280",
-                      padding: "0 0.75rem",
-                      fontSize: "0.7rem",
+                      flex: 1,
+                      display: "block",
+                      padding: "0.45rem 1rem",
+                      textDecoration: "none",
+                      fontWeight: bereichAktiv ? "600" : "500",
+                      color: bereichAktiv
+                        ? "#4F6EF7"
+                        : dark ? "#c9d1e0" : "#374151",
+                      backgroundColor: aktiv
+                        ? dark ? "#1e2235" : "#f0f4ff"
+                        : "transparent",
+                      borderLeft: bereichAktiv
+                        ? "3px solid #4F6EF7"
+                        : "3px solid transparent",
+                      transition: "all 0.1s",
                     }}
                   >
-                    {offen[bereich.label] || istBereichAktiv(bereich.path) ? "▲" : "▼"}
-                  </button>
-                )}
+                    {bereich.label}
+                  </Link>
+
+                  {/* Toggle Button */}
+                  {bereich.unterseiten.length > 0 && (
+                    <button
+                      onClick={() => toggleBereich(bereich.label)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: dark ? "#8B92A5" : "#6B7280",
+                        padding: "0 0.75rem",
+                        fontSize: "0.7rem",
+                      }}
+                    >
+                      {offen[bereich.label] || bereichAktiv ? "▲" : "▼"}
+                    </button>
+                  )}
+                </div>
+
+                {/* Unterseiten */}
+                {(offen[bereich.label] || bereichAktiv) && bereich.unterseiten.map((unter) => {
+                  const unterAktiv = istExakterPfadAktiv(location.pathname, unter.path);
+
+                  return (
+                    <Link
+                      key={unter.path}
+                      to={unter.path}
+                      style={{
+                        display: "block",
+                        padding: "0.35rem 1rem 0.35rem 2rem",
+                        textDecoration: "none",
+                        color: unterAktiv
+                          ? "#4F6EF7"
+                          : dark ? "#8B92A5" : "#6B7280",
+                        fontWeight: unterAktiv ? "600" : "400",
+                        backgroundColor: unterAktiv
+                          ? dark ? "#1e2235" : "#f0f4ff"
+                          : "transparent",
+                        borderLeft: unterAktiv
+                          ? "3px solid #4F6EF7"
+                          : "3px solid transparent",
+                        fontSize: "0.8rem",
+                      }}
+                    >
+                      {unter.label}
+                    </Link>
+                  );
+                })}
               </div>
- 
-              {/* Unterseiten */}
-              {(offen[bereich.label] || istBereichAktiv(bereich.path)) && bereich.unterseiten.map((unter) => (
-                <Link
-                  key={unter.path}
-                  to={unter.path}
-                  style={{
-                    display: "block",
-                    padding: "0.35rem 1rem 0.35rem 2rem",
-                    textDecoration: "none",
-                    color: istAktiv(unter.path)
-                      ? "#4F6EF7"
-                      : dark ? "#8B92A5" : "#6B7280",
-                    fontWeight: istAktiv(unter.path) ? "600" : "400",
-                    backgroundColor: istAktiv(unter.path)
-                      ? dark ? "#1e2235" : "#f0f4ff"
-                      : "transparent",
-                    borderLeft: istAktiv(unter.path)
-                      ? "3px solid #4F6EF7"
-                      : "3px solid transparent",
-                    fontSize: "0.8rem",
-                  }}
-                >
-                  {unter.label}
-                </Link>
-              ))}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ))}
     </div>
-  )
+  );
 }

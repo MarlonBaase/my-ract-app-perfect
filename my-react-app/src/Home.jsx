@@ -1,93 +1,66 @@
-import { useState } from 'react'
-import { supabase } from './supabase'
+import { useState } from "react";
+import { anmeldenMitPasswort, verifiziere2FACode } from "./services/homeService";
 
 export default function Home() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [step, setStep] = useState('login')
-  const [otpCode, setOtpCode] = useState('')
-  const [factorId, setFactorId] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [step, setStep] = useState("login");
+  const [otpCode, setOtpCode] = useState("");
+  const [factorId, setFactorId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const signIn = async () => {
-    setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setLoading(false)
-      return alert(error.message)
+  const handleSignIn = async () => {
+    setLoading(true);
+
+    const res = await anmeldenMitPasswort(email, password);
+
+    setLoading(false);
+
+    if (!res.success) {
+      return alert(res.error);
     }
 
-    // Prüfen, ob 2FA erforderlich ist
-    const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-    if (mfaError) {
-      setLoading(false)
-      return alert(mfaError.message)
-    }
-
-    if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
-      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors()
-      if (factorsError) {
-        setLoading(false)
-        return alert(factorsError.message)
-      }
-
-      const totpFactor = factors?.totp?.find(f => f.status === 'verified')
-
-      if (totpFactor) {
-        setFactorId(totpFactor.id)
-        setStep('mfa')
-        setLoading(false)
-        return
-      }
-    }
-
-    setLoading(false)
-    alert("Erfolgreich eingeloggt!")
-  }
-
-  const verify = async () => {
-    const cleanCode = String(otpCode).replace(/\s+/g, '').trim()
-
-    if (!cleanCode || cleanCode.length !== 6) {
-      return alert("Bitte gib einen 6-stelligen Code ein.")
-    }
-
-    setLoading(true)
-
-    // Supabase führt Challenge und Verifizierung in einem Schritt aus
-    const { error } = await supabase.auth.mfa.challengeAndVerify({
-      factorId,
-      code: cleanCode
-    })
-
-    setLoading(false)
-
-    if (error) {
-      alert("2FA-Fehler: " + error.message)
+    if (res.requiresMfa) {
+      setFactorId(res.factorId);
+      setStep("mfa");
     } else {
-      alert('2FA erfolgreich!')
+      alert("Erfolgreich eingeloggt!");
+    }
+  };
+
+  const handleVerify = async () => {
+    setLoading(true);
+
+    const res = await verifiziere2FACode(factorId, otpCode);
+
+    setLoading(false);
+
+    if (!res.success) {
+      alert(res.error);
+    } else {
+      alert("2FA erfolgreich!");
       // Hier z. B. Weiterleitung: navigate('/dashboard')
     }
-  }
+  };
 
   return (
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
           <div className="login-icon">
-            {step === 'login' ? '🔐' : '🛡️'}
+            {step === "login" ? "🔐" : "🛡️"}
           </div>
           <h2 className="login-title">
-            {step === 'login' ? 'Willkommen zurück' : '2FA-Bestätigung'}
+            {step === "login" ? "Willkommen zurück" : "2FA-Bestätigung"}
           </h2>
           <p className="login-subtitle">
-            {step === 'login'
-              ? 'Melde dich an, um auf dein Konto zuzugreifen.'
-              : 'Gib den 6-stelligen Code aus deiner Authenticator-App ein.'}
+            {step === "login"
+              ? "Melde dich an, um auf dein Konto zuzugreifen."
+              : "Gib den 6-stelligen Code aus deiner Authenticator-App ein."}
           </p>
         </div>
 
-        {step === 'login' ? (
+        {step === "login" ? (
           <div className="login-form">
             <div className="input-group">
               <label className="input-label">E-Mail-Adresse</label>
@@ -95,7 +68,7 @@ export default function Home() {
                 placeholder="name@beispiel.de"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 className="login-input"
               />
             </div>
@@ -106,17 +79,17 @@ export default function Home() {
                 placeholder="••••••••"
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className="login-input"
               />
             </div>
 
             <button
-              onClick={signIn}
+              onClick={handleSignIn}
               disabled={loading}
               className="login-button"
             >
-              {loading ? 'Anmelden...' : 'Einloggen'}
+              {loading ? "Anmelden..." : "Einloggen"}
             </button>
           </div>
         ) : (
@@ -128,21 +101,21 @@ export default function Home() {
                 type="text"
                 maxLength={6}
                 value={otpCode}
-                onChange={e => setOtpCode(e.target.value)}
+                onChange={(e) => setOtpCode(e.target.value)}
                 className="login-input otp-input"
               />
             </div>
 
             <button
-              onClick={verify}
+              onClick={handleVerify}
               disabled={loading}
               className="login-button"
             >
-              {loading ? 'Prüfen...' : 'Code Bestätigen'}
+              {loading ? "Prüfen..." : "Code Bestätigen"}
             </button>
 
             <button
-              onClick={() => setStep('login')}
+              onClick={() => setStep("login")}
               className="back-button"
             >
               ← Zurück zum Login
@@ -151,5 +124,5 @@ export default function Home() {
         )}
       </div>
     </div>
-  )
+  );
 }
