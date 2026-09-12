@@ -80,7 +80,7 @@ export default function Support() {
 
   const sortedMessages = selectedTicket?.support_nachrichten
     ? [...selectedTicket.support_nachrichten].sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        (a, b) => new Date(a.erstellt_am) - new Date(b.erstellt_am)
       )
     : [];
 
@@ -256,7 +256,7 @@ export default function Support() {
                             color:
                               t.status === 'offen'
                                 ? '#eab308'
-                                : t.status === 'in_bearbeitung'
+                                : t.status === 'in bearbeitung'
                                 ? '#3b82f6'
                                 : '#22c55e',
                           }}
@@ -319,7 +319,7 @@ export default function Support() {
                               }}
                             >
                               {m.ist_admin ? 'Support Team' : 'Du'} •{' '}
-                              {new Date(m.created_at).toLocaleTimeString(
+                              {new Date(m.erstellt_am).toLocaleTimeString(
                                 'de-DE',
                                 { hour: '2-digit', minute: '2-digit' }
                               )}
