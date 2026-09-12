@@ -22,7 +22,7 @@ export async function createSupportTicket({ titel, kategorie, nachricht }) {
     .from('support_tickets')
     .insert([
       {
-        user_id: user.id,
+        benutzer_id: user.id,
         titel,
         kategorie,
         status: 'offen',
