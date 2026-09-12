@@ -1,23 +1,42 @@
-import { supabase } from "../supabase";
-import { useEffect, useState, useContext } from "react";
+import { useState, useEffect, useContext } from 'react';
+import {
+  ladeKategorien,
+  kategorieHinzufuegen,
+  kategorieLoeschen,
+  logout,
+  startSetup2FA,
+  enableMfa,
+  disableMfa
+} from './services/konfigurationService';
 import { SettingsContext } from "../SettingsContext";
+
 
 export default function Konfiguration({ darkMode, setDarkMode }) {
   const [kategorien, setKategorien] = useState([]);
   const [neueKategorie, setNeueKategorie] = useState("");
-  const [kategorieInter, setkategorieInter] = useState("");
   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [factorId, setFactorID] = useState("");
   const [confirmCode, setConfirmCode] = useState("");
-
-
-  // 💡 Layout-State aus dem globalen Context holen
+  const [factorId, setFactorID] = useState("");
   const { ansicht, setAnsicht } = useContext(SettingsContext);
+
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+
+  const fetchKategorien = async () => {
+    try {
+      const data = await ladeKategorien();
+      setKategorien(data || []);
+    } catch (err) {
+      console.error("Fehler beim Laden der Kategorien:", err);
+    }
+  };
+
 
   useEffect(() => {
     const init = async () => {
       try {
-        await ladeKategorien();
+        await fetchKategorien();
       } catch (err) {
         console.error("Fehler in init:", err);
       }
@@ -25,114 +44,70 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
     init();
   }, []);
 
-  const ladeKategorien = async () => {
-    const { data } = await supabase
-      .from("transaktionskategorie")
-      .select("*")
-      .order("name", { ascending: true });
 
-    if (data) setKategorien(data);
-  };
+  const handleAddKategorie = async (e) => {
+    e.preventDefault();
+    if (!neueKategorie.trim()) return;
 
-  const kategorieHinzufuegen = async () => {
-    if (!neueKategorie) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from("transaktionskategorie").insert({
-      benutzer_id: user.id,
-      name: neueKategorie,
-      ist_vordefiniert: false,
-      erstellt_am: new Date()
-    });
-    setNeueKategorie("");
-    ladeKategorien();
-  };
+    setLoading(true);
+    setErrorMsg('');
 
-  const kategorieLoeschen = async (id, ist_vordefiniert) => {
-    if (ist_vordefiniert === false) {
-      await supabase.from("transaktionskategorie").delete().eq("id", id);
+    try {
+      await kategorieHinzufuegen(neueKategorie);
+      setNeueKategorie("");
+      await fetchKategorien();
+    } catch (err) {
+      console.error("Fehler beim Hinzufügen der Kategorie:", err);
+      setErrorMsg('Fehler beim Hinzufügen der Kategorie');
+    } finally {
+      setLoading(false);
     }
-    ladeKategorien();
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "https://my-ract-app-perfect.vercel.app/";
-  };
-
-  const startSetup = async () => {
-    const { data: factors, error: listError } = await supabase.auth.mfa.listFactors();
-
-    if (listError) {
-      alert(`Fehler beim Abrufen der Faktoren: ${listError.message}`);
-      return;
+  // Handler zum Löschen von Kategorien
+  const handleDeleteKategorie = async (id, ist_vordefiniert) => {
+    try {
+      await kategorieLoeschen(id, ist_vordefiniert);
+      await fetchKategorien();
+    } catch (err) {
+      console.error("Fehler beim Löschen:", err);
     }
+  };
+  
 
-    if (factors && factors.totp) {
-      const verifiedFactor = factors.totp.find(f => f.status === 'verified');
-      if (verifiedFactor) {
-        alert("2FA ist bereits aktiv! Wenn du 2FA neu einrichten möchtest, musst du es zuerst explizit deaktivieren.");
-        return;
+  const handleStartSetup = async () => {
+    try {
+      const res = await startSetup2FA();
+      if (res) {
+        setQrCodeUrl(res.qrCodeUrl);
+        setFactorID(res.factorId);
       }
-
-      const unverifiedFactors = factors.totp.filter(f => f.status === 'unverified');
-      for (const factor of unverifiedFactors) {
-        await supabase.auth.mfa.unenroll({ factorId: factor.id });
-      }
-    }
-
-    const { data, error } = await supabase.auth.mfa.enroll({
-      factorType: 'totp',
-      friendlyName: `MeinAuthenticator_${Date.now()}`
-    });
-
-    if (error) {
-      alert(`Fehler beim Erstellen: ${error.message}`);
-      return;
-    }
-
-    if (data) {
-      setQrCodeUrl(data.totp.qr_code);
-      setFactorID(data.id);
+    } catch (err) {
+      alert(err.message);
     }
   };
 
-  const enableMfa = async () => {
-    if (!confirmCode || !factorId) return;
-
-    const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-      factorId: factorId,
-      code: confirmCode
-    });
-
-    if (error) {
-      alert(`Fehler beim Aktivieren: ${error.message}`);
-    }
-    else {
-      alert("2 FA wurde erfolgreich aktiviert! ");
-      setQrCodeUrl("")
+  // 4. MFA Verifizierung übergibt Werte an den Service
+  const handleEnableMfa = async () => {
+    try {
+      await enableMfa({ factorId, confirmCode });
+      alert("2FA wurde erfolgreich aktiviert!");
+      setQrCodeUrl("");
       setConfirmCode("");
+    } catch (err) {
+      alert(`Fehler beim Aktivieren: ${err.message}`);
     }
   };
 
-  const disableMfa = async () => {
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-  const verifiedFactor = factors?.totp?.find(f => f.status === 'verified');
+  const handleDisableMfa = async () => {
+    try {
+      await disableMfa();
+      alert("2FA wurde erfolgreich deaktiviert!");
+    } catch (err) {
+      alert(`Fehler beim Deaktivieren: ${err.message}`);
+    }
+  };
 
-  if (!verifiedFactor) {
-    alert("Kein aktiver 2FA-Faktor vorhanden.");
-    return;
-  }
-
-  const { error } = await supabase.auth.mfa.unenroll({
-    factorId: verifiedFactor.id
-  });
-
-  if (error) {
-    alert(`Fehler beim Deaktivieren: ${error.message}. (Hinweis: Du musst mit 2FA eingeloggt sein, um 2FA zu deaktivieren!)`);
-  } else {
-    alert("2FA wurde erfolgreich deaktiviert!");
-  }
-};
 
   return (
     <div>
@@ -160,7 +135,10 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
           onChange={(e) => setNeueKategorie(e.target.value)}
           placeholder="z.B. 🎮 Gaming"
         />
-        <button onClick={kategorieHinzufuegen}>Kategorie hinzufügen</button>
+        <button onClick={handleAddKategorie} disabled={loading}>
+          {loading ? "Wird hinzugefügt..." : "Kategorie hinzufügen"}
+        </button>
+        {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
       </div>
 
       <ul>
@@ -168,15 +146,15 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
           <li key={e.id}>
             {e.name}
             {!e.ist_vordefiniert && (
-              <button onClick={() => kategorieLoeschen(e.id, e.ist_vordefiniert)}>🗑️</button>
+              <button onClick={() => handleDeleteKategorie(e.id, e.ist_vordefiniert)}>🗑️</button>
             )}
           </li>
         ))}
       </ul>
 
       <div>
-        <button onClick={startSetup}>2-FA aktivieren</button>
-        <button onClick={disableMfa}>2-FA deaktivieren</button>
+        <button onClick={handleStartSetup}>2-FA aktivieren</button>
+        <button onClick={handleDisableMfa}>2-FA deaktivieren</button>
         {qrCodeUrl === "" ?
           (<div>
             <h2>nicht vorhanden</h2>
@@ -185,7 +163,7 @@ export default function Konfiguration({ darkMode, setDarkMode }) {
             <h2>2-FA QR-Code</h2>
             <img src={qrCodeUrl} alt="2FA QR Code" />
             <input value={confirmCode} type="text" placeholder="code" onChange={(e) => setConfirmCode(e.target.value)}></input>
-            <button onClick={enableMfa}>Verifizieren & Aktivieren</button>
+            <button onClick={handleEnableMfa}>Verifizieren & Aktivieren</button>
           </div>)}
       </div>
 
