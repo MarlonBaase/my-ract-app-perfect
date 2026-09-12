@@ -12,7 +12,7 @@ import {
     transaktionHinzufuegen,
     pruefeWiederkehren,
     assetLoeschenMitLog
-} from './services/fremdwaehrung_kontoService';
+} from '../services/fremdwaehrung_kontoService';
 
 export default function FremdwaehrungKonto() {
     const [listeFremdwaehrungskonto, setListeFremdwaehrungskonto] = useState([]);

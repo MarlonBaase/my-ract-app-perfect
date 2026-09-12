@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../fremd_navbar';
-import { getFremdwaehrungLayoutTitle } from './services/fremdwaehrungService';
+import { getFremdwaehrungLayoutTitle } from '../services/fremdwaehrungService';
 
 export default function Fremdwaehrung() {
   const pageTitle = getFremdwaehrungLayoutTitle();

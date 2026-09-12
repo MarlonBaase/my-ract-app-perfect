@@ -6,7 +6,7 @@ import {
   fetchVorletzterTageskurs, 
   fetchTageskursHistorie, 
   erstelleDiagrammData 
-} from "./fremdwaehrung_detailService";
+} from "../services/fremdwaehrung_detailService";
 
 export default function FremdwaehrungDetail() {
   const [tageskurs, setTageskurs] = useState(null);

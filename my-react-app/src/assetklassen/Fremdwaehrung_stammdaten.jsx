@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ladeWaehrungen, filterWaehrungen } from "./services/fremdwaehrung_stammdatenService";
+import { ladeWaehrungen, filterWaehrungen } from "../services/fremdwaehrung_stammdatenService";
 
 export default function FremdwaehrungStammdaten() {
   const [listeWaehrung, setListeWaehrung] = useState([]);

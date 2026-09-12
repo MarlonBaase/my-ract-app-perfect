@@ -11,7 +11,7 @@ import {
     transaktionHinzufuegen,
     pruefeWiederkehren,
     assetLoeschenMitLog
-} from './services/girokontoService';
+} from '../services/girokontoService';
 
 export default function Girokonto() {
     const [listeGirokonto, setListeGirokonto] = useState([]);
