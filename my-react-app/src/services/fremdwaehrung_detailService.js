@@ -69,7 +69,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
           new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
           new Date(e.erstellt_am).getFullYear() === tag.getFullYear()
         );
-      punkte.push({ label: `${tag.getDate()}.`, werte: werte[1] });
+      punkte.push({ label: `${tag.getDate()}.`, werte: werte[0] });
     }
    }
 
@@ -80,7 +80,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
         .filter(e => new Date(e.erstellt_am).getDate() === i &&
           new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
           new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear ());
-      punkte.push({ label: `${i}.`, werte: werte[1] });
+      punkte.push({ label: `${i}.`, werte: werte[0] });
     }
    }
 
@@ -90,7 +90,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
       const werte = eintraege
         .filter(e => new Date(e.erstellt_am).getMonth() === i &&
           new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
-      punkte.push({ label: monate[i], werte: werte[1] });
+      punkte.push({ label: monate[i], werte: werte[0] });
     }
    }
   return punkte;
