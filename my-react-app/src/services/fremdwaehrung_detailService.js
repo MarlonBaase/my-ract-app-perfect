@@ -54,30 +54,33 @@ export async function fetchTageskursHistorie(code) {
  */
 export function erstelleDiagrammData(eintraege, zeitraum) {
   console.log(eintraege, zeitraum);
-  
+
   const jetzt = new Date();
   let punkte = [];
-  
+
   if (zeitraum === "woche") {
     let letzterGueltigerWert = null;
 
     for (let i = 6; i >= 0; i--) {
       const tag = new Date();
       tag.setDate(jetzt.getDate() - i);
-      
-      const werte = eintraege.filter(e => 
-        new Date(e.erstellt_am).getDate() === tag.getDate() &&
-        new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
-        new Date(e.erstellt_am).getFullYear() === tag.getFullYear()
-      );
+
+      const werte = eintraege.filter(e => {
+        const eDatum = new Date(e.erstellt_am);
+        return (
+          eDatum.getUTCDate() === tag.getDate() &&
+          eDatum.getUTCMonth() === tag.getMonth() &&
+          eDatum.getUTCFullYear() === tag.getFullYear()
+        );
+      });
 
       if (werte.length > 0) {
         letzterGueltigerWert = werte[0].tageskurs_zu_eur;
       }
 
-      punkte.push({ 
-        label: `${tag.getDate()}.`, 
-        werte: letzterGueltigerWert 
+      punkte.push({
+        label: `${tag.getDate()}.`,
+        werte: letzterGueltigerWert
       });
     }
   }
@@ -86,20 +89,25 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
     const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
     let letzterGueltigerWert = null;
 
-    for (let i = 1; i <= tageImMonat; i++) {
-      const werte = eintraege.filter(e => 
-        new Date(e.erstellt_am).getDate() === i &&
-        new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
-        new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
-      );
+    const maxTag = tageImMonat;
+
+    for (let i = 1; i <= maxTag; i++) {
+      const werte = eintraege.filter(e => {
+        const eDatum = new Date(e.erstellt_am);
+        return (
+          eDatum.getUTCDate() === i &&
+          eDatum.getUTCMonth() === jetzt.getMonth() &&
+          eDatum.getUTCFullYear() === jetzt.getFullYear()
+        );
+      });
 
       if (werte.length > 0) {
         letzterGueltigerWert = werte[0].tageskurs_zu_eur;
       }
 
-      punkte.push({ 
-        label: `${i}.`, 
-        werte: letzterGueltigerWert 
+      punkte.push({
+        label: `${i}.`,
+        werte: letzterGueltigerWert
       });
     }
   }
@@ -107,11 +115,11 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
   if (zeitraum === "jahr") {
     const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
     for (let i = 0; i < 12; i++) {
-      const werte = eintraege.filter(e => 
-        new Date(e.erstellt_am).getMonth() === i &&
-        new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
-      );
-      
+      const werte = eintraege.filter(e => {
+        const eDatum = new Date(e.erstellt_am);
+        return eDatum.getUTCMonth() === i && eDatum.getUTCFullYear() === jetzt.getFullYear();
+      });
+
       let durchschnitt = 0;
       if (werte.length > 0) {
         const summe = werte.reduce((sum, e) => sum + e.tageskurs_zu_eur, 0);
