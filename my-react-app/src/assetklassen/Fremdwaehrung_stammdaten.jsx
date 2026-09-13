@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ladeWaehrungen, filterWaehrungen } from "../services/fremdwaehrung_stammdatenService";
+import { SettingsContext } from '../SettingsContext';
 
 export default function FremdwaehrungStammdaten() {
   const [listeWaehrung, setListeWaehrung] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const { ansicht } = useContext(SettingsContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,27 +32,11 @@ export default function FremdwaehrungStammdaten() {
 
       {ansicht === 'card' ? (
         <div className="karten-grid">
-          {listeFremdwaehrungskonto.map((e) => {
-            const gefundenerEintrag = listeFremdwaehrungskonto.find(k => k.asset?.asset_id === e.elternkonto);
-            const elternkontoName = gefundenerEintrag ? gefundenerEintrag.asset?.asset_name : null;
-
-            const transaktionen = e.asset?.transaktionsprotokoll || [];
-            const aktuellerKontostand = transaktionen.reduce((acc, t) => {
-              const betrag = Number(t.betrag || 0);
-              return t.typ === 'einnahme' ? acc + betrag : acc - betrag;
-            }, 0);
 
             return (
-              <div className="account-card" key={e.id}>
+              <div className="account-card">
                 <div className="card-header">
-                  <div>
-                    <h3>{e.asset?.asset_name}</h3>
-                    <span className="bank-name">{e.name_der_bank}</span>
-                  </div>
                   <div className="badge-group">
-                    {e.hauptkonto && <span className="badge badge-primary">Hauptkonto</span>}
-                    {e.ist_referenzkonto && <span className="badge badge-info">Referenzkonto</span>}
-                    {e.ist_aktiv === false && <span className="badge badge-warning">Inaktiv</span>}
                   </div>
                 </div>
 
@@ -77,7 +63,7 @@ export default function FremdwaehrungStammdaten() {
                 </div> */}
               </div>
             );
-          })}
+
         </div>
       ) : (
         <div className="table-responsive">
@@ -96,7 +82,7 @@ export default function FremdwaehrungStammdaten() {
             <tbody>
 
                 return (
-                  <tr className={e.ist_aktiv === false ? 'row-inactive' : ''}>
+                  <tr>
                     <td>
                       
                     </td>
