@@ -74,7 +74,7 @@ export default function FremdwaehrungDetail() {
             <Legend />
             <Line
               type="monotone"
-              dataKey="kurs"
+              dataKey="werte"
               stroke="#10b981"
               strokeWidth={2}
               connectNulls={true}
