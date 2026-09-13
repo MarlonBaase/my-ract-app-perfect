@@ -80,32 +80,33 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
         werte: letzterGueltigerWert
       });
     }
-
-    if (zeitraum === "monat") {
-      const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
-      for (let i = 1; i <= tageImMonat; i++) {
-        const werte = eintraege
-          .filter(e => new Date(e.erstellt_am).getDate() === i &&
-            new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
-            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
-        punkte.push({ label: `${i}.`, werte: werte[0]?.tageskurs_zu_eur });
-      }
-    }
-
-    if (zeitraum === "jahr") {
-      const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-      for (let i = 0; i < 12; i++) {
-        const werte = eintraege
-          .filter(e => new Date(e.erstellt_am).getMonth() === i &&
-            new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
-          );
-        let durchschnitt = 0;
-        if (werte.length > 0) {
-          const summe = werte.reduce((sum, e) => sum + e.tageskurs_zu_eur, 0)
-          durchschnitt = summe / werte.length;
-        }
-        punkte.push({ label: monate[i], werte: durchschnitt });
-      }
-    }
-    return punkte;
   }
+
+  if (zeitraum === "monat") {
+    const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
+    for (let i = 1; i <= tageImMonat; i++) {
+      const werte = eintraege
+        .filter(e => new Date(e.erstellt_am).getDate() === i &&
+          new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
+          new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
+      punkte.push({ label: `${i}.`, werte: werte[0]?.tageskurs_zu_eur });
+    }
+  }
+
+  if (zeitraum === "jahr") {
+    const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+    for (let i = 0; i < 12; i++) {
+      const werte = eintraege
+        .filter(e => new Date(e.erstellt_am).getMonth() === i &&
+          new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear()
+        );
+      let durchschnitt = 0;
+      if (werte.length > 0) {
+        const summe = werte.reduce((sum, e) => sum + e.tageskurs_zu_eur, 0)
+        durchschnitt = summe / werte.length;
+      }
+      punkte.push({ label: monate[i], werte: durchschnitt });
+    }
+  }
+  return punkte;
+}
