@@ -58,20 +58,25 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
   const jetzt = new Date();
   let punkte = [];
 
+  // Hilfsfunktion, um ein Datum in "YYYY-MM-DD" (lokal) umzuwandeln
+  const formatYMD = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   if (zeitraum === "woche") {
     let letzterGueltigerWert = null;
 
     for (let i = 6; i >= 0; i--) {
       const tag = new Date();
       tag.setDate(jetzt.getDate() - i);
+      const tagString = formatYMD(tag);
 
       const werte = eintraege.filter(e => {
         const eDatum = new Date(e.erstellt_am);
-        return (
-          eDatum.getUTCDate() === tag.getDate() &&
-          eDatum.getUTCMonth() === tag.getMonth() &&
-          eDatum.getUTCFullYear() === tag.getFullYear()
-        );
+        return formatYMD(eDatum) === tagString;
       });
 
       if (werte.length > 0) {
@@ -89,16 +94,14 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
     const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
     let letzterGueltigerWert = null;
 
-    const maxTag = tageImMonat;
+    for (let i = 1; i <= tageImMonat; i++) {
+      // Datum für den jeweiligen Monatstag zusammenbauen
+      const tag = new Date(jetzt.getFullYear(), jetzt.getMonth(), i);
+      const tagString = formatYMD(tag);
 
-    for (let i = 1; i <= maxTag; i++) {
       const werte = eintraege.filter(e => {
         const eDatum = new Date(e.erstellt_am);
-        return (
-          eDatum.getUTCDate() === i &&
-          eDatum.getUTCMonth() === jetzt.getMonth() &&
-          eDatum.getUTCFullYear() === jetzt.getFullYear()
-        );
+        return formatYMD(eDatum) === tagString;
       });
 
       if (werte.length > 0) {
@@ -117,7 +120,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
     for (let i = 0; i < 12; i++) {
       const werte = eintraege.filter(e => {
         const eDatum = new Date(e.erstellt_am);
-        return eDatum.getUTCMonth() === i && eDatum.getUTCFullYear() === jetzt.getFullYear();
+        return eDatum.getMonth() === i && eDatum.getFullYear() === jetzt.getFullYear();
       });
 
       let durchschnitt = 0;
