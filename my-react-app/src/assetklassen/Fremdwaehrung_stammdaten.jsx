@@ -70,11 +70,11 @@ export default function FremdwaehrungStammdaten() {
                   </ul>
                 </div>
 
-                <div className="card-actions">
+                {/* <div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
                   <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
-                </div>
+                </div> */}
               </div>
             );
           })}
@@ -109,9 +109,9 @@ export default function FremdwaehrungStammdaten() {
                     <td></td>
                     <td></td>
                     <td className="table-actions">
-                      <button onClick={() => } title="Bearbeiten">✏️</button>
+                      {/* <button onClick={() => } title="Bearbeiten">✏️</button>
                       <button onClick={() => } title="Löschen">🗑️</button>
-                      <button onClick={() => } title="Transaktionen">💰</button>
+                      <button onClick={() => } title="Transaktionen">💰</button> */}
                     </td>
                   </tr>
                 );
