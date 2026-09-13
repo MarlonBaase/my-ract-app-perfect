@@ -63,30 +63,34 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
     for (let i = 6; i >= 0; i--) {
       const tag = new Date();
       tag.setDate(jetzt.getDate() - i);
-      const eintrage = eintraege
-        .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
-          new Date(e.erstellt_am).getMonth() === tag.getMonth());
-      punkte.push({ label: `${tag.getDate()}.`, eintrage });
+      const werte = eintraege
+        .filter(e => 
+          new Date(e.erstellt_am).getDate() === tag.getDate() &&
+          new Date(e.erstellt_am).getMonth() === tag.getMonth() &&
+          new Date(e.erstellt_am).getFullYear() === tag.getFullYear()
+        );
+      punkte.push({ label: `${tag.getDate()}.`, werte: werte[1] });
     }
    }
 
    if (zeitraum === "monat") {
     const tageImMonat = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate();
     for (let i = 1; i <= tageImMonat; i++) {
-      const eintrage = eintraege
+      const werte = eintraege
         .filter(e => new Date(e.erstellt_am).getDate() === i &&
-          new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
-      punkte.push({ label: `${i}.`, eintrage });
+          new Date(e.erstellt_am).getMonth() === jetzt.getMonth() &&
+          new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear ());
+      punkte.push({ label: `${i}.`, werte: werte[1] });
     }
    }
 
    if (zeitraum === "jahr") {
     const monate = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
     for (let i = 0; i < 12; i++) {
-      const eintrage = eintraege
+      const werte = eintraege
         .filter(e => new Date(e.erstellt_am).getMonth() === i &&
           new Date(e.erstellt_am).getFullYear() === jetzt.getFullYear());
-      punkte.push({ label: monate[i], eintrage });
+      punkte.push({ label: monate[i], werte: werte[1] });
     }
    }
   return punkte;
