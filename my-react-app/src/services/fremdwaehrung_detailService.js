@@ -63,7 +63,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
       const eintrage = eintraege
         .filter(e => new Date(e.erstellt_am).getDate() === tag.getDate() &&
           new Date(e.erstellt_am).getMonth() === tag.getMonth());
-      punkte.push({ label: `${jetzt.getDate() - i}.`, eintrage});
+      punkte.push({ label: `${tag.getDate()}.`, eintrage });
     }
    }
 
@@ -73,7 +73,7 @@ export function erstelleDiagrammData(eintraege, zeitraum) {
       const eintrage = eintraege
         .filter(e => new Date(e.erstellt_am).getDate() === i &&
           new Date(e.erstellt_am).getMonth() === jetzt.getMonth());
-      punkte.push({ label: `${jetzt.getDate() - i}.`, eintrage});
+      punkte.push({ label: `${i}.`, eintrage });
     }
    }
 
