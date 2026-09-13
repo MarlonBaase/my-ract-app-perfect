@@ -53,6 +53,9 @@ export async function fetchTageskursHistorie(code) {
  * Wandelt Rohdaten aus der Datenbank in Diagramm-Punkte um (nach Zeitraum).
  */
 export function erstelleDiagrammData(eintraege, zeitraum) {
+  
+  console.log(eintraege, zeitraum);
+  
   const jetzt = new Date();
   let punkte = [];
   
