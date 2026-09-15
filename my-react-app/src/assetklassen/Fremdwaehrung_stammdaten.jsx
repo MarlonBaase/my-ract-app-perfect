@@ -41,21 +41,21 @@ export default function FremdwaehrungStammdaten() {
 
       {ansicht === 'card' ? (
         <div>
-          {filteredItems.map((item) => (
+          {filteredItems.map((waehrung) => (
             <div className="karten-grid">
-              <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
+              <li key={waehrung.waehrungs_code} style={{ listStyle: "none" }}>
                 <div className="account-card"></div>
                 <div className="card-header"></div>
                 <div className="badge-group"></div>
                 <div className="card-body">
-                  {filteredKurs.map((item) => (
+                  {filteredKurs.map((kurs) => (
                     <div>
-                      <p>{item.tageskurs_zu_eur}</p>
+                      <p>{kurs.tageskurs_zu_eur}</p>
                       <button
                         onClick={() =>
-                          navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
+                          navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)
                         }>
-                        ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
+                        ✏️ {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
                       </button>
                     </div>
                   ))}
