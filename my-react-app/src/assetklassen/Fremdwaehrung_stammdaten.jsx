@@ -1,46 +1,116 @@
-import React, { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { ladeWaehrungen, filterWaehrungen, ladeTageskurse, filterTageskurse } from "../services/fremdwaehrung_stammdatenService";
+import { SettingsContext } from '../SettingsContext';
 
-export function FremdwaehrungListe({ waehrungen, onSelectWaehrung }) {
+export default function FremdwaehrungStammdaten() {
+  const [listeWaehrung, setListeWaehrung] = useState([]);
+  const [listeTageskurse, setListeTageskurse] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filtert die Liste basierend auf Code oder Name
-  const gefilterteWaehrungen = waehrungen.filter((w) => {
-    const query = searchTerm.toLowerCase();
-    const code = w.waehrungs_code?.toLowerCase() || "";
-    const name = w.name?.toLowerCase() || "";
-    return code.includes(query) || name.includes(query);
-  });
+  const { ansicht } = useContext(SettingsContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchWaehrungen = async () => {
+      const data = await ladeWaehrungen();
+      setListeWaehrung(data);
+    };
+
+    const fetchTageskurse = async () => {
+      const data = await ladeTageskurse();
+      setListeTageskurse(data);
+    }
+
+
+    fetchWaehrungen();
+    fetchTageskurse();
+  }, []);
+
+  const filteredItems = filterWaehrungen(listeWaehrung, searchTerm);
+  const filteredKurs = filterTageskurse(listeTageskurse, searchTerm);
 
   return (
-    <div className="space-y-4">
-      {/* Suchfeld */}
+    <div>
       <input
         type="text"
-        placeholder="Währung suchen (z.B. USD, Dollar)..."
+        placeholder="Suchen..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      {/* Gefilterte Liste */}
-      <ul className="divide-y divide-gray-200 border rounded-lg bg-white shadow-sm">
-        {gefilterteWaehrungen.length > 0 ? (
-          gefilterteWaehrungen.map((w) => (
-            <li
-              key={w.waehrungs_code}
-              onClick={() => onSelectWaehrung(w.waehrungs_code)}
-              className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex justify-between items-center"
-            >
-              <span className="font-medium">{w.waehrungs_code}</span>
-              <span className="text-gray-500 text-sm">{w.name}</span>
-            </li>
-          ))
-        ) : (
-          <li className="px-4 py-4 text-center text-gray-500">
-            Keine passenden Währungen gefunden.
-          </li>
-        )}
-      </ul>
-    </div>
+      {ansicht === 'card' ? (
+        <ul>
+          {filteredItems.map((item) => (
+            <div className="karten-grid">
+              <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
+                <div className="account-card"></div>
+                <div className="card-header"></div>
+                <div className="badge-group"></div>
+                <div className="card-body">
+                  {filteredKurs.map((item) => (
+                    <div>
+                      <p>{item.tageskurs_zu_eur}</p>
+                      <button
+                        onClick={() =>
+                          navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
+                        }>
+                        ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
+                      </button>
+                    </div>
+                  ))}
+                  {/*<div className="card-actions">
+                  <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
+                  <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                  <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
+                </div>
+                */}
+                </div>
+              </li>
+            </div>
+          ))}
+        </ul>
+      ) : (
+        <div className="table-responsive">
+          <table className="konto-tabelle">
+            <thead>
+              <tr>
+                <th>Asset / Bank</th>
+                <th>IBAN / BIC</th>
+                <th>Guthaben</th>
+                <th>Konto-Details</th>
+                <th>Inhaber</th>
+                <th>Elternkonto</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              return (
+              <tr>
+                <td>
+
+                </td>
+                <td className="code-text">
+                </td>
+                <td>
+                </td>
+                <td className="subtext">
+                </td>
+                <td></td>
+                <td></td>
+                <td className="table-actions">
+                  {/* <button onClick={() => } title="Bearbeiten">✏️</button>
+                      <button onClick={() => } title="Löschen">🗑️</button>
+                      <button onClick={() => } title="Transaktionen">💰</button> */}
+                </td>
+              </tr>
+              );
+            </tbody>
+          </table>
+        </div>
+      )
+      }
+    </div >
   );
 }
