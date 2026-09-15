@@ -30,22 +30,29 @@ export function filterWaehrungen(listeWaehrung = [], searchTerm = "") {
 }
 
 /**
- * Lädt den aktuellsten Tageskurs für einen bestimmten Währungscode.
+ * Lädt alle Währungsstammdaten aus der Datenbank.
  */
-export async function fetchAktuellerTageskurs(searchTerm = "") {
+export async function ladeTageskurse() {
+  const { data, error } = await supabase
+    .from("tageskurs")
+    .select("waehrungs_code, tageskurs_zu_eur")
+    .order("erstellt_am", { ascending: false });
 
+  if (handleApiError(error, "Tageskurse laden")) return [];
+  return data || [];
+}
+
+/**
+ * Filtert Währungseinträge anhand eines Suchbegriffs (Name oder Code).
+ */
+export function filterTageskurse(listeTageskurse = [], searchTerm = "") {
   if (!searchTerm.trim()) return [];
 
   const search = searchTerm.toLowerCase();
 
+  return listeTageskurse.filter((item) => {
+    const tageskurs = String(item.tageskurs_zu_eur || "").toLowerCase();
 
-  const { data, error } = await supabase
-    .from("tageskurs")
-    .select("tageskurs_zu_eur")
-    .eq("waehrungs_code", search)
-    .order("erstellt_am", { ascending: false })
-    .limit(1);
-
-  if (handleApiError(error, "Aktuellen Tageskurs laden")) return null;
-  return data && data.length > 0 ? data[0] : null;
+    return tageskurs.includes(search);
+  });
 }

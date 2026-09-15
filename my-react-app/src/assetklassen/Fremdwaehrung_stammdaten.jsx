@@ -1,28 +1,15 @@
-import { useEffect, useState, useContext, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ladeWaehrungen, filterWaehrungen, fetchAktuellerTageskurs } from "../services/fremdwaehrung_stammdatenService";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { ladeWaehrungen, filterWaehrungen, ladeTageskurse, filterTageskurse } from "../services/fremdwaehrung_stammdatenService";
 import { SettingsContext } from '../SettingsContext';
 
 export default function FremdwaehrungStammdaten() {
   const [listeWaehrung, setListeWaehrung] = useState([]);
+  const [listeTageskurse, setListeTageskurse] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [tageskurs, setTageskurs] = useState(null);
 
   const { ansicht } = useContext(SettingsContext);
-  const { code } = useParams();
   const navigate = useNavigate();
-
-  const ladeDaten = useCallback(async () => {
-    if (!code) return;
-
-    const aktueller = await fetchAktuellerTageskurs(code);
-
-    setTageskurs(aktueller);
-  }, [code]);
-
-  useEffect(() => {
-    ladeDaten();
-  }, [ladeDaten]);
 
   useEffect(() => {
     const fetchWaehrungen = async () => {
@@ -30,11 +17,18 @@ export default function FremdwaehrungStammdaten() {
       setListeWaehrung(data);
     };
 
+    const fetchTageskurse = async () => {
+      const data = await ladeTageskurse();
+      setListeTageskurse(data);
+    }
+
+
     fetchWaehrungen();
+    fetchTageskurse();
   }, []);
 
   const filteredItems = filterWaehrungen(listeWaehrung, searchTerm);
-  const kursAktuell = tageskurs?.tageskurs_zu_eur;
+  const filteredKurs = filterTageskurse(listeTageskurse, searchTerm);
 
   return (
     <div>
@@ -48,7 +42,6 @@ export default function FremdwaehrungStammdaten() {
       {ansicht === 'card' ? (
         <div className="karten-grid">
 
-          return (
           <div className="account-card">
             <div className="card-header">
               <div className="badge-group">
@@ -56,7 +49,9 @@ export default function FremdwaehrungStammdaten() {
             </div>
 
             <div className="card-body">
-              <p>{kursAktuell ?? "Lade..."}</p>
+              <p>{filteredKurs.map((item) => 
+                    <p>{item.tageskurs_zu_eur}</p>
+                  )}</p>
               <ul>
                 {filteredItems.map((item) => (
                   <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
@@ -78,8 +73,6 @@ export default function FremdwaehrungStammdaten() {
                   <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
                 </div> */}
           </div>
-          );
-
         </div>
       ) : (
         <div className="table-responsive">
