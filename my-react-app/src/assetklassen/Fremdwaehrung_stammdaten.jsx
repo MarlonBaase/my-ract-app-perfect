@@ -40,7 +40,7 @@ export default function FremdwaehrungStammdaten() {
       />
 
       {ansicht === 'card' ? (
-        <ul>
+        <div>
           {filteredItems.map((item) => (
             <div className="karten-grid">
               <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
@@ -69,7 +69,7 @@ export default function FremdwaehrungStammdaten() {
               </li>
             </div>
           ))}
-        </ul>
+        </div>
       ) : (
         <div className="table-responsive">
           <table className="konto-tabelle">
