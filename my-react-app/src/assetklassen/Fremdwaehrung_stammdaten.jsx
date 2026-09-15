@@ -50,17 +50,19 @@ export default function FremdwaehrungStammdaten() {
                 <div className="card-header"></div>
                 <div className="badge-group"></div>
                 <div className="card-body">
-                  {filteredKurs.filter(k => k.waehrungs_code === waehrung.waehrungs_code).map((kurs) => (
-                    <div>
-                      <p>{kurs.tageskurs_zu_eur}</p>
-                      <button
-                        onClick={() =>
-                          navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)
-                        }>
-                        ✏️ {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
-                      </button>
-                    </div>
-                  ))}
+                  {filteredKurs
+                    .filter((k) => k.waehrungs_code === waehrung.waehrungs_code)
+                    .map((kurs, index) => (
+                      <div key={index}>
+                        <p>{kurs.tageskurs_zu_eur}</p>
+                        <button
+                          onClick={() =>
+                            navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)
+                          }>
+                          ✏️ {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
+                        </button>
+                      </div>
+                    ))}
                   {/*<div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
