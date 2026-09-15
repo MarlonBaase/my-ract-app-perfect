@@ -48,12 +48,13 @@ export default function FremdwaehrungStammdaten() {
               </div>
             </div>
 
-            <div className="card-body">
-              {filteredKurs.map((item) => (
-                <p>{item.tageskurs_zu_eur}</p>
-              ))}
-              <ul>
-                {filteredItems.map((item) => (
+            <ul>
+              {filteredItems.map((item) => (
+                <div className="card-body">
+                  {filteredKurs.map((item) => (
+                    <p>{item.tageskurs_zu_eur}</p>
+                  ))}
+
                   <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
                     <button
                       onClick={() =>
@@ -63,10 +64,9 @@ export default function FremdwaehrungStammdaten() {
                       ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
                     </button>
                   </li>
-                ))}
-              </ul>
-            </div>
-
+                </div>
+              ))}
+            </ul>
             {/* <div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
@@ -113,7 +113,8 @@ export default function FremdwaehrungStammdaten() {
             </tbody>
           </table>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }
