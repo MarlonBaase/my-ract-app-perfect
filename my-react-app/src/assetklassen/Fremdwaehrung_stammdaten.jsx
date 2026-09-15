@@ -40,42 +40,33 @@ export default function FremdwaehrungStammdaten() {
       />
 
       {ansicht === 'card' ? (
-        <div className="karten-grid">
-
-          <div className="account-card">
-            <div className="card-header">
-              <div className="badge-group">
-              </div>
-            </div>
-
-            <ul>
-              {filteredItems.map((item) => (
-                <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
-                  <div className="card-body">
-                    {filteredKurs.map((item) => (
-                      <p>{item.tageskurs_zu_eur}</p>
-                    ))}
-
-
-                    <button
-                      onClick={() =>
-                        navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
-                      }
-                    >
-                      ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
-                    </button>
-
-                  </div>
-                </li>
+        <ul>
+          {filteredItems.map((item) => (<li key={item.waehrungs_code} style={{ listStyle: "none" }}> </li>))}
+          <div className="karten-grid">
+            <div className="account-card"></div>
+            <div className="card-header"></div>
+            <div className="badge-group"></div>
+            <div className="card-body">
+              {filteredKurs.map((item) => (
+                <div>
+                  <p>{item.tageskurs_zu_eur}</p>
+                  <button
+                    onClick={() =>
+                      navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
+                    }>
+                    ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
+                  </button>
+                </div>
               ))}
-            </ul>
-            {/* <div className="card-actions">
-                  <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                  <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
-                  <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
-                </div> */}
+                {/*<div className="card-actions">
+                    <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
+                    <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
+                    <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
+                  </div>
+                */}
+            </div>
           </div>
-        </div>
+        </ul>
       ) : (
         <div className="table-responsive">
           <table className="konto-tabelle">
