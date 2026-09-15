@@ -58,13 +58,15 @@ export default function FremdwaehrungStammdaten() {
                         </div>
                       ))}
                       {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
-                    <button
-                      onClick={() =>
-                        navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)
-                      }>
-                      ✏️ Details
-                      Favourit
-                    </button>
+                      <div className="card-actions">
+                        <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)}>
+                          ✏️ Details
+                        </button>
+                        <button>
+                          Favourit
+                        </button>
+                      </div>
+                    
                     {/*<div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
