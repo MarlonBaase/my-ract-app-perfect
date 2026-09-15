@@ -42,8 +42,8 @@ export default function FremdwaehrungStammdaten() {
       {ansicht === 'card' ? (
         <div>
           {filteredItems.map((waehrung) => (
-            <div className="karten-grid">
-              <li key={waehrung.waehrungs_code} style={{ listStyle: "none" }}>
+            <div className="karten-grid" key={waehrung.waehrungs_code}>
+              <li style={{ listStyle: "none" }}>
                 <div className="account-card"></div>
                 <div className="card-header"></div>
                 <div className="badge-group"></div>
