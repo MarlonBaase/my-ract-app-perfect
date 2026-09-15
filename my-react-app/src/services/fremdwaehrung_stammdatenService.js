@@ -17,7 +17,7 @@ export async function ladeWaehrungen() {
  * Filtert Währungseinträge anhand eines Suchbegriffs (Name oder Code).
  */
 export function filterWaehrungen(listeWaehrung = [], searchTerm = "") {
-  if (!searchTerm.trim()) return [];
+  if (!searchTerm.trim()) return listeWaehrung;
 
   const search = searchTerm.toLowerCase();
 
