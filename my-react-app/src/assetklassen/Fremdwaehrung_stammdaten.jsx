@@ -49,9 +49,9 @@ export default function FremdwaehrungStammdaten() {
             </div>
 
             <div className="card-body">
-              <p>{filteredKurs.map((item) => 
+              <p>{filteredKurs.map((item) => (
                     <p>{item.tageskurs_zu_eur}</p>
-                  )}</p>
+                  ))}</p>
               <ul>
                 {filteredItems.map((item) => (
                   <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
