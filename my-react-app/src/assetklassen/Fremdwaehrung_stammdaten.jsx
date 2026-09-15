@@ -50,12 +50,13 @@ export default function FremdwaehrungStammdaten() {
 
             <ul>
               {filteredItems.map((item) => (
-                <div className="card-body">
-                  {filteredKurs.map((item) => (
-                    <p>{item.tageskurs_zu_eur}</p>
-                  ))}
+                <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
+                  <div className="card-body">
+                    {filteredKurs.map((item) => (
+                      <p>{item.tageskurs_zu_eur}</p>
+                    ))}
 
-                  <li key={item.waehrungs_code} style={{ listStyle: "none" }}>
+
                     <button
                       onClick={() =>
                         navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${item.waehrungs_code}`)
@@ -63,8 +64,9 @@ export default function FremdwaehrungStammdaten() {
                     >
                       ✏️ {item.name} ({item.symbol}) - {item.waehrungs_code}
                     </button>
-                  </li>
-                </div>
+
+                  </div>
+                </li>
               ))}
             </ul>
             {/* <div className="card-actions">
