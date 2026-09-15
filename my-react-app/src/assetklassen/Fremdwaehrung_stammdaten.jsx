@@ -55,14 +55,14 @@ export default function FremdwaehrungStammdaten() {
                     .map((kurs, index) => (
                       <div key={index}>
                         <p>{kurs.tageskurs_zu_eur}</p>
-                        <button
+                      </div>
+                    ))}
+                    <button
                           onClick={() =>
                             navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)
                           }>
                           ✏️ {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
                         </button>
-                      </div>
-                    ))}
                   {/*<div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
