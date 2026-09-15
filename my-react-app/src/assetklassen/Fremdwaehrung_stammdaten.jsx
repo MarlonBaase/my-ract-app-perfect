@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ladeWaehrungen, filterWaehrungen } from "../services/fremdwaehrung_stammdatenService";
-import { fetchAktuellerTageskurs } from "../services/fremdwaehrung_detailService";
+import { ladeWaehrungen, filterWaehrungen, fetchAktuellerTageskurs } from "../services/fremdwaehrung_stammdatenService";
 import { SettingsContext } from '../SettingsContext';
 
 export default function FremdwaehrungStammdaten() {
