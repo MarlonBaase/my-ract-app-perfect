@@ -30,6 +30,8 @@ export default function FremdwaehrungStammdaten() {
   const filteredItems = filterWaehrungen(listeWaehrung, searchTerm);
   const filteredKurs = filterTageskurse(listeTageskurse, searchTerm);
 
+  console.log(filteredItems)
+
   return (
     <div>
       <input
@@ -48,7 +50,7 @@ export default function FremdwaehrungStammdaten() {
                 <div className="card-header"></div>
                 <div className="badge-group"></div>
                 <div className="card-body">
-                  {filteredKurs.map((kurs) => (
+                  {filteredKurs.filter(k => k.waehrungs_code === waehrung.waehrungs_code).map((kurs) => (
                     <div>
                       <p>{kurs.tageskurs_zu_eur}</p>
                       <button
