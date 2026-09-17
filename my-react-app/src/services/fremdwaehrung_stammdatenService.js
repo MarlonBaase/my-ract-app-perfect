@@ -61,7 +61,7 @@ export async function favouritesSetzen(waehrungs_code) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from("waehrung_favourites")
+    .from("waehrung_favorites")
     .insert({
       benutzer_id: user.id,
       waehrungs_code: waehrungs_code})
@@ -75,7 +75,7 @@ export async function ladeFavourites() {
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from("waehrung_favourites")
+    .from("waehrung_favorites")
     .select("waehrungs_code")
     .eq("benutzer_id", user.id)
     .order("erstellt_am", { ascending: false });
