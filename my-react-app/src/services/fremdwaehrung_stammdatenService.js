@@ -57,6 +57,20 @@ export function filterTageskurse(listeTageskurse = [], searchTerm = "") {
   });
 }
 
+export async function favouritesSetzen(waehrungs_code) {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from("waehrung_favourites")
+    .insert({
+      benutzer_id: user.id,
+      waehrungs_code: waehrungs_code})
+
+    if (handleApiError(error, "Favourites setzen")) return [];
+    return data || [];
+  
+}
+
 export async function ladeFavourites() {
   const { data: { user } } = await supabase.auth.getUser();
 
