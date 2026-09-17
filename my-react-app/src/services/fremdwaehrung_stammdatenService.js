@@ -56,3 +56,24 @@ export function filterTageskurse(listeTageskurse = [], searchTerm = "") {
     return tageskurs.includes(search);
   });
 }
+
+export async function ladeFavourites() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from("waehrung_favourites")
+    .select("waehrungs_code")
+    .eq("benutzer_id", user.id)
+    .order("erstellt_am", { ascending: false });
+
+  if (handleApiError(error, "Favourites laden")) return [];
+  return data || [];
+}
+
+export function filterFavourites(listeFavourites = []) {
+  return listeFavourites.filter((item) => {
+    const favourites = String(item.waehrungs_code || "").toLowerCase();
+
+    return favourites;
+  });
+}
