@@ -39,7 +39,7 @@ export default function FremdwaehrungStammdaten() {
   const filteredItems = filterWaehrungen(listeWaehrung, searchTerm);
   const filteredKurs = filterTageskurse(listeTageskurse, searchTerm);
   const filteredFavourites = filterFavourites(listeFavourites);
-  
+
 
   console.log(filteredItems)
 
@@ -68,22 +68,20 @@ export default function FremdwaehrungStammdaten() {
                           <p>{kurs.tageskurs_zu_eur}</p>
                         </div>
                       ))}
-                      {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
-                      <div className="card-actions">
-                        <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)}>
-                          ✏️ Details
-                        </button>
-                        <button onClick={() => setFavourites}>
-                          Favourit
-                        </button>
-                        {filteredFavourites
-                          .map((waehrungs_code, index) => (
-                            <div key={index}>
-                              <p>{waehrungs_code.waehrungs_code}</p>
-                            </div>
-                          ))}
-                      </div>
-                    
+                    {waehrung.name} ({waehrung.symbol}) - {waehrung.waehrungs_code}
+                    <div className="card-actions">
+                      <button onClick={() => navigate(`/assetklassen/lf/fremdwaehrung/fremdwaehrung_stammdaten/${waehrung.waehrungs_code}`)}>
+                        ✏️ Details
+                      </button>
+                      <button onClick={() => favouritesSetzen(waehrung.waehrungs_code)} title="Als Favoriten hinzufügen"> ⭐ </button>
+                      {filteredFavourites
+                        .map((waehrungs_code, index) => (
+                          <div key={index}>
+                            <p>{waehrungs_code.waehrungs_code}</p>
+                          </div>
+                        ))}
+                    </div>
+
                     {/*<div className="card-actions">
                   <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
                   <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
