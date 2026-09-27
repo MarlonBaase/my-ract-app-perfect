@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { SettingsContext } from '../SettingsContext';
 import {
     ladeGirokonto,
@@ -250,7 +250,7 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="card-actions">
-                                    <button onClick={() => navigate(`/assetklassen/lf/girokonto/GirokontoDetail/${e.iban}`)}>
+                                    <button onClick={() => navigate(`/assetklassen/lf/girokonto/girokonto_detail/${e.iban}`)}>
                                         ✏️ Details
                                     </button>
                                 </div>
@@ -525,6 +525,7 @@ export default function Girokonto() {
                     </div>
                 </div>
             )}
+            <Outlet />
         </div>
     );
 }
