@@ -11,3 +11,7 @@ export const GIROKONTO_LAYOUT_CONFIG = {
 export function getGirokontoLayoutTitle() {
   return GIROKONTO_LAYOUT_CONFIG.title;
 }
+
+import { supabase } from "../supabase";
+import { handleApiError } from "../utils/errorHandler";
+
