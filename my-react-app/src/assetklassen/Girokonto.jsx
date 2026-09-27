@@ -1,14 +1,14 @@
-import { Outlet } from 'react-router-dom';
-import { useEffect, useState, useContext } from "react";
-import { getGirokontoLayoutTitle } from '../services/girokontoService';
-import { ladeGirokonto,girokontoHinzufuegen } from '../services/girokonto_listeService';
+import { useEffect, useState } from "react";
+import { getGirokontoLayoutTitle } from "../services/girokontoService";
+import { ladeGirokonto, girokontoHinzufuegen } from "../services/girokonto_listeService";
+import GirokontoListe from "./Girokonto_Liste";
 
 export default function Girokonto() {
-
     const pageTitle = getGirokontoLayoutTitle();
     const [konten, setKonten] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Formular-States
     const [name, setName] = useState("");
     const [bank, setBank] = useState("");
     const [iban, setIban] = useState("");
@@ -23,14 +23,11 @@ export default function Girokonto() {
     const [waehrung, setWaehrung] = useState("EUR");
     const [eroeffnungsdatum, setEroeffnungsdatum] = useState("");
 
-    const [modalOffen, setModalOffen] = useState(false);
     const [modalOffenHinzu, setModalOffenHinzu] = useState(false);
     const [zuBearbeiten, setZuBearbeiten] = useState(null);
-
     const [transaktionsNotizen, setTransaktionsNotizen] = useState("");
     const [ist_referenzkonto, setIstReferenzkonto] = useState(false);
     const [errors, setErrors] = useState({});
-
 
     const resetForm = () => {
         setName(""); setBank(""); setIban(""); setEinzahlung_bei_eroeffnung("");
@@ -38,7 +35,6 @@ export default function Girokonto() {
         setKontoinhaber(""); setIstAktiv(true); setHauptkonto(false); setAusgewaehltesElternkonto("");
         setDispoLimit(""); setBic(""); setZinssatz(""); setIstReferenzkonto(false); setErrors({});
     };
-
 
     const validateForm = () => {
         const newErrors = {};
@@ -65,47 +61,69 @@ export default function Girokonto() {
         if (success) {
             setModalOffenHinzu(false);
             resetForm();
-        }
-    }
-
-
-useEffect(() => {
-    const init = async () => {
-        try {
-            const [kontoData] = await Promise.all([
-                ladeGirokonto()
-            ]);
-            setKonten(kontoData);
-        } catch (err) {
-            console.error("Fehler in init:", err);
+            // Nach dem Speichern die Konten neu laden, damit die Liste erscheint
+            const updatedData = await ladeGirokonto();
+            setKonten(updatedData || []);
         }
     };
-    init();
-}, []);
 
+    useEffect(() => {
+        const init = async () => {
+            try {
+                const kontoData = await ladeGirokonto();
+                setKonten(kontoData || []);
+            } catch (err) {
+                console.error("Fehler beim Laden der Girokonten:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        init();
+    }, []);
 
-if (loading) return <p>Lade Konten...</p>;
+    if (loading) return <p>Lade Konten...</p>;
 
-if (konten.length === 0) {
     return (
-        <div className="empty-state-container" style={{ opacity: 0.5, textAlign: "center", padding: "50px" }}>
-            <h2>Kein Girokonto vorhanden</h2>
-            <p>Du hast noch kein Girokonto angelegt. Lege jetzt dein erstes Konto an, um zu starten.</p>
-            <button className="btn-primary" onClick={() => {
-                resetForm();
-                setZuBearbeiten(null);
-                setModalOffenHinzu(true);
-            }}>
-                ➕ Girokonto hinzufügen
-            </button>
+        <div className="girokonto-page">
+            <h2>{pageTitle}</h2>
 
-            {/* MODAL: Hinzufügen / Bearbeiten */}
-            {(modalOffenHinzu || modalOffen) && (
+            {/* ENTWEDER: Keine Konten -> Ausgegrauter Bereich mit Button in der Mitte */}
+            {konten.length === 0 ? (
+                <div className="empty-state-container" style={{ 
+                    opacity: 0.4, 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    height: "60vh",
+                    textAlign: "center" 
+                }}>
+                    <h3>Kein Girokonto vorhanden</h3>
+                    <p>Lege dein erstes Konto an, um die Übersicht zu aktivieren.</p>
+                    <button className="btn-primary" style={{ opacity: 1, marginTop: "20px" }} onClick={() => {
+                        resetForm();
+                        setZuBearbeiten(null);
+                        setModalOffenHinzu(true);
+                    }}>
+                        ➕ Girokonto hinzufügen
+                    </button>
+                </div>
+            ) : (
+                /* ODER: Konten vorhanden -> Zeige den Inhalt deiner girokonto_liste Datei */
+                <GirokontoListe konten={konten} onAddClick={() => {
+                    resetForm();
+                    setZuBearbeiten(null);
+                    setModalOffenHinzu(true);
+                }} />
+            )}
+
+            {/* MODAL zum Hinzufügen (immer erreichbar) */}
+            {modalOffenHinzu && (
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
                             <h3>{zuBearbeiten ? "Girokonto bearbeiten" : "Neues Girokonto hinzufügen"}</h3>
-                            <button className="close-btn" onClick={() => { setErrors({}); setModalOffenHinzu(false); setModalOffen(false); }}>✕</button>
+                            <button className="close-btn" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>✕</button>
                         </div>
                         <div className="modal-body">
                             <div className="form-grid">
@@ -173,85 +191,10 @@ if (konten.length === 0) {
                                     />
                                     {errors.eroeffnungsdatum && <span className="error-text">{errors.eroeffnungsdatum}</span>}
                                 </div>
-
-                                <div className="form-group">
-                                    <label>Kontoinhaber</label>
-                                    <input
-                                        value={kontoinhaber}
-                                        onChange={(e) => setKontoinhaber(e.target.value)}
-                                        placeholder="Max Mustermann"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>BIC</label>
-                                    <input
-                                        value={bic}
-                                        onChange={(e) => setBic(e.target.value)}
-                                        placeholder="BIC Code"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Dispo-Limit</label>
-                                    <input
-                                        type="number"
-                                        value={dispo_limit}
-                                        onChange={(e) => setDispoLimit(e.target.value)}
-                                        placeholder="0.00"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Zinssatz (%)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={zinssatz}
-                                        onChange={(e) => setZinssatz(e.target.value)}
-                                        placeholder="0.00"
-                                    />
-                                </div>
-
-                                <div className="form-group col-span-2">
-                                    <label>Notizen</label>
-                                    <input
-                                        value={transaktionsNotizen}
-                                        onChange={(e) => setTransaktionsNotizen(e.target.value)}
-                                        placeholder="Optionale Notizen..."
-                                    />
-                                </div>
-
-                                <div className="form-group checkbox-group col-span-2">
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={hauptkonto}
-                                            onChange={(e) => setHauptkonto(e.target.checked)}
-                                        />
-                                        Hauptkonto
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={ist_referenzkonto}
-                                            onChange={(e) => setIstReferenzkonto(e.target.checked)}
-                                        />
-                                        Referenzkonto
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={ist_aktiv}
-                                            onChange={(e) => setIstAktiv(e.target.checked)}
-                                        />
-                                        Konto ist aktiv
-                                    </label>
-                                </div>
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => { setErrors({}); setModalOffenHinzu(false); setModalOffen(false); }}>Abbrechen</button>
+                            <button className="btn-secondary" onClick={() => { setErrors({}); setModalOffenHinzu(false); }}>Abbrechen</button>
                             <button className="btn-primary" onClick={handleGirokontoSpeichern}>Speichern</button>
                         </div>
                     </div>
@@ -260,14 +203,3 @@ if (konten.length === 0) {
         </div>
     );
 }
-
-return (
-    <div>
-        <h2>{pageTitle}</h2>
-
-        <Outlet />
-    </div>
-
-);
-}
-
