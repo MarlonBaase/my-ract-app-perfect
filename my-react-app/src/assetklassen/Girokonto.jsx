@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from '../fremd_navbar';
 import { getGirokontoLayoutTitle } from '../services/girokontoService';
 
 export default function Girokonto() {
@@ -7,7 +6,6 @@ export default function Girokonto() {
 
   return (
     <div>
-      <Navbar />
       <h2>{pageTitle}</h2>
       <Outlet />
     </div>
