@@ -11,6 +11,7 @@ import Assetklassen from './Assetklassen'
 import Lf from './Lf'
 import Wd from './Wd'
 import Girokonto from './assetklassen/Girokonto'
+import GirokontoListe from './assetklassen/Girokonto_Liste'
 import GirokontoDetail from './assetklassen/GirokontoDetail';
 import Tagesgeld from './assetklassen/Tagesgeld'
 import Festgeld from './assetklassen/Festgeld'
@@ -75,6 +76,7 @@ function App() {
             <Route path="/assetklassen" element={<Assetklassen darkMode={darkMode} />}>
               <Route path="lf" element={<Lf darkMode={darkMode} />}>
                 <Route path="girokonto" element={<Girokonto darkMode={darkMode} />}>
+                  <Route path="girokonto_liste" element={<GirokontoListe darkMode={darkMode}/> } />
                   <Route path="girokonto_detail/:iban" element={<GirokontoDetail darkMode={darkMode} />} />
                 </Route>                  
                 <Route path="tagesgeld" element={<Tagesgeld darkMode={darkMode} />} />
