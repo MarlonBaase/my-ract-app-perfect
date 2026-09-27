@@ -250,9 +250,14 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="card-actions">
-                                    <button onClick={() => navigate(`/assetklassen/lf/girokonto/girokonto_detail/${e.iban}`)}>
-                                        ✏️ Details
-                                    </button>
+                                    {listeGirokonto
+                                        .map((konto) => (
+                                            <button onClick={() => navigate(`/assetklassen/lf/girokonto/girokonto_detail/${konto.iban}`)}>
+                                                ✏️ Details
+                                            </button>
+                                        ))
+                                    }
+
                                 </div>
                             </div>
                         );
