@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { SettingsContext } from '../SettingsContext';
 import {
     ladeGirokonto,
@@ -52,6 +53,7 @@ export default function Girokonto() {
     const [errors, setErrors] = useState({});
 
     const { ansicht } = useContext(SettingsContext);
+    const navigate = useNavigate();
 
     const refreshGirokonten = async () => {
         const data = await ladeGirokonto();
@@ -248,9 +250,9 @@ export default function Girokonto() {
                                 </div>
 
                                 <div className="card-actions">
-                                    <button onClick={() => bearbeitenOeffnen(e)} title="Bearbeiten">✏️</button>
-                                    <button onClick={() => handleDelete(e.asset?.asset_id)} title="Löschen">🗑️</button>
-                                    <button onClick={() => transaktionenOeffnen(e.asset?.asset_id)} title="Transaktionen">💰</button>
+                                    <button onClick={() => navigate(`/assetklassen/lf/girokonto/GirokontoDetail/${e.iban}`)}>
+                                        ✏️ Details
+                                    </button>
                                 </div>
                             </div>
                         );

@@ -71,6 +71,18 @@ export async function favouritesSetzen(waehrungs_code) {
   
 }
 
+export async function favouritesloeschen() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from("waehrung_favorites")
+    .delete('*')
+
+    if (handleApiError(error, "Favourites setzen")) return [];
+    return data || [];
+  
+}
+
 export async function ladeFavourites() {
   const { data: { user } } = await supabase.auth.getUser();
 

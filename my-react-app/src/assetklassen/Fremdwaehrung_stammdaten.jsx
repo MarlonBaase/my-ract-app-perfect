@@ -9,7 +9,6 @@ export default function FremdwaehrungStammdaten() {
   const [listeFavourites, setListeFavourites] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [favourites, setFavourites] = useState("");
 
   const { ansicht } = useContext(SettingsContext);
   const navigate = useNavigate();
@@ -74,12 +73,14 @@ export default function FremdwaehrungStammdaten() {
                         ✏️ Details
                       </button>
                       <button onClick={() => favouritesSetzen(waehrung.waehrungs_code)} title="Als Favoriten hinzufügen"> ⭐ </button>
-                      {filteredFavourites
+                      
+                      
+                      {/* {filteredFavourites
                         .map((waehrungs_code, index) => (
                           <div key={index}>
                             <p>{waehrungs_code.waehrungs_code}</p>
                           </div>
-                        ))}
+                        ))} */}
                     </div>
 
                     {/*<div className="card-actions">

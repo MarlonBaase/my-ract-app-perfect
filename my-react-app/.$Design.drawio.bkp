@@ -1,0 +1,64 @@
+<mxfile host="Electron">
+  <diagram name="Seite-1" id="T-UpMQd7hwp8zmvvHVhu">
+    <mxGraphModel dx="1334" dy="2183" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Dashboard" vertex="1">
+          <mxGeometry height="40" width="120" x="300" y="-60" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="- monatlichens Passives Einkommen&lt;br&gt;- Portfolio Rendite&lt;br&gt;- Gesamtvermögen&lt;br&gt;- Diversifikationsgrad&lt;br&gt;- Verhältnis der einzelnen Assetklassen zum Gesamtportfolio" vertex="1">
+          <mxGeometry height="80" width="330" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="- durch Klicken auf die Transaktion wird ein Modal mit den Transaktionsdetails angezeigt&lt;div&gt;- durch Klicken auf eine Assetklasse kommt man auf das Assetklassendashboard&lt;/div&gt;&lt;div&gt;- durch klicken auf ein Produkt kommt man auf die Deatilseite des Produktes&lt;/div&gt;&lt;div&gt;- schnell Erfassung eines neuen Produktes&lt;br&gt;- schnell Erfassung einer Transaktion&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="480" x="370" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-9" edge="1" parent="1" source="tyRfsDX90LRLqWAuHYDe-1" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tyRfsDX90LRLqWAuHYDe-7" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="270" y="210" as="sourcePoint" />
+            <mxPoint x="320" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-10" edge="1" parent="1" source="tyRfsDX90LRLqWAuHYDe-1" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tyRfsDX90LRLqWAuHYDe-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="410" y="30" as="sourcePoint" />
+            <mxPoint x="340" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Was soll abgebildet werden&amp;nbsp;" vertex="1">
+          <mxGeometry height="30" width="170" x="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-12" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Was kann der User machen" vertex="1">
+          <mxGeometry height="30" width="170" x="500" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Haushaltsbuch" vertex="1">
+          <mxGeometry height="40" width="120" x="1190" y="-60" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="" vertex="1">
+          <mxGeometry height="80" width="330" x="890" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="" vertex="1">
+          <mxGeometry height="80" width="480" x="1260" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-17" edge="1" parent="1" source="tyRfsDX90LRLqWAuHYDe-14" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tyRfsDX90LRLqWAuHYDe-15" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1160" y="210" as="sourcePoint" />
+            <mxPoint x="1210" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-18" edge="1" parent="1" source="tyRfsDX90LRLqWAuHYDe-14" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="tyRfsDX90LRLqWAuHYDe-16" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1300" y="30" as="sourcePoint" />
+            <mxPoint x="1230" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Was soll abgebildet werden&amp;nbsp;" vertex="1">
+          <mxGeometry height="30" width="170" x="950" as="geometry" />
+        </mxCell>
+        <mxCell id="tyRfsDX90LRLqWAuHYDe-20" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Was kann der User machen" vertex="1">
+          <mxGeometry height="30" width="170" x="1390" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
