@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../fremd_navbar';
-import { getFremdwaehrungLayoutTitle } from '../services/girokontoService';
+import { getGirokontoLayoutTitle } from '../services/girokontoService';
 
 export default function Girokonto() {
-  const pageTitle = getFremdwaehrungLayoutTitle();
+  const pageTitle = getGirokontoLayoutTitle();
 
   return (
     <div>
